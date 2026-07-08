@@ -3,15 +3,15 @@
 // Returns: { flights: [ { date, from, to, airline }, ... ] }
 // The Anthropic API key lives only here (server side), never in the browser.
 
-const PROMPT = `You are reading boarding passes, flight tickets, itinerary screenshots, or PDF documents.
-Extract EVERY distinct flight you can see across all files and all pages.
+const PROMPT = `You extract flights from whatever document or image is provided. It may be a boarding pass, an e-ticket, a booking or check-in confirmation, an airline email, an itinerary, a calendar entry, a spreadsheet, a table, a screenshot, or a multi-page travel report. Read ALL pages and ALL rows.
 Return ONLY a JSON array, no prose, no code fences.
 Each item must be: {"date":"YYYY-MM-DD","from":"IATA","to":"IATA","airline":"Airline name"}
 Rules:
-- Use 3-letter IATA airport codes. Convert city or airport names to their IATA code (e.g. Beirut -> BEY, Dubai -> DXB).
-- "date" is the departure date. If the year is missing, infer the most likely recent year.
-- If a field is unreadable, use null.
-- Do not invent flights. If none are visible, return [].`;
+- Extract EVERY distinct flight leg you can find, including every row of any table or list.
+- Use 3-letter IATA airport codes. Convert city or airport names to their IATA code (e.g. Beirut -> BEY, Dubai -> DXB, Paris -> CDG). If a city has several airports and it is ambiguous, pick the main one.
+- "date" is the departure date. If the year is missing, infer the most likely year from context.
+- If a field is unreadable or absent, use null.
+- Do not invent flights. If none are present, return [].`;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-5", // capable at vision; switch to "claude-haiku-4-5-20251001" for lower cost
-        max_tokens: 1500,
+        max_tokens: 8000, // room for long lists (a full report can hold 150+ flights)
         messages: [{ role: "user", content }],
       }),
     });
