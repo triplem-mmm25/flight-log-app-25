@@ -305,13 +305,19 @@ async function handlePhotos(files){
     }
   }
   if(!parts.length){status("Nothing readable to send.");return;}
-  try{
-    const r=await fetch("/api/parse-photo",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({files:parts})});
-    const d=await r.json();
-    if(!r.ok){status("Read failed: "+(d.error||r.status));return;}
-    if(!d.flights||!d.flights.length){status("No flights found in the file(s).");return;}
-    status("");showConfirm(d.flights);
-  }catch(err){status("Reading needs the deployed /api (not available in local preview).");}
+  status("Reading... a long document can take up to a minute.");
+  let r;
+  try{ r=await fetch("/api/parse-photo",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({files:parts})}); }
+  catch(e){ status("Could not reach the server. Check your connection and that you are on the deployed site."); return; }
+  const txt=await r.text(); let d={}; try{ d=JSON.parse(txt); }catch(_){}
+  if(!r.ok){
+    const hint = r.status===413 ? "the file is too large for one request, try fewer pages"
+      : (r.status===504||r.status===502) ? "it took too long, try one ticket or a few pages at a time"
+      : (d.error || txt.slice(0,140));
+    status("Read failed ("+r.status+"): "+hint); return;
+  }
+  if(!d.flights||!d.flights.length){ status("No flights found"+(d.sample?" (the model replied but I could not parse it)":"")+"."); return; }
+  status(""); showConfirm(d.flights);
 }
 function showConfirm(rows){
   const box=$("confList");box.innerHTML="";
