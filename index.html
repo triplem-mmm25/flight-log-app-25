@@ -134,7 +134,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
     <div class="toolbar">
       <button class="tool primary" id="addBtn">+ Add flight</button>
       <button class="tool" id="uploadBtn">Upload photo(s)</button>
-      <input id="fileInput" type="file" accept="image/*" multiple class="hidden"/>
+      <input id="fileInput" type="file" accept="image/*,application/pdf" multiple class="hidden"/>
       <span id="status"></span>
     </div>
     <div id="cfgwarn" class="cfg-warn hidden"></div>
@@ -290,18 +290,28 @@ $("a_save").onclick=async()=>{
 $("uploadBtn").onclick=()=>$("fileInput").click();
 $("fileInput").onchange=async e=>{const files=[...e.target.files];e.target.value="";if(!files.length)return;await handlePhotos(files);};
 function scale(file,max){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);
-  img.onload=()=>{let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);const u=c.toDataURL("image/jpeg",0.85);URL.revokeObjectURL(url);res({data:u.split(",")[1],mediaType:"image/jpeg"});};
+  img.onload=()=>{let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);const u=c.toDataURL("image/jpeg",0.85);URL.revokeObjectURL(url);res({kind:"image",data:u.split(",")[1],mediaType:"image/jpeg"});};
   img.onerror=()=>res(null);img.src=url;});}
+function readB64(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=()=>res(null);r.readAsDataURL(file);});}
 async function handlePhotos(files){
-  status("Reading "+files.length+" image(s)...");
-  const images=[];for(const f of files){const im=await scale(f,1400);if(im)images.push(im);}
+  status("Reading "+files.length+" file(s)...");
+  const parts=[];
+  for(const f of files){
+    if(f.type==="application/pdf"){
+      if(f.size>4*1024*1024){status("Skipped a PDF over 4MB. Split or compress it first.");continue;}
+      const b=await readB64(f);if(b)parts.push({kind:"document",data:b,mediaType:"application/pdf"});
+    }else{
+      const im=await scale(f,1400);if(im)parts.push(im);
+    }
+  }
+  if(!parts.length){status("Nothing readable to send.");return;}
   try{
-    const r=await fetch("/api/parse-photo",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({images})});
+    const r=await fetch("/api/parse-photo",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({files:parts})});
     const d=await r.json();
-    if(!r.ok){status("Photo read failed: "+(d.error||r.status));return;}
-    if(!d.flights||!d.flights.length){status("No flights found in the image(s).");return;}
+    if(!r.ok){status("Read failed: "+(d.error||r.status));return;}
+    if(!d.flights||!d.flights.length){status("No flights found in the file(s).");return;}
     status("");showConfirm(d.flights);
-  }catch(err){status("Photo read needs the deployed /api (not available in local preview).");}
+  }catch(err){status("Reading needs the deployed /api (not available in local preview).");}
 }
 function showConfirm(rows){
   const box=$("confList");box.innerHTML="";
