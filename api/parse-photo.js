@@ -3,8 +3,8 @@
 // Returns: { flights: [ { date, from, to, airline }, ... ] }
 // The Anthropic API key lives only here (server side), never in the browser.
 
-const PROMPT = `You are reading boarding passes, flight tickets, or itinerary screenshots.
-Extract EVERY distinct flight you can see across all images.
+const PROMPT = `You are reading boarding passes, flight tickets, itinerary screenshots, or PDF documents.
+Extract EVERY distinct flight you can see across all files and all pages.
 Return ONLY a JSON array, no prose, no code fences.
 Each item must be: {"date":"YYYY-MM-DD","from":"IATA","to":"IATA","airline":"Airline name"}
 Rules:
@@ -19,14 +19,15 @@ export default async function handler(req, res) {
   if (!key) return res.status(500).json({ error: "ANTHROPIC_API_KEY is not set in Vercel env vars" });
 
   try {
-    const { images } = req.body || {};
-    if (!Array.isArray(images) || images.length === 0)
-      return res.status(400).json({ error: "no images provided" });
+    const { files, images } = req.body || {};
+    const parts = Array.isArray(files) ? files : Array.isArray(images) ? images.map((i) => ({ kind: "image", ...i })) : [];
+    if (parts.length === 0) return res.status(400).json({ error: "no files provided" });
 
-    const content = images.map((im) => ({
-      type: "image",
-      source: { type: "base64", media_type: im.mediaType || "image/jpeg", data: im.data },
-    }));
+    const content = parts.map((p) =>
+      p.kind === "document"
+        ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: p.data } }
+        : { type: "image", source: { type: "base64", media_type: p.mediaType || "image/jpeg", data: p.data } }
+    );
     content.push({ type: "text", text: PROMPT });
 
     const r = await fetch("https://api.anthropic.com/v1/messages", {
