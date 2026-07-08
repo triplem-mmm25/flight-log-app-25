@@ -13,6 +13,8 @@ Rules:
 - If a field is unreadable or absent, use null.
 - Do not invent flights. If none are present, return [].`;
 
+export const maxDuration = 60; // allow up to 60s; long reports take a while
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
   const key = process.env.ANTHROPIC_API_KEY;
