@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-5", // capable at vision; switch to "claude-haiku-4-5-20251001" for lower cost
-        max_tokens: 8000, // room for long lists (a full report can hold 150+ flights)
+        max_tokens: 16000, // plenty of room even for a full multi-page report
         messages: [{ role: "user", content }],
       }),
     });
@@ -48,13 +48,30 @@ export default async function handler(req, res) {
     if (!r.ok) return res.status(502).json({ error: "anthropic error", detail: d });
 
     const text = (d.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
-    const s = text.indexOf("["), e = text.lastIndexOf("]");
-    let flights = [];
-    if (s !== -1 && e !== -1) {
-      try { flights = JSON.parse(text.slice(s, e + 1)); } catch (_) {}
-    }
-    return res.status(200).json({ flights });
+    const flights = parseFlights(text);
+    const out = { flights };
+    if (!flights.length) out.sample = text.slice(0, 400); // helps debugging when nothing parses
+    return res.status(200).json(out);
   } catch (e) {
     return res.status(500).json({ error: String(e) });
   }
+}
+
+// Resilient: try to parse the whole array; if it is truncated or messy,
+// salvage every complete {..} object so we never throw away good rows.
+function parseFlights(text) {
+  const s = text.indexOf("[");
+  if (s === -1) return [];
+  const chunk = text.slice(s);
+  const end = chunk.lastIndexOf("]");
+  if (end !== -1) {
+    try { const a = JSON.parse(chunk.slice(0, end + 1)); if (Array.isArray(a)) return a; } catch (_) {}
+  }
+  const objs = [];
+  const re = /\{[^{}]*\}/g;
+  let m;
+  while ((m = re.exec(chunk))) {
+    try { objs.push(JSON.parse(m[0])); } catch (_) {}
+  }
+  return objs;
 }
