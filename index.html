@@ -142,8 +142,106 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .trip .tl{font-weight:500;font-size:14px}
 .trip .td{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
 .trip .tr{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:right;white-space:nowrap}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.badge{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--ink3);opacity:.45}
+.badge.got{opacity:1;border-color:var(--amber-d)}
+.badge .bn{font-family:var(--disp);font-size:15px;font-weight:600}
+.badge.got .bn{color:var(--amber)}
+.badge .bd{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:3px}
+.otd{padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.otd:last-child{border-bottom:none}
+.otd .oy{font-family:var(--mono);font-size:12px;color:var(--amber);margin-right:8px}
+#mapPlay{position:absolute;top:10px;left:10px;background:var(--ink2);border:1px solid var(--line2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;z-index:6}
+#mapPlay:hover{color:var(--paper);border-color:var(--amber)}
+#mapSpin{position:absolute;bottom:10px;right:10px;background:var(--ink2);border:1px solid var(--line2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;z-index:6}
+#mapSpin:hover{color:var(--paper);border-color:var(--amber)}
+.revcard{background:var(--ink3);border:1px solid var(--line2);border-radius:14px;padding:22px}
+.revhead{font-family:var(--disp);font-weight:600;font-size:26px;margin-bottom:14px;color:var(--amber)}
+.revstat{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+.revstat:last-child{border-bottom:none}
+.revstat .rk{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.revstat .rv{font-family:var(--disp);font-size:18px;text-align:right}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 0 24px}
+.tab{background:none;border:none;color:var(--muted);font-family:var(--disp);font-size:16px;padding:10px 18px;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.tab .ti{font-size:14px;opacity:.85}
+.tab:hover{color:var(--paper)}
+.tab.on{color:var(--amber);border-bottom-color:var(--amber)}
+@media(max-width:560px){.tab{font-size:14px;padding:9px 12px}}
+.growthsvg{width:100%;height:auto;display:block}
+.growthsvg .ga{fill:var(--amber);opacity:.13}
+.growthsvg .gl{fill:none;stroke:var(--amber);stroke-width:2}
+.growthsvg circle{fill:var(--amber)}
+.growthsvg .axl{fill:var(--dim);font-family:var(--mono);font-size:9px}
+.growthsvg .gval{fill:var(--amber);font-family:var(--mono);font-size:12px;font-weight:600}
+.avatarchip{display:inline-flex;align-items:center;gap:8px;background:var(--ink2);border:1px solid var(--line2);border-radius:20px;padding:4px 13px 4px 4px;cursor:pointer;color:var(--paper);font-family:var(--body);font-size:13px}
+.avatarchip:hover{border-color:var(--amber)}
+.avatarSm{width:26px;height:26px;border-radius:50%;background:var(--amber-d);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto}
+.profhead{display:flex;gap:16px;align-items:flex-start}
+.avatarBig{width:64px;height:64px;border-radius:50%;background:var(--amber-d);display:flex;align-items:center;justify-content:center;font-size:34px;flex:0 0 auto}
+.pickrow{display:flex;flex-wrap:wrap;gap:8px}
+.pickchip{width:42px;height:42px;border-radius:10px;border:1px solid var(--line2);background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:21px;cursor:pointer;padding:0}
+.pickchip.sel{border-color:var(--amber);box-shadow:0 0 0 2px var(--amber-d)}
+.swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;border:2px solid transparent;padding:0}
+.swatch.sel{border-color:var(--paper)}
+.passport{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.passport .pp{background:var(--ink);padding:12px 14px}
+.passport .pp .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.passport .pp .v{font-family:var(--mono);font-size:15px;color:var(--amber);margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.passport .pp.wide{grid-column:1/3}
+.passport .pp .v.arch{color:var(--cyan);font-family:var(--disp);font-size:18px}
+#tripBanner{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--ink3);border:1px solid var(--amber-d);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:13px;color:var(--paper)}
+#tripBanner .fl{vertical-align:-2px}
+#tripBanner button{background:var(--amber);border:none;color:#04231f;font-family:var(--mono);font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.tripmap{background:var(--ink2);border:1px solid var(--line2);color:var(--cyan);font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:7px;cursor:pointer;margin-right:4px}
+.tripmap:hover{border-color:var(--amber);color:var(--amber)}
+.minibars{display:flex;align-items:flex-end;gap:6px;height:150px}
+.mb{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;gap:5px}
+.mbwrap{width:100%;flex:1;display:flex;align-items:flex-end}
+.mbbar{width:100%;background:var(--amber);border-radius:4px 4px 0 0;min-height:2px}
+.mbv{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mbl{font-family:var(--mono);font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.fld2{background:var(--ink);border:1px solid var(--line2);color:var(--paper);font-family:var(--mono);font-size:14px;padding:8px 12px;border-radius:8px;outline:none}
+.cmppick{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.cmpvs{font-family:var(--mono);font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.15em}
+.cmpgrid{display:flex;flex-direction:column}
+.cmprow{display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:center;padding:11px 6px;border-top:1px solid var(--line)}
+.cmprow.head{border-top:none;font-family:var(--disp);font-size:20px;color:var(--amber);text-align:center}
+.cmpv{font-family:var(--mono);font-size:18px;text-align:center;color:var(--paper);font-variant-numeric:tabular-nums}
+.cmpm{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);line-height:1.6}
+.dl{font-size:11px}.dl.up{color:var(--amber)}.dl.dn{color:var(--red)}.dl.z{color:var(--dim)}
+.toppair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.toph{font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--muted);margin-bottom:14px}
+.toplist{display:flex;flex-direction:column;gap:11px}
+.tlrow{display:flex;align-items:center;gap:10px;font-size:13px}
+.tlrow .lg{height:18px;width:18px;object-fit:contain;border-radius:3px;background:#fff}
+.tlname{flex:0 0 42%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--paper)}
+.tlbar{flex:1;height:6px;background:var(--ink);border-radius:4px;overflow:hidden}
+.tlbar i{display:block;height:100%;background:var(--amber)}
+.tlnum{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:22px;text-align:right}
+.timeline{display:flex;flex-direction:column}
+.tl{display:grid;grid-template-columns:14px 90px 1fr;gap:12px;align-items:start;padding:0 0 18px;position:relative}
+.tl:not(:last-child)::before{content:"";position:absolute;left:6px;top:13px;bottom:-1px;width:1px;background:var(--line2)}
+.tldot{width:11px;height:11px;border-radius:50%;background:var(--amber);margin-top:3px;z-index:1}
+.tldate{font-family:var(--mono);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.tltext{font-size:14px;color:var(--paper)}
+.tlsub{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+@media(max-width:640px){.toppair{grid-template-columns:1fr}.tl{grid-template-columns:14px 74px 1fr;gap:9px}}
+.wishwrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.wishchip{display:inline-flex;align-items:center;gap:6px;background:var(--ink2);border:1px solid var(--line2);border-radius:20px;padding:5px 12px;font-size:13px}
+.wishchip .wx{background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;line-height:1;padding:0}
+.wishchip .wx:hover{color:var(--red)}
 footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font-family:var(--mono);font-size:12px;color:var(--dim)}
 @media(max-width:820px){.board{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.recs{grid-template-columns:1fr}.countries{grid-template-columns:1fr 1fr}.bar{grid-template-columns:110px 1fr auto}.frow{grid-template-columns:1fr}.cfields{grid-template-columns:1fr 1fr}}
+@media print{
+  :root{--ink:#ffffff;--ink2:#ffffff;--ink3:#f7f9fc;--line:#dfe3ea;--line2:#cfd6e0;--muted:#2b2b2b;--dim:#5a6b7b;--paper:#111820;--amber:#0d8a7c;--amber-d:#0d8a7c;--cyan:#b06a00;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff;color:#111820}
+  .topbar .brand{color:#111820}
+  .toolbar,#status,.topbar .who,.tabs,.toggle,.chips,#tripBanner,#mapReset,#mapPlay,#mapSpin,#askSection,#mapSection,.controls,button,input,select{display:none!important}
+  .sec-head p{display:none}
+  section,.card,.recs,.badges,.countries,.board,.toppair,.yeargroup,.trip,.rec,.badge,.panel{break-inside:avoid;page-break-inside:avoid}
+  @page{margin:14mm}
+}
 </style>
 </head>
 <body>
@@ -167,7 +265,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="wrap">
     <div class="topbar">
       <div class="brand">Travelers <b>Log</b></div>
-      <div class="who"><span id="useremail"></span><button id="signout" class="linkbtn">Sign out</button></div>
+      <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail"></span><button id="signout" class="linkbtn">Sign out</button></div>
     </div>
     <div class="toolbar">
       <button class="tool primary" id="addBtn">+ Add flight</button>
@@ -175,15 +273,25 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       <input id="fileInput" type="file" accept="image/*,application/pdf" multiple class="hidden"/>
       <button class="tool" id="exportCsv">Export CSV</button>
       <button class="tool" id="exportJson">Export JSON</button>
+      <button class="tool" id="csvBtn">Import CSV</button>
+      <input id="csvInput" type="file" accept=".csv,text/csv" class="hidden"/>
+      <button class="tool" id="reviewBtn">Year in review</button>
+      <button class="tool" id="printBtn">Save PDF</button>
       <button class="tool" id="shareBtn">Share</button>
+      <div class="toggle" id="unitToggle"><button data-u="km" class="on">km</button><button data-u="mi">mi</button></div>
       <span id="status"></span>
     </div>
     <div id="cfgwarn" class="cfg-warn hidden"></div>
 
     <div id="dash">
-      <div class="board" id="board"></div>
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-tab="overview"><span class="ti">🗺️</span>Overview</button>
+        <button class="tab" data-tab="insights"><span class="ti">📊</span>Insights</button>
+        <button class="tab" data-tab="flights"><span class="ti">✈️</span>Flights</button>
+      </div>
+      <div class="board" id="board" data-t="overview"></div>
 
-      <section><div class="sec-head"><h2>This year &amp; goals</h2></div>
+      <section data-t="overview"><div class="sec-head"><h2>This year &amp; goals</h2></div>
         <div class="grid2">
           <div class="panel"><h3>This year</h3><div class="cap">Your <span id="tyYear"></span> so far</div><div id="tyStats" class="tystats"></div></div>
           <div class="panel"><h3>Country goal <button id="goalEdit" class="linkbtn" style="font-size:12px;margin-left:6px">edit</button></h3><div class="cap" id="goalCap"></div>
@@ -194,22 +302,37 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
         </div>
       </section>
 
-      <section><div class="sec-head"><h2>Where I've been</h2></div>
+      <section id="otdSection" class="hidden" data-t="overview"><div class="sec-head"><h2>On this day</h2></div><div class="card" id="onthisday"></div></section>
+
+       <section id="mapSection" data-t="overview"><div class="sec-head"><h2>Where I've been</h2></div>
         <div class="card">
           <div class="toggle" id="mapmode"><button data-m="routes" class="on">Routes</button><button data-m="countries">Countries</button></div>
+          <div class="toggle" id="viewmode"><button data-v="flat" class="on">Flat</button><button data-v="globe">Globe</button></div>
           <div class="chips" id="chips"></div>
-          <div id="mapwrap"><div id="map"></div><div id="tip"></div><button id="mapReset">Reset view</button></div>
+          <div id="tripBanner" class="hidden"></div>
+          <div id="mapwrap"><div id="map"></div><div id="tip"></div><button id="mapReset">Reset view</button><button id="mapPlay">Play routes</button><button id="mapSpin">Spin</button></div>
           <div class="legend" id="legend"></div>
         </div>
       </section>
 
-      <section><div class="sec-head"><h2>Ask the log</h2><p>Plain-English questions answered from your flights.</p></div>
+      <section id="askSection" data-t="flights"><div class="sec-head"><h2>Ask the log</h2><p>Plain-English questions answered from your flights.</p></div>
         <div class="ask-shell"><div class="ask-row"><input id="q" placeholder="e.g. How many days did I spend in the UAE last year?"/><button id="askbtn">Ask</button></div><div id="answer"></div></div>
       </section>
 
-      <section><div class="sec-head"><h2>Travel rhythm</h2></div><div class="card"><div class="heat" id="heat"></div></div></section>
+      <section data-t="insights"><div class="sec-head"><h2>Travel rhythm</h2></div><div class="card"><div class="heat" id="heat"></div></div></section>
 
-      <section><div class="sec-head"><h2>By the numbers</h2></div>
+      <section data-t="insights"><div class="sec-head"><h2>When you fly</h2></div>
+        <div class="toppair">
+          <div class="card"><h3 class="toph">By day of week</h3><div id="dowChart" class="minibars"></div></div>
+          <div class="card"><h3 class="toph">By month</h3><div id="monChart" class="minibars"></div></div>
+        </div>
+      </section>
+
+      <section data-t="insights"><div class="sec-head"><h2>Connections</h2><p>Same-airport transfers within a day, read from your flight order.</p></div>
+        <div class="board" id="connBoard"></div>
+      </section>
+
+      <section data-t="insights"><div class="sec-head"><h2>By the numbers</h2></div>
         <div class="grid2">
           <div class="panel"><h3>Flights per year</h3><div class="cap">Legs flown</div><div class="cols" id="yearcols"></div></div>
           <div class="panel"><h3>Most frequent routes</h3><div class="cap">Top 6</div><div class="bars" id="routebars"></div></div>
@@ -218,15 +341,48 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
         </div>
       </section>
 
-      <section><div class="sec-head"><h2>Records</h2></div><div class="recs" id="records"></div></section>
+      <section data-t="insights"><div class="sec-head"><h2>Your world over time</h2></div>
+        <div class="toppair">
+          <div class="card"><h3 class="toph">Countries reached</h3><div id="growthCountries"></div></div>
+          <div class="card"><h3 class="toph">Cumulative distance</h3><div id="growthDist"></div></div>
+        </div>
+      </section>
 
-      <section><div class="sec-head"><h2 id="ctitle">Countries visited</h2></div><div class="countries" id="countries"></div></section>
+      <section data-t="insights"><div class="sec-head"><h2>Compare years</h2></div>
+        <div class="card">
+          <div class="cmppick"><select id="cmpA" class="fld2"></select><span class="cmpvs">vs</span><select id="cmpB" class="fld2"></select></div>
+          <div class="cmpgrid" id="cmpGrid"></div>
+        </div>
+      </section>
 
-      <section><div class="sec-head"><h2 id="tripsTitle" style="cursor:pointer">Trips <span id="tripsCount"></span> <span class="chev" id="tripsChev">+</span></h2><p>Journeys grouped from your home base. Tap the heading to show or hide.</p></div>
+      <section data-t="insights"><div class="sec-head"><h2>Top airlines &amp; routes</h2></div>
+        <div class="toppair">
+          <div class="card"><h3 class="toph">Airlines</h3><div id="topAir" class="toplist"></div></div>
+          <div class="card"><h3 class="toph">Routes</h3><div id="topRoute" class="toplist"></div></div>
+        </div>
+      </section>
+
+      <section data-t="insights"><div class="sec-head"><h2>Records</h2></div><div class="recs" id="records"></div></section>
+
+      <section data-t="insights"><div class="sec-head"><h2 id="badgeTitle">Achievements</h2></div><div class="badges" id="badges"></div></section>
+
+      <section data-t="insights"><div class="sec-head"><h2>Milestones</h2></div><div class="card"><div class="timeline" id="timeline"></div></div></section>
+
+      <section data-t="overview"><div class="sec-head"><h2 id="ctitle">Countries visited</h2></div><div class="countries" id="countries"></div></section>
+
+      <section data-t="overview"><div class="sec-head"><h2>Want to visit <span id="wishCount"></span></h2><p>Build a bucket list. These show in gold on the Countries map.</p></div>
+        <div class="card">
+          <div class="controls"><input id="wishInput" list="countryList" placeholder="Add a country..."/><button class="tool" id="wishAdd">Add</button></div>
+          <datalist id="countryList"></datalist>
+          <div id="wishList" class="wishwrap"></div>
+        </div>
+      </section>
+
+      <section data-t="flights"><div class="sec-head"><h2 id="tripsTitle" style="cursor:pointer">Trips <span id="tripsCount"></span> <span class="chev" id="tripsChev">+</span></h2><p>Grouped by year from your home base: <span id="homeLabel"></span> <button id="homeEdit" class="linkbtn">edit</button></p></div>
         <div id="trips" class="tripwrap hidden"></div>
       </section>
 
-      <section><div class="sec-head"><h2 id="fltitle">Your flights</h2></div>
+      <section data-t="flights"><div class="sec-head"><h2 id="fltitle">Your flights</h2></div>
         <div class="controls">
           <input id="fSearch" placeholder="Search city, code or airline..."/>
           <select id="fYear"><option value="">All years</option></select>
@@ -270,6 +426,28 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 </div></div>
 
 <!-- SHARE MODAL -->
+<div id="profileModal" class="modal hidden"><div class="modalbox">
+  <h3>Your profile</h3>
+  <div class="profhead">
+    <div id="avatarBig" class="avatarBig">🌍</div>
+    <div style="flex:1;min-width:0">
+      <input id="pf_name" class="fld" placeholder="Your name" style="margin-bottom:8px"/>
+      <input id="pf_tag" class="fld" placeholder="Tagline (e.g. Collecting boarding passes)"/>
+    </div>
+  </div>
+  <div class="cap" style="margin:16px 0 6px">Avatar</div>
+  <div id="pf_emojis" class="pickrow"></div>
+  <div class="cap" style="margin:16px 0 6px">Accent</div>
+  <div id="pf_colors" class="pickrow"></div>
+  <div class="cap" style="margin:20px 0 8px">Travel passport</div>
+  <div id="pf_passport" class="passport"></div>
+  <div id="pf_msg" class="msg" style="margin-top:12px"></div>
+  <div style="display:flex;gap:10px;margin-top:14px">
+    <button id="pf_save" class="btn" style="flex:1">Save</button>
+    <button id="pf_close" class="btn ghost" style="flex:1;margin-top:0">Close</button>
+  </div>
+</div></div>
+
 <div id="shareModal" class="modal hidden"><div class="modalbox">
   <h3>Share your map</h3>
   <p class="cap" style="margin-bottom:16px">Turn this on for a public, read-only link to your map and stats. It shows only what is on your dashboard, can never be edited by anyone, and you can turn it off anytime.</p>
@@ -281,6 +459,28 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   </div>
   <div id="share_msg" class="msg" style="margin-top:12px"></div>
   <button id="share_close" class="btn ghost" style="margin-top:16px">Close</button>
+</div></div>
+
+<!-- CSV IMPORT MODAL -->
+<div id="csvModal" class="modal hidden"><div class="modalbox">
+  <h3>Import from CSV</h3>
+  <p class="cap" style="margin-bottom:14px">Works with exports from most trackers (Flighty, MyFlightradar24, App in the Air). Columns for date, from, to and airline are matched automatically.</p>
+  <div id="csvSummary" class="cap"></div>
+  <div id="csvPreview" style="margin-top:10px;max-height:230px;overflow:auto"></div>
+  <div id="csv_msg" class="msg" style="margin-top:10px"></div>
+  <button id="csvImport" class="btn" style="margin-top:8px">Import</button>
+  <button id="csv_cancel" class="btn ghost">Cancel</button>
+</div></div>
+
+<!-- YEAR IN REVIEW MODAL -->
+<div id="reviewModal" class="modal hidden"><div class="modalbox">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px">
+    <h3 style="margin:0">Year in review</h3>
+    <select id="revYear" class="fld" style="width:auto;padding:6px 10px"></select>
+  </div>
+  <div id="revCard"></div>
+  <button id="revDownload" class="btn" style="margin-top:14px">Download image</button>
+  <button id="rev_close" class="btn ghost">Close</button>
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -304,10 +504,26 @@ if(configured){ sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_
 const $=id=>document.getElementById(id);
 const YCOL={2022:"#6EA8FE",2023:"#37D1BE",2024:"#F2B34A",2025:"#FF8FA3",2026:"#A98CFF"};
 function yColor(y){return YCOL[y]|| "#9AA7B2";}
-let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set(), USERID=null, PROFILE=null;
+let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set(), USERID=null, PROFILE=null, WISH=new Set(), UNIT="km";
 function goalKey(){return "flg_goal_"+(USERID||"anon");}
 function goalGet(){try{const v=parseInt(localStorage.getItem(goalKey()));return v>0?v:null;}catch(e){return null;}}
 function goalSet(v){try{localStorage.setItem(goalKey(),String(v));}catch(e){}}
+function homeKey(){return "flg_home_"+(USERID||"anon");}
+function homeGet(){try{return localStorage.getItem(homeKey())||null;}catch(e){return null;}}
+function homeSet(v){try{localStorage.setItem(homeKey(),v);}catch(e){}}
+function wishKey(){return "flg_wish_"+(USERID||"anon");}
+function wishGet(){try{return JSON.parse(localStorage.getItem(wishKey())||"[]");}catch(e){return [];}}
+function wishSet(a){try{localStorage.setItem(wishKey(),JSON.stringify(a));}catch(e){}}
+function unitKey(){return "flg_unit_"+(USERID||"anon");}
+function unitGet(){try{return localStorage.getItem(unitKey())||"km";}catch(e){return "km";}}
+function unitSet(u){try{localStorage.setItem(unitKey(),u);}catch(e){}}
+function dConv(km){return UNIT==="mi"?km*0.621371:km;}
+function dUnit(){return UNIT==="mi"?"mi":"km";}
+function dStr(km){return Math.round(dConv(km)).toLocaleString()+" "+dUnit();}
+function dStrK(km){const v=dConv(km);return (v>=1000?Math.round(v/1000)+"k":Math.round(v))+" "+dUnit();}
+let NAME2ID=null,ID2NAME=null,ID3TO2=null;
+function buildNameMaps(){NAME2ID={};ID2NAME={};WORLDF.forEach(f=>{if(f.properties&&f.properties.name){NAME2ID[f.properties.name.toLowerCase()]=f.id;ID2NAME[f.id]=f.properties.name;}});ID3TO2={};for(const k in AP){const a=AP[k];if(a[5]&&a[4])ID3TO2[a[5]]=a[4];}}
+function iso3to2(id){return ID3TO2?(ID3TO2[id]||""):"";}
 
 const CONTINENT2 = {"AW":"North America","AF":"Asia","AO":"Africa","AI":"North America","AX":"Europe","AL":"Europe","AD":"Europe","AE":"Asia","AR":"South America","AM":"Asia","AS":"Oceania","AG":"North America","AU":"Oceania","AT":"Europe","AZ":"Asia","BI":"Africa","BE":"Europe","BJ":"Africa","BQ":"North America","BF":"Africa","BD":"Asia","BG":"Europe","BH":"Asia","BS":"North America","BA":"Europe","BL":"North America","BY":"Europe","BZ":"North America","BM":"North America","BO":"South America","BR":"South America","BB":"North America","BN":"Asia","BT":"Asia","BV":"Antarctica","BW":"Africa","CF":"Africa","CA":"North America","CC":"Asia","CH":"Europe","CL":"South America","CN":"Asia","CI":"Africa","CM":"Africa","CD":"Africa","CG":"Africa","CK":"Oceania","CO":"South America","KM":"Africa","CV":"Africa","CR":"North America","CU":"North America","CW":"North America","CX":"Asia","KY":"North America","CY":"Asia","CZ":"Europe","DE":"Europe","DJ":"Africa","DM":"North America","DK":"Europe","DO":"North America","DZ":"Africa","EC":"South America","EG":"Africa","ER":"Africa","ES":"Europe","EE":"Europe","ET":"Africa","FI":"Europe","FJ":"Oceania","FK":"South America","FR":"Europe","FO":"Europe","FM":"Oceania","GA":"Africa","GB":"Europe","GE":"Asia","GG":"Europe","GH":"Africa","GI":"Europe","GN":"Africa","GP":"North America","GM":"Africa","GW":"Africa","GQ":"Africa","GR":"Europe","GD":"North America","GL":"North America","GT":"North America","GF":"South America","GU":"Oceania","GY":"South America","HK":"Asia","HM":"Antarctica","HN":"North America","HR":"Europe","HT":"North America","HU":"Europe","ID":"Asia","IM":"Europe","IN":"Asia","IO":"Asia","IE":"Europe","IR":"Asia","IQ":"Asia","IS":"Europe","IL":"Asia","IT":"Europe","JM":"North America","JE":"Europe","JO":"Asia","JP":"Asia","KZ":"Asia","KE":"Africa","KG":"Asia","KH":"Asia","KI":"Oceania","KN":"North America","KR":"Asia","KW":"Asia","LA":"Asia","LB":"Asia","LR":"Africa","LY":"Africa","LC":"North America","LI":"Europe","LK":"Asia","LS":"Africa","LT":"Europe","LU":"Europe","LV":"Europe","MO":"Asia","MF":"North America","MA":"Africa","MC":"Europe","MD":"Europe","MG":"Africa","MV":"Asia","MX":"North America","MH":"Oceania","MK":"Europe","ML":"Africa","MT":"Europe","MM":"Asia","ME":"Europe","MN":"Asia","MP":"Oceania","MZ":"Africa","MR":"Africa","MS":"North America","MQ":"North America","MU":"Africa","MW":"Africa","MY":"Asia","YT":"Africa","NA":"Africa","NC":"Oceania","NE":"Africa","NF":"Oceania","NG":"Africa","NI":"North America","NU":"Oceania","NL":"Europe","NO":"Europe","NP":"Asia","NR":"Oceania","NZ":"Oceania","OM":"Asia","PK":"Asia","PA":"North America","PE":"South America","PH":"Asia","PW":"Oceania","PG":"Oceania","PL":"Europe","PR":"North America","KP":"Asia","PT":"Europe","PY":"South America","PS":"Asia","PF":"Oceania","QA":"Asia","RE":"Africa","RO":"Europe","RU":"Europe","RW":"Africa","SA":"Asia","SD":"Africa","SN":"Africa","SG":"Asia","GS":"South America","SH":"Africa","SJ":"Europe","SB":"Oceania","SL":"Africa","SV":"North America","SM":"Europe","SO":"Africa","PM":"North America","RS":"Europe","SS":"Africa","ST":"Africa","SR":"South America","SK":"Europe","SI":"Europe","SE":"Europe","SZ":"Africa","SC":"Africa","SY":"Asia","TC":"North America","TD":"Africa","TG":"Africa","TH":"Asia","TJ":"Asia","TK":"Oceania","TM":"Asia","TO":"Oceania","TT":"North America","TN":"Africa","TR":"Asia","TV":"Oceania","TW":"Asia","TZ":"Africa","UG":"Africa","UA":"Europe","UY":"South America","US":"North America","UZ":"Asia","VC":"North America","VE":"South America","VG":"North America","VI":"North America","VN":"Asia","VU":"Oceania","WF":"Oceania","WS":"Oceania","YE":"Asia","ZA":"Africa","ZM":"Africa","ZW":"Africa","XK":"Europe"};
 function flag(iso2){return iso2?'<img class="fl" src="https://flagcdn.com/20x15/'+iso2.toLowerCase()+'.png" onerror="this.style.display=\'none\'">':'';}
@@ -355,6 +571,12 @@ async function saveProfile(isPublic,name){
   if(error){m.textContent="Could not save. Did you run schema-public.sql? ("+error.message+")";m.className="msg err";return;}
   PROFILE=row;m.textContent=isPublic?"Public. Copy your link below.":"Now private.";m.className="msg ok";updateShareUI();
 }
+$("printBtn").onclick=()=>{clearTripHighlight(false);const cur=currentTab;document.querySelectorAll("#dash > [data-t]").forEach(el=>{el.style.display="";});window.print();setTab(cur);};
+$("profileBtn").onclick=openProfile;
+$("pf_close").onclick=()=>$("profileModal").classList.add("hidden");
+$("pf_emojis").addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(!b)return;pfDraft.emoji=b.getAttribute("data-e");$("avatarBig").textContent=pfDraft.emoji;document.querySelectorAll("#pf_emojis .pickchip").forEach(x=>x.classList.toggle("sel",x===b));});
+$("pf_colors").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;pfDraft.color=b.getAttribute("data-c");$("avatarBig").style.background=pfDraft.color;document.querySelectorAll("#pf_colors .swatch").forEach(x=>x.classList.toggle("sel",x===b));});
+$("pf_save").onclick=()=>{profSet({name:$("pf_name").value.trim(),tagline:$("pf_tag").value.trim(),emoji:pfDraft.emoji,color:pfDraft.color});applyProfileChrome();$("pf_msg").textContent="Saved.";$("pf_msg").className="msg ok";};
 $("shareBtn").onclick=()=>{$("share_msg").textContent="";$("sharePublic").checked=!!(PROFILE&&PROFILE.is_public);$("shareName").value=(PROFILE&&PROFILE.display_name)||"";updateShareUI();$("shareModal").classList.remove("hidden");};
 $("share_close").onclick=()=>$("shareModal").classList.add("hidden");
 $("sharePublic").onchange=()=>saveProfile($("sharePublic").checked,$("shareName").value);
@@ -362,6 +584,11 @@ $("shareName").onchange=()=>{if(PROFILE)saveProfile($("sharePublic").checked,$("
 $("shareCopy").onclick=()=>{const i=$("shareLink");i.select();try{navigator.clipboard.writeText(i.value);}catch(e){}try{document.execCommand("copy");}catch(e){}$("share_msg").textContent="Link copied.";$("share_msg").className="msg ok";};
 $("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}render();}};
 $("tripsTitle").onclick=()=>{const t=$("trips"),c=$("tripsChev");t.classList.toggle("hidden");if(c)c.textContent=t.classList.contains("hidden")?"+":"\u2013";};
+$("homeEdit").onclick=()=>{const cur=homeGet()||"";const v=prompt("Home airport code (e.g. BEY):",cur);if(v===null)return;const c=v.trim().toUpperCase();if(!c){try{localStorage.removeItem(homeKey());}catch(e){}render();return;}if(!ap(c)){alert("Unknown airport code.");return;}homeSet(c);render();};
+function addWish(){const v=$("wishInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}const a=wishGet();if(!a.includes(id)){a.push(id);wishSet(a);}$("wishInput").value="";render();}
+$("wishAdd").onclick=addWish;
+$("wishInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addWish();}});
+$("wishList").addEventListener("click",e=>{const b=e.target.closest("[data-wid]");if(b){const id=b.getAttribute("data-wid");wishSet(wishGet().filter(x=>x!==id));render();}});
 $("signin").onclick=async()=>{
   if(!configured){authmsg("Not set up yet. See the README.","err");return;}
   const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});
@@ -420,6 +647,102 @@ async function updateFlight(id,row){
 function download(name,text,type){const b=new Blob([text],{type});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
 $("exportJson").onclick=()=>download("flights.json",JSON.stringify(FLIGHTS.map(f=>({date:f.date,from:f.from,to:f.to,airline:f.airline})),null,2),"application/json");
 $("exportCsv").onclick=()=>{const rows=[["date","from","to","airline"]].concat(FLIGHTS.map(f=>[f.date,f.from,f.to,'"'+(f.airline||"").replace(/"/g,'""')+'"']));download("flights.csv",rows.map(r=>r.join(",")).join("\n"),"text/csv");};
+
+/* ---------- CSV import ---------- */
+function parseCSV(text){
+  const rows=[];let i=0,field="",row=[],q=false;text=text.replace(/\r\n?/g,"\n");
+  while(i<text.length){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){field+='"';i++;}else q=false;}else field+=c;}
+    else{if(c==='"')q=true;else if(c===","){row.push(field);field="";}else if(c==="\n"){row.push(field);rows.push(row);row=[];field="";}else field+=c;}
+    i++;}
+  if(field.length||row.length){row.push(field);rows.push(row);}
+  return rows.filter(r=>r.some(x=>x.trim()!==""));
+}
+function resolveIata(s){
+  if(!s)return null;s=String(s).trim();if(!s)return null;
+  const up=s.toUpperCase();
+  if(/^[A-Z]{3}$/.test(up)&&AP[up])return up;
+  let m=s.match(/\(([A-Za-z]{3})\b/);if(m&&AP[m[1].toUpperCase()])return m[1].toUpperCase();
+  m=up.match(/\b([A-Z]{3})\b/);if(m&&AP[m[1]])return m[1];
+  const low=s.toLowerCase();for(const k in AP){if(AP[k][2]&&AP[k][2].toLowerCase()===low)return k;}
+  return null;
+}
+function parseDate(s){
+  if(!s)return null;s=String(s).trim();
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+"-"+m[2]+"-"+m[3];
+  m=s.match(/^(\d{1,2})[\/\.](\d{1,2})[\/\.](\d{4})/);if(m){const d=+m[1],mo=+m[2];if(mo>12&&d<=12)return m[3]+"-"+String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0");return m[3]+"-"+String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0");}
+  const dt=new Date(s);if(!isNaN(dt))return dt.toISOString().slice(0,10);
+  return null;
+}
+let CSVREADY=[];
+function handleCSV(text){
+  const rows=parseCSV(text);if(rows.length<2){$("csvSummary").textContent="Could not read any rows.";CSVREADY=[];return;}
+  const head=rows[0].map(h=>h.trim().toLowerCase());
+  const find=(...keys)=>{for(const k of keys){const idx=head.findIndex(h=>h.includes(k));if(idx>=0)return idx;}return -1;};
+  const di=find("date"),fi=find("from","origin","depart","dep "),ti=find("to","destination","dest","arriv","arr "),ai=find("airline","carrier");
+  const out=[];let skipped=0;
+  for(let r=1;r<rows.length;r++){const cells=rows[r];
+    const date=parseDate(di>=0?cells[di]:""),from=resolveIata(fi>=0?cells[fi]:""),to=resolveIata(ti>=0?cells[ti]:"");
+    const airline=ai>=0?(cells[ai]||"").trim():"";
+    if(date&&from&&to)out.push({date,from,to,airline});else skipped++;}
+  CSVREADY=out;
+  $("csvSummary").textContent="Found "+out.length+" flight"+(out.length===1?"":"s")+(skipped?(" ("+skipped+" row"+(skipped===1?"":"s")+" skipped, could not read date or airports)"):"")+".";
+  $("csvPreview").innerHTML=out.slice(0,6).map(f=>'<div class="otd">'+f.date+' &middot; '+cityOf(f.from)+' &rarr; '+cityOf(f.to)+(f.airline?' &middot; '+f.airline:'')+'</div>').join("")+(out.length>6?'<div class="cap" style="margin-top:6px">and '+(out.length-6)+' more</div>':"");
+  $("csvImport").style.display=out.length?"":"none";
+}
+$("csvBtn").onclick=()=>$("csvInput").click();
+$("csvInput").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{$("csv_msg").textContent="";handleCSV(String(rd.result));$("csvModal").classList.remove("hidden");};rd.readAsText(f);e.target.value="";};
+$("csv_cancel").onclick=()=>$("csvModal").classList.add("hidden");
+$("csvImport").onclick=async()=>{if(!CSVREADY.length)return;$("csv_msg").textContent="Importing...";const ok=await insertFlights(CSVREADY);if(ok){$("csvModal").classList.add("hidden");CSVREADY=[];}else{$("csv_msg").textContent="Import failed.";$("csv_msg").className="msg err";}};
+
+/* ---------- year in review ---------- */
+let REVSTATS=null;
+function yearStats(Y){
+  const fl=FLIGHTS.filter(f=>f.year===Y);
+  let km=0,longest={km:0};const arr={},air={},iso=new Set(),mon={};
+  fl.forEach(f=>{const A=ap(f.from),B=ap(f.to);if(A&&B){const d=hav([A[0],A[1]],[B[0],B[1]]);km+=d;if(d>longest.km)longest={km:d,from:f.from,to:f.to};}
+    const at=ap(f.to);if(at){arr[at[2]]=(arr[at[2]]||0)+1;}
+    [f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])iso.add(a[5]);});
+    if(f.airline&&f.airline!=="Unknown")air[f.airline]=(air[f.airline]||0)+1;
+    const k=f.date.slice(0,7);mon[k]=(mon[k]||0)+1;});
+  const beforeISO=new Set();FLIGHTS.filter(f=>f.year<Y).forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])beforeISO.add(a[5]);}));
+  let newC=0;iso.forEach(x=>{if(!beforeISO.has(x))newC++;});
+  const topDest=Object.entries(arr).sort((a,b)=>b[1]-a[1])[0];
+  const bm=Object.entries(mon).sort((a,b)=>b[1]-a[1])[0];
+  const mn=k=>new Date(k+"-01").toLocaleDateString("en-US",{month:"long"});
+  return {Y,flights:fl.length,countries:iso.size,newC,km:Math.round(km),longest,topDest:topDest?topDest[0]:"-",airlines:Object.keys(air).length,busiest:bm?mn(bm[0]):"-"};
+}
+function renderReview(Y){
+  const s=yearStats(Y);REVSTATS=s;
+  const row=(k,v)=>'<div class="revstat"><span class="rk">'+k+'</span><span class="rv">'+v+'</span></div>';
+  $("revCard").innerHTML='<div class="revcard"><div class="revhead">'+Y+' in review</div>'+
+    row("Flights",s.flights)+row("Countries",s.countries+(s.newC?" ("+s.newC+" new)":""))+
+    row("Distance",dStr(s.km))+
+    row("Longest",s.longest.km?cityOf(s.longest.from)+" \u2192 "+cityOf(s.longest.to):"-")+
+    row("Top destination",s.topDest)+row("Busiest month",s.busiest)+row("Airlines",s.airlines)+'</div>';
+}
+function drawReviewImage(s){
+  const W=1080,H=1080,cv=document.createElement("canvas");cv.width=W;cv.height=H;
+  const ctx=cv.getContext&&cv.getContext("2d");if(!ctx)return null;
+  ctx.fillStyle="#0A0F1C";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#37D1BE";ctx.font="600 34px Georgia, serif";ctx.fillText("Travelers Log",80,110);
+  ctx.fillStyle="#ECF1F8";ctx.font="600 96px Georgia, serif";ctx.fillText(s.Y+" in review",80,240);
+  const items=[["Flights",String(s.flights)],["Countries",s.countries+(s.newC?"  ("+s.newC+" new)":"")],["Distance",dStr(s.km)],["Longest",s.longest.km?cityOf(s.longest.from)+" \u2192 "+cityOf(s.longest.to):"-"],["Top destination",s.topDest],["Busiest month",s.busiest]];
+  let y=380;items.forEach(([k,v])=>{
+    ctx.fillStyle="#57677E";ctx.font="500 26px monospace";ctx.fillText(k.toUpperCase(),80,y);
+    ctx.fillStyle="#F2B34A";ctx.font="600 58px Georgia, serif";ctx.fillText(String(v),80,y+62);y+=118;});
+  ctx.fillStyle="#57677E";ctx.font="400 24px monospace";ctx.fillText("travelers log",80,H-60);
+  return cv.toDataURL("image/png");
+}
+$("reviewBtn").onclick=()=>{
+  const yrs=[...new Set(FLIGHTS.map(f=>f.year))].sort((a,b)=>b-a);
+  if(!yrs.length)return;
+  $("revYear").innerHTML=yrs.map(y=>'<option value="'+y+'">'+y+'</option>').join("");
+  renderReview(yrs[0]);$("reviewModal").classList.remove("hidden");
+};
+$("revYear").onchange=()=>renderReview(+$("revYear").value);
+$("rev_close").onclick=()=>$("reviewModal").classList.add("hidden");
+$("revDownload").onclick=()=>{if(!REVSTATS)return;const url=drawReviewImage(REVSTATS);if(!url)return;const a=document.createElement("a");a.href=url;a.download="travelers-log-"+REVSTATS.Y+".png";a.click();};
 
 /* ---------- photo upload ---------- */
 $("uploadBtn").onclick=()=>$("fileInput").click();
@@ -493,11 +816,16 @@ function render(){
   const countriesN=Object.keys(visISO3).length;
   const flyDays=Math.round(hours/24),earth=(km/40075).toFixed(1);
   const top=(o,n)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const HOME=(homeGet()&&ap(homeGet()))?homeGet().toUpperCase():top(cityCount,1)[0][0];
+  $("homeLabel").innerHTML=flag((ap(HOME)||[])[4])+cityOf(HOME);
+  if(!NAME2ID&&WORLDF.length)buildNameMaps();
+  WISH=new Set(wishGet());
+  UNIT=unitGet();document.querySelectorAll("#unitToggle button").forEach(b=>b.classList.toggle("on",b.dataset.u===UNIT));
 
   const board=$("board");board.innerHTML="";
   [["Flights",FLIGHTS.length,""],["Airlines",Object.keys(airCount).length,""],["Airports",uniqAir,""],
    ["Countries visited",countriesN,""],["Est. flying time",Math.round(hours).toLocaleString()+" h","~"+flyDays+" days"],
-   ["Distance",Math.round(km).toLocaleString()+" km","~"+earth+"x around Earth"]].forEach(([k,v,s])=>{
+   ["Distance",dStr(km),"~"+earth+"x around Earth"]].forEach(([k,v,s])=>{
     const e=document.createElement("div");e.className="cell";e.innerHTML='<div class="k">'+k+'</div><div class="v">'+v+'</div>'+(s?'<div class="s">'+s+'</div>':'');board.appendChild(e);});
 
   // year cols
@@ -527,7 +855,7 @@ function render(){
   const rbox=$("records");rbox.innerHTML="";
   if(D.length){
     const long=D.reduce((a,b)=>b.km>a.km?b:a),short=D.reduce((a,b)=>b.km<a.km?b:a);
-    const home=top(cityCount,1)[0][0],HA=ap(home);
+    const home=HOME,HA=ap(home);
     let far={c:"",d:0};Object.keys(cityCount).forEach(code=>{const a=ap(code);if(a&&HA&&code!==home){const d=hav([HA[0],HA[1]],[a[0],a[1]]);if(d>far.d)far={c:cityOf(code),d:d};}});
     const my={};FLIGHTS.forEach(f=>{const k=f.date.slice(0,7);my[k]=(my[k]||0)+1;});const bm=Object.entries(my).sort((a,b)=>b[1]-a[1])[0];
     const by=Object.entries(perYear).sort((a,b)=>b[1]-a[1])[0];
@@ -535,13 +863,21 @@ function render(){
     sl.forEach(f=>{if(f.from===home&&away===null)away=f.date;if(f.to===home&&away!==null){const sp=Math.round((new Date(f.date)-new Date(away))/864e5);if(sp>la){la=sp;las=[away,f.date];}away=null;}});
     const fmt=s=>new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
     const mn=k=>new Date(k+"-01").toLocaleDateString("en-US",{month:"long",year:"numeric"});
-    const recs=[["Longest flight",Math.round(long.km).toLocaleString()+" km",cityOf(long.from)+" &rarr; "+cityOf(long.to)],
-      ["Shortest flight",Math.round(short.km).toLocaleString()+" km",cityOf(short.from)+" &rarr; "+cityOf(short.to)],
-      ["Farthest from "+cityOf(home),Math.round(far.d).toLocaleString()+" km",far.c||"-"],
+    const cty={};FLIGHTS.forEach(f=>{[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5]){(cty[f.year]=cty[f.year]||new Set()).add(a[5]);}});});
+    let mcY=["-",0];Object.keys(cty).forEach(y=>{if(cty[y].size>mcY[1])mcY=[y,cty[y].size];});
+    const ms=[...new Set(FLIGHTS.map(f=>f.date.slice(0,7)))].sort();let bestRun=0,run=0,prevM=null;
+    ms.forEach(m=>{if(prevM){const pp=prevM.split("-").map(Number),cc2=m.split("-").map(Number);run=(cc2[0]*12+cc2[1])===(pp[0]*12+pp[1])+1?run+1:1;}else run=1;bestRun=Math.max(bestRun,run);prevM=m;});
+    const pct=Math.round(countriesN/195*100);
+    const recs=[["Longest flight",dStr(long.km),cityOf(long.from)+" &rarr; "+cityOf(long.to)],
+      ["Shortest flight",dStr(short.km),cityOf(short.from)+" &rarr; "+cityOf(short.to)],
+      ["Farthest from "+cityOf(home),dStr(far.d),far.c||"-"],
       ["Longest trip away",(las?la+" days":"-"),las?fmt(las[0])+" to "+fmt(las[1]):"needs a home base"],
       ["Busiest year",by[1]+" flights",by[0]],["Busiest month",bm[1]+" flights",mn(bm[0])],
       ["Most-visited airport",cityOf(top(cityCount,1)[0][0]),top(cityCount,1)[0][1]+" visits"],
-      ["Est. CO2",(km*0.15/1000).toFixed(1)+" t","rough economy estimate"]];
+      ["Est. CO2",(km*0.15/1000).toFixed(1)+" t","rough economy estimate"],
+      ["Most countries in a year",mcY[1]+" countries",mcY[0]],
+      ["Longest monthly streak",bestRun+" month"+(bestRun===1?"":"s"),"consecutive with a flight"],
+      ["World coverage",pct+"%",countriesN+" of ~195 countries"]];
     recs.forEach(([k,v,d])=>{const e=document.createElement("div");e.className="rec";e.innerHTML='<div class="k">'+k+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div>';rbox.appendChild(e);});
   }
 
@@ -550,6 +886,12 @@ function render(){
   const cbox=$("countries");cbox.innerHTML="";
   const list=Object.keys(visCities).sort();
   list.forEach((cn,i)=>{const iso=isoForCountry(cn);const cities=[...visCities[cn]].slice(0,6).join(", ");const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
+
+  // want to visit
+  if(ID2NAME&&$("countryList").children.length===0){const opts=Object.keys(ID2NAME).map(id=>ID2NAME[id]).sort();$("countryList").innerHTML=opts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+  const wa=wishGet();$("wishCount").textContent="("+wa.length+")";
+  const wl=$("wishList");
+  wl.innerHTML=wa.length?wa.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-wid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">Nothing yet. Add a country above.</span>';
 
   // continents, this year, goal, trips
   const curY=new Date().getFullYear();
@@ -566,7 +908,7 @@ function render(){
   if(goal){$("goalCap").textContent=countriesN+" of "+goal+" countries";$("goalFill").style.width=Math.min(100,countriesN/goal*100)+"%";$("goalNote").textContent=countriesN>=goal?"Reached. Set a new one?":((goal-countriesN)+" to go.");}
   else{$("goalCap").textContent="No goal set.";$("goalFill").style.width="0%";$("goalNote").textContent="Set your own target with edit.";}
   $("contList").innerHTML=contN+" of 7 &middot; "+Object.keys(contSet).sort().join(", ");
-  const home2=top(cityCount,1)[0][0];
+  const home2=HOME;
   const sorted=FLIGHTS.slice().sort((a,b)=>a.date<b.date?-1:1);
   const trips=[];let curT=null;
   sorted.forEach(f=>{if(!curT||f.from===home2){if(curT)trips.push(curT);curT={start:f.date,end:f.date,legs:[],dests:new Set()};}curT.legs.push(f);curT.end=f.date;if(f.to!==home2)curT.dests.add(f.to);});
@@ -586,9 +928,10 @@ function render(){
       const destHtml=codes.map(c=>{const a=ap(c);return flag(a&&a[4])+cityOf(c);}).join(", ")||"local hops";
       const legsHtml=t.legs.map(l=>{const a=ap(l.from),b=ap(l.to);return '<div class="leg">'+l.date+' &middot; '+flag(a&&a[4])+cityOf(l.from)+' &rarr; '+flag(b&&b[4])+cityOf(l.to)+(l.airline&&l.airline!=="Unknown"?' &middot; '+l.airline:'')+'</div>';}).join("");
       const el=document.createElement("div");el.className="trip";
-      el.innerHTML='<div class="triphead"><div><div class="tl">'+destHtml+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr">'+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+' <span class="chev">+</span></div></div><div class="tripdetails hidden">'+legsHtml+'</div>';
+      el.innerHTML='<div class="triphead"><div><div class="tl">'+destHtml+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr"><button class="tripmap">Map</button> '+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+' <span class="chev">+</span></div></div><div class="tripdetails hidden">'+legsHtml+'</div>';
       const th=el.querySelector(".triphead"),det=el.querySelector(".tripdetails"),ch=el.querySelector(".chev");
       th.style.cursor="pointer";th.onclick=()=>{det.classList.toggle("hidden");ch.textContent=det.classList.contains("hidden")?"+":"\u2013";};
+      const mb=el.querySelector(".tripmap");if(mb)mb.onclick=(e)=>{e.stopPropagation();highlightTripOnMap(t.legs,destHtml);};
       ybody.appendChild(el);});
     yhead.onclick=()=>{ybody.classList.toggle("hidden");yhead.querySelector(".chev").textContent=ybody.classList.contains("hidden")?"+":"\u2013";};
     grp.appendChild(yhead);grp.appendChild(ybody);tw.appendChild(grp);
@@ -605,8 +948,205 @@ function render(){
   csel.value=curc;
   renderTable();
 
+  // on this day
+  const nowd=new Date();const md=String(nowd.getMonth()+1).padStart(2,"0")+"-"+String(nowd.getDate()).padStart(2,"0");
+  const otd=FLIGHTS.filter(f=>f.date.slice(5)===md).sort((a,b)=>a.date<b.date?1:-1);
+  if(otd.length){$("otdSection").classList.remove("hidden");
+    $("onthisday").innerHTML=otd.map(f=>{const a=ap(f.from),b=ap(f.to);return '<div class="otd"><span class="oy">'+f.year+'</span> '+flag(a&&a[4])+cityOf(f.from)+' &rarr; '+flag(b&&b[4])+cityOf(f.to)+(f.airline&&f.airline!=="Unknown"?' &middot; '+f.airline:'')+'</div>';}).join("");}
+  else{$("otdSection").classList.add("hidden");}
+
+  // achievements
+  const longKm=FLIGHTS.reduce((m,f)=>{const A=ap(f.from),B=ap(f.to);return (A&&B)?Math.max(m,hav([A[0],A[1]],[B[0],B[1]])):m;},0);
+  const eq=FLIGHTS.some(f=>{const A=ap(f.from),B=ap(f.to);return A&&B&&((A[1]>=0)!==(B[1]>=0));});
+  const maxYearFlights=Math.max(0,...Object.values(perYear));
+  const defs=[["First flight","Log your first flight",FLIGHTS.length>=1],
+    ["Century club","100+ flights",FLIGHTS.length>=100],
+    ["Globetrotter","25+ countries",countriesN>=25],
+    ["World tourer","50+ countries",countriesN>=50],
+    ["Continent hopper","4+ continents",contN>=4],
+    ["All seven","Reach all 7 continents",contN>=7],
+    ["Long hauler","A flight over 10,000 km",longKm>=10000],
+    ["Around the world","Fly 40,075 km in total",km>=40075],
+    ["To the moon","Fly 384,400 km in total",km>=384400],
+    ["Equator crosser","Cross the equator on a flight",eq],
+    ["Frequent flyer","50+ flights in one year",maxYearFlights>=50]];
+  const bb=$("badges");bb.innerHTML="";let earned=0;
+  defs.forEach(([name,desc,got])=>{if(got)earned++;const e=document.createElement("div");e.className="badge"+(got?" got":"");e.innerHTML='<div class="bn">'+name+'</div><div class="bd">'+desc+'</div>';bb.appendChild(e);});
+  $("badgeTitle").textContent="Achievements ("+earned+"/"+defs.length+")";
+
+  renderCompare();renderTopLists();renderMilestones();renderWhenYouFly();renderConnections();renderGrowth();applyProfileChrome();
+  if(!tabRestored){tabRestored=true;const _t=tabGet();if(_t&&_t!==currentTab)setTab(_t);}
   drawMap(visISO3);
   chips(yrs,perYear);legend(yrs,perYear,countriesN);
+}
+
+/* ---------- tabs ---------- */
+let currentTab="overview",tabRestored=false;
+function tabKey(){return "flg_tab_"+(USERID||"anon");}
+function tabGet(){try{return localStorage.getItem(tabKey());}catch(e){return null;}}
+function tabSet(n){try{localStorage.setItem(tabKey(),n);}catch(e){}}
+function setTab(name){currentTab=name;tabSet(name);
+  document.querySelectorAll("#tabs .tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===name));
+  document.querySelectorAll("#dash > [data-t]").forEach(el=>{el.style.display=el.getAttribute("data-t").split(" ").indexOf(name)>=0?"":"none";});
+  if(name!=="overview"&&typeof stopSpin==="function")stopSpin();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("#tabs .tab").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+setTab("overview");
+document.querySelectorAll("#unitToggle button").forEach(b=>b.onclick=()=>{unitSet(b.dataset.u);render();});
+document.addEventListener("keydown",e=>{if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(document.querySelector(".modal:not(.hidden)"))return;if(e.key==="1")setTab("overview");else if(e.key==="2")setTab("insights");else if(e.key==="3")setTab("flights");});
+
+/* ---------- growth over time ---------- */
+function areaChart(series,fmt){
+  const W=340,H=150,pad=26,n=series.length;
+  if(!n)return '<div class="cap">No data yet.</div>';
+  const max=Math.max(1,...series.map(s=>s.value));
+  const x=i=>pad+(n===1?(W-2*pad)/2:i*(W-2*pad)/(n-1));
+  const y=v=>H-pad-v/max*(H-2*pad);
+  const pts=series.map((s,i)=>[x(i),y(s.value)]);
+  const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const area=line+" L"+pts[n-1][0].toFixed(1)+" "+(H-pad)+" L"+pts[0][0].toFixed(1)+" "+(H-pad)+" Z";
+  const dots=pts.map(p=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6"/>').join("");
+  const xl=series.map((s,i)=>'<text x="'+x(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="middle" class="axl">'+s.label+'</text>').join("");
+  const last=pts[n-1];
+  return '<svg viewBox="0 0 '+W+' '+H+'" class="growthsvg"><path d="'+area+'" class="ga"/><path d="'+line+'" class="gl"/>'+dots+xl+
+    '<text x="'+last[0].toFixed(1)+'" y="'+(last[1]-9).toFixed(1)+'" text-anchor="end" class="gval">'+fmt(series[n-1].value)+'</text></svg>';
+}
+function renderGrowth(){
+  const years=[...new Set(FLIGHTS.map(f=>f.year))].filter(Boolean).sort((a,b)=>a-b);
+  const iso=new Set();let cum=0;const cC=[],cD=[];
+  years.forEach(y=>{FLIGHTS.filter(f=>f.year===y).forEach(f=>{const A=ap(f.from),B=ap(f.to);if(A&&B)cum+=hav([A[0],A[1]],[B[0],B[1]]);[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])iso.add(a[5]);});});
+    cC.push({label:"'"+String(y).slice(2),value:iso.size});cD.push({label:"'"+String(y).slice(2),value:Math.round(cum)});});
+  const a=$("growthCountries");if(a)a.innerHTML=areaChart(cC,v=>v+" countries");
+  const b=$("growthDist");if(b)b.innerHTML=areaChart(cD,v=>dStrK(v));
+}
+
+/* ---------- profile ---------- */
+const PF_EMOJIS=["🌍","✈️","🧭","🗺️","🌏","🛫","🎒","⛰️","🏝️","🚀","🛩️","🌐"];
+const PF_COLORS=["#1E9E8E","#F2B34A","#FF8FA3","#A98CFF","#6EA8FE","#E5624C"];
+let pfDraft={emoji:"🌍",color:"#1E9E8E"};
+function profKey(){return "flg_profile_"+(USERID||"anon");}
+function profGet(){try{return JSON.parse(localStorage.getItem(profKey())||"{}")||{};}catch(e){return {};}}
+function profSet(o){try{localStorage.setItem(profKey(),JSON.stringify(o));}catch(e){}}
+function applyProfileChrome(){const p=profGet();const t=$("profileNameTop");if(t)t.textContent=p.name||"Traveler";const a=$("avatarSm");if(a){a.textContent=p.emoji||"🌍";a.style.background=p.color||"#1E9E8E";}}
+function travelerArchetype(st){
+  if(st.flights===0)return "Ready for takeoff";
+  if(st.continents>=6)return "Continent hopper";
+  if(st.longShare>=0.4)return "Long-haul specialist";
+  if(st.countries>=25)return "Globetrotter";
+  if(st.avgKm>0&&st.avgKm<1500)return "Regional hopper";
+  if(st.flights>=50)return "Frequent flyer";
+  return "Explorer";
+}
+function fillPassport(){
+  const box=$("pf_passport");if(!box)return;
+  let km=0,longN=0,firstY=null;const iso=new Set(),cont=new Set(),air={},rte={};
+  FLIGHTS.forEach(f=>{const A=ap(f.from),B=ap(f.to);if(A&&B){const d=hav([A[0],A[1]],[B[0],B[1]]);km+=d;if(d>=6000)longN++;}
+    [f.from,f.to].forEach(c=>{const a=ap(c);if(a){if(a[5])iso.add(a[5]);if(a[4]&&CONTINENT2[a[4]])cont.add(CONTINENT2[a[4]]);}});
+    if(f.airline&&f.airline!=="Unknown")air[f.airline]=(air[f.airline]||0)+1;
+    rte[[f.from,f.to].sort().join(" \u2013 ")]=(rte[[f.from,f.to].sort().join(" \u2013 ")]||0)+1;
+    const y=+String(f.date).slice(0,4);if(y&&(!firstY||y<firstY))firstY=y;});
+  const topAir=Object.entries(air).sort((a,b)=>b[1]-a[1])[0];
+  const topRte=Object.entries(rte).sort((a,b)=>b[1]-a[1])[0];
+  const st={flights:FLIGHTS.length,countries:iso.size,continents:cont.size,avgKm:FLIGHTS.length?km/FLIGHTS.length:0,longShare:FLIGHTS.length?longN/FLIGHTS.length:0};
+  const favRoute=topRte?topRte[0].split(" \u2013 ").map(cityOf).join(" \u2013 "):"\u2013";
+  const home=(typeof homeGet==="function"&&homeGet())||"";
+  const pp=(k,v,wide)=>'<div class="pp'+(wide?" wide":"")+'"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>';
+  box.innerHTML='<div class="pp wide"><div class="k">Traveler type</div><div class="v arch">'+travelerArchetype(st)+'</div></div>'+
+    pp("Member since",firstY||"\u2013")+pp("Home base",home?cityOf(home):"\u2013")+
+    pp("Flights",st.flights.toLocaleString())+pp("Distance",dStr(km))+
+    pp("Countries",st.countries)+pp("Continents",st.continents+" / 7")+
+    pp("Top airline",topAir?topAir[0]:"\u2013",true)+pp("Favourite route",favRoute,true);
+}
+function openProfile(){const p=profGet();pfDraft={emoji:p.emoji||"🌍",color:p.color||"#1E9E8E"};
+  $("pf_name").value=p.name||"";$("pf_tag").value=p.tagline||"";
+  $("avatarBig").textContent=pfDraft.emoji;$("avatarBig").style.background=pfDraft.color;
+  $("pf_emojis").innerHTML=PF_EMOJIS.map(e=>'<button class="pickchip'+(e===pfDraft.emoji?" sel":"")+'" data-e="'+e+'">'+e+'</button>').join("");
+  $("pf_colors").innerHTML=PF_COLORS.map(c=>'<button class="swatch'+(c===pfDraft.color?" sel":"")+'" data-c="'+c+'" style="background:'+c+'"></button>').join("");
+  $("pf_msg").textContent="";fillPassport();$("profileModal").classList.remove("hidden");}
+
+/* ---------- trip highlight on map ---------- */
+function highlightTripOnMap(legs,label){
+  hlTrip=legs;selYears.clear();mode="routes";
+  document.querySelectorAll("#mapmode button").forEach(x=>x.classList.toggle("on",x.dataset.m==="routes"));
+  const b=$("tripBanner");if(b){b.classList.remove("hidden");b.innerHTML='<span>Showing trip &middot; '+label+'</span><button id="tripClear">Clear</button>';const bc=$("tripClear");if(bc)bc.onclick=clearTripHighlight;}
+  render();
+  const mw=$("mapwrap");if(mw&&mw.scrollIntoView)mw.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function clearTripHighlight(rerender){hlTrip=null;const b=$("tripBanner");if(b)b.classList.add("hidden");if(rerender!==false)render();}
+
+/* ---------- when you fly ---------- */
+function renderWhenYouFly(){
+  const dow=[0,0,0,0,0,0,0],mon=new Array(12).fill(0);
+  FLIGHTS.forEach(f=>{if(!f.date)return;const dt=new Date(f.date+"T00:00:00");if(!isNaN(dt))dow[(dt.getDay()+6)%7]++;const m=+f.date.slice(5,7);if(m>=1&&m<=12)mon[m-1]++;});
+  const dl=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],ml=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const bars=(vals,labels,box)=>{const el=$(box);if(!el)return;const mx=Math.max(1,...vals);
+    el.innerHTML=vals.map((v,i)=>'<div class="mb" title="'+labels[i]+': '+v+'"><div class="mbwrap"><div class="mbbar" style="height:'+(v/mx*100)+'%"></div></div><div class="mbv">'+v+'</div><div class="mbl">'+labels[i]+'</div></div>').join("");};
+  bars(dow,dl,"dowChart");bars(mon,ml,"monChart");
+}
+
+/* ---------- connections ---------- */
+function renderConnections(){
+  const box=$("connBoard");if(!box)return;
+  const s=FLIGHTS.slice().filter(f=>f.date).sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0));
+  let conn=0,sameDay=0,curLegs=1,maxLegs=1;const hub={};
+  for(let i=1;i<s.length;i++){const prev=s[i-1],cur=s[i];const gap=Math.round((new Date(cur.date)-new Date(prev.date))/864e5);
+    if(prev.to===cur.from&&gap>=0&&gap<=1){conn++;if(gap===0)sameDay++;hub[prev.to]=(hub[prev.to]||0)+1;curLegs++;if(curLegs>maxLegs)maxLegs=curLegs;}
+    else curLegs=1;}
+  const topHub=Object.entries(hub).sort((a,b)=>b[1]-a[1])[0];
+  const cell=(k,v,sub)=>'<div class="cell"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="s">'+(sub||"")+'</div></div>';
+  box.innerHTML=cell("Connections",conn,"same-airport transfers")+cell("Same-day",sameDay,"tight layovers")+
+    cell("Top hub",topHub?cityOf(topHub[0]):"&ndash;",topHub?topHub[1]+" transfer"+(topHub[1]===1?"":"s"):"none yet")+
+    cell("Longest journey",maxLegs+(maxLegs===1?" leg":" legs"),maxLegs>1?"one continuous trip":"all direct so far");
+}
+
+/* ---------- compare years ---------- */
+function cmpYears(){return [...new Set(FLIGHTS.map(f=>f.year))].sort((a,b)=>a-b);}
+function renderCompare(){
+  const ys=cmpYears();const A=$("cmpA"),B=$("cmpB");if(!A||!B)return;
+  const sig=ys.join(",");
+  if(A.dataset.sig!==sig){const opt=ys.map(y=>'<option value="'+y+'">'+y+'</option>').join("");A.innerHTML=opt;B.innerHTML=opt;A.dataset.sig=sig;B.dataset.sig=sig;
+    A.value=String(ys.length>1?ys[ys.length-2]:ys[0]);B.value=String(ys[ys.length-1]);}
+  drawCmp();
+}
+function cmpDelta(a,b){const d=b-a;if(!d)return '<span class="dl z">&plusmn;0</span>';const up=d>0;return '<span class="dl '+(up?"up":"dn")+'">'+(up?"+":"")+d.toLocaleString()+'</span>';}
+function drawCmp(){
+  const A=$("cmpA"),B=$("cmpB"),g=$("cmpGrid");if(!A||!B||!g)return;
+  const ya=+A.value,yb=+B.value,sa=yearStats(ya),sb=yearStats(yb);
+  const rows=[["Flights",sa.flights,sb.flights,1],["Distance ("+dUnit()+")",Math.round(dConv(sa.km)),Math.round(dConv(sb.km)),1],["Countries",sa.countries,sb.countries,1],
+    ["New countries",sa.newC,sb.newC,1],["Airlines",sa.airlines,sb.airlines,1],
+    ["Longest flight ("+dUnit()+")",sa.longest.km?Math.round(dConv(sa.longest.km)):0,sb.longest.km?Math.round(dConv(sb.longest.km)):0,1],
+    ["Top destination",sa.topDest,sb.topDest,0],["Busiest month",sa.busiest,sb.busiest,0]];
+  g.innerHTML='<div class="cmprow head"><div>'+ya+'</div><div class="cmpm"></div><div>'+yb+'</div></div>'+
+    rows.map(([label,va,vb,num])=>'<div class="cmprow"><div class="cmpv">'+(num?(va||0).toLocaleString():va)+'</div><div class="cmpm">'+label+(num?'<br>'+cmpDelta(va,vb):'')+'</div><div class="cmpv">'+(num?(vb||0).toLocaleString():vb)+'</div></div>').join("");
+}
+
+/* ---------- top airlines & routes ---------- */
+function renderTopLists(){
+  const air={};FLIGHTS.forEach(f=>{if(f.airline&&f.airline!=="Unknown")air[f.airline]=(air[f.airline]||0)+1;});
+  const rte={};FLIGHTS.forEach(f=>{const key=[f.from,f.to].sort().join(" \u2013 ");rte[key]=(rte[key]||0)+1;});
+  const ta=$("topAir");if(ta){const list=Object.entries(air).sort((a,b)=>b[1]-a[1]).slice(0,8);const mx=list.length?list[0][1]:1;
+    ta.innerHTML=list.length?list.map(([name,n])=>'<div class="tlrow">'+logoImg(name)+'<span class="tlname">'+name+'</span><span class="tlbar"><i style="width:'+(n/mx*100)+'%"></i></span><span class="tlnum">'+n+'</span></div>').join(""):'<span class="cap">No airline data yet.</span>';}
+  const tr=$("topRoute");if(tr){const list=Object.entries(rte).sort((a,b)=>b[1]-a[1]).slice(0,8);const mx=list.length?list[0][1]:1;
+    tr.innerHTML=list.length?list.map(([key,n])=>{const [x,y]=key.split(" \u2013 ");return '<div class="tlrow"><span class="tlname">'+cityOf(x)+' \u2013 '+cityOf(y)+'</span><span class="tlbar"><i style="width:'+(n/mx*100)+'%"></i></span><span class="tlnum">'+n+'</span></div>';}).join(""):'<span class="cap">No routes yet.</span>';}
+}
+
+/* ---------- milestones timeline ---------- */
+function renderMilestones(){
+  const box=$("timeline");if(!box)return;
+  const sorted=FLIGHTS.slice().filter(f=>f.date).sort((a,b)=>a.date<b.date?-1:1);
+  if(!sorted.length){box.innerHTML='<span class="cap">Log a flight to start your timeline.</span>';return;}
+  const ev=[];
+  sorted.forEach((f,i)=>{const n=i+1;if(n===1||n%50===0)ev.push({date:f.date,ord:0,text:(n===1?"First flight":n+"th flight"),sub:cityOf(f.from)+" \u2192 "+cityOf(f.to)});});
+  const seen=new Set();
+  sorted.forEach(f=>{[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[4]&&CONTINENT2[a[4]]){const cn=CONTINENT2[a[4]];if(!seen.has(cn)){seen.add(cn);ev.push({date:f.date,ord:1,text:"First time in "+cn,sub:cityOf(c)});}}});});
+  let far={km:0};sorted.forEach(f=>{const A=ap(f.from),B=ap(f.to);if(A&&B){const d=hav([A[0],A[1]],[B[0],B[1]]);if(d>far.km)far={km:d,date:f.date,from:f.from,to:f.to};}});
+  if(far.km)ev.push({date:far.date,ord:2,text:"Longest flight \u00b7 "+dStr(far.km),sub:cityOf(far.from)+" \u2192 "+cityOf(far.to)});
+  let gap={d:0};for(let i=1;i<sorted.length;i++){const g=Math.round((new Date(sorted[i].date)-new Date(sorted[i-1].date))/864e5);if(g>gap.d)gap={d:g,date:sorted[i].date};}
+  if(gap.d>0)ev.push({date:gap.date,ord:3,text:"Longest break \u00b7 "+gap.d+" days","sub":"between trips"});
+  ev.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.ord-b.ord);
+  const df=s=>new Date(s).toLocaleDateString("en-GB",{month:"short",year:"numeric"});
+  box.innerHTML=ev.map(e=>'<div class="tl"><div class="tldot"></div><div class="tldate">'+df(e.date)+'</div><div class="tltext">'+e.text+'<span class="tlsub">'+e.sub+'</span></div></div>').join("");
 }
 
 // crude country name -> iso2 from the airports table (first airport in that country)
@@ -638,17 +1178,34 @@ const bc=$("bulkClear");if(bc)bc.onclick=()=>{selIds.clear();const s=$("selAll")
 const bd=$("bulkDel");if(bd)bd.onclick=async()=>{if(!selIds.size||!sb)return;if(!confirm("Delete "+selIds.size+" selected flight(s)?"))return;const ids=[...selIds];const {error}=await sb.from("flights").delete().in("id",ids);if(error){status("Delete error: "+error.message);return;}selIds.clear();await loadFlights();};})();
 
 /* ---------- map ---------- */
-let svg,proj,path,gLand,gArc,gDot,gLabel,mapZoom,mapT=null,mapLabels=[];
+let svg,proj,path,gRoot,gSphere,gLand,gArc,gDot,gLabel,mapZoom,mapDrag,mapT=null,mapLabels=[],view="flat",rotation=[-30,-18],lastVis={},globeK=1,spinning=false,spinTimer=null,hlTrip=null;
+function buildProj(){const W=960,H=500;
+  if(view==="globe"){proj=d3.geoOrthographic().fitExtent([[16,16],[W-16,H-16]],{type:"Sphere"}).clipAngle(90).rotate(rotation);proj.scale(proj.scale()*globeK);}
+  else{proj=d3.geoNaturalEarth1().fitExtent([[8,10],[W-8,H-10]],{type:"Sphere"});}
+  path=d3.geoPath(proj);}
+function stopSpin(){if(spinTimer){clearInterval(spinTimer);spinTimer=null;}spinning=false;const b=$("mapSpin");if(b)b.textContent="Spin";}
+function toggleSpin(){if(view!=="globe"){view="globe";document.querySelectorAll("#viewmode button").forEach(x=>x.classList.toggle("on",x.dataset.v==="globe"));buildProj();applyInteraction();render();}
+  if(spinning){stopSpin();return;}
+  spinning=true;const b=$("mapSpin");if(b)b.textContent="Stop";
+  spinTimer=setInterval(()=>{if(view!=="globe"){stopSpin();return;}rotation[0]+=0.35;buildProj();drawCurrent();},33);}
+function applyInteraction(){if(!svg)return;svg.on(".zoom",null).on(".drag",null).on("wheel.gz",null);
+  if(view==="globe"){mapT=d3.zoomIdentity;if(gRoot)gRoot.attr("transform",null);svg.call(mapDrag);
+    svg.on("wheel.gz",ev=>{ev.preventDefault();globeK=Math.max(0.6,Math.min(6,globeK*(ev.deltaY<0?1.12:0.89)));buildProj();drawCurrent();});}
+  else{stopSpin();svg.call(mapZoom).on("dblclick.zoom",null);}}
+function drawCurrent(){drawMap(lastVis);}
 function initMap(){const W=960,H=500;svg=d3.select("#map").append("svg").attr("viewBox","0 0 "+W+" "+H);
-  proj=d3.geoNaturalEarth1().fitExtent([[8,10],[W-8,H-10]],{type:"Sphere"});path=d3.geoPath(proj);mapT=d3.zoomIdentity;
-  const root=svg.append("g");
-  gLand=root.append("g");gArc=root.append("g").attr("fill","none").attr("stroke-linecap","round");gDot=root.append("g");
+  buildProj();mapT=d3.zoomIdentity;
+  gRoot=svg.append("g");
+  gSphere=gRoot.append("path").attr("fill","#0E1A2B").attr("stroke","#1E2B40");
+  gLand=gRoot.append("g");gArc=gRoot.append("g").attr("fill","none").attr("stroke-linecap","round");gDot=gRoot.append("g");
   gLabel=svg.append("g").attr("pointer-events","none");
-  mapZoom=d3.zoom().scaleExtent([1,8]).on("zoom",ev=>{mapT=ev.transform;root.attr("transform",mapT);updateLabels();});
-  svg.call(mapZoom).on("dblclick.zoom",null);
-  const rb=$("mapReset");if(rb)rb.onclick=()=>svg.transition().duration(400).call(mapZoom.transform,d3.zoomIdentity);}
+  mapZoom=d3.zoom().scaleExtent([1,8]).on("zoom",ev=>{mapT=ev.transform;gRoot.attr("transform",mapT);updateLabels();});
+  mapDrag=d3.drag().on("start",()=>stopSpin()).on("drag",ev=>{rotation[0]+=ev.dx*0.3;rotation[1]=Math.max(-90,Math.min(90,rotation[1]-ev.dy*0.3));buildProj();drawCurrent();});
+  applyInteraction();
+  const sp=$("mapSpin");if(sp)sp.onclick=toggleSpin;
+  const rb=$("mapReset");if(rb)rb.onclick=()=>{if(view==="globe"){stopSpin();rotation=[-30,-18];globeK=1;buildProj();drawCurrent();}else{svg.transition().duration(400).call(mapZoom.transform,d3.zoomIdentity);}};}
 const NAME_FIX={"United States of America":"United States","Russian Federation":"Russia","Republic of Korea":"South Korea","Korea, Republic of":"South Korea","Democratic Republic of the Congo":"DR Congo","Republic of the Congo":"Congo","United Republic of Tanzania":"Tanzania","Bolivia (Plurinational State of)":"Bolivia","Venezuela (Bolivarian Republic of)":"Venezuela","Iran (Islamic Republic of)":"Iran","Syrian Arab Republic":"Syria","Czech Republic":"Czechia","Dominican Republic":"Dominican Rep.","Central African Republic":"C.A.R.","United Arab Emirates":"UAE","Bosnia and Herzegovina":"Bosnia"};
-function bestAnchor(f){const g=f.geometry;if(!g)return null;let polys;if(g.type==="Polygon")polys=[g.coordinates];else if(g.type==="MultiPolygon")polys=g.coordinates;else return null;let best=null,bestA=-1;for(const coords of polys){const ff={type:"Feature",geometry:{type:"Polygon",coordinates:coords}};const a=Math.abs(path.area(ff));if(a>bestA){bestA=a;best=ff;}}if(!best)return null;const c=path.centroid(best),b=path.bounds(best);if(!c||!isFinite(c[0]))return null;return{x:c[0],y:c[1],bw:b[1][0]-b[0][0],w:bestA};}
+function bestAnchor(f){const g=f.geometry;if(!g)return null;let polys;if(g.type==="Polygon")polys=[g.coordinates];else if(g.type==="MultiPolygon")polys=g.coordinates;else return null;let best=null,bestA=-1;for(const coords of polys){const ff={type:"Feature",geometry:{type:"Polygon",coordinates:coords}};const a=Math.abs(path.area(ff));if(a>bestA){bestA=a;best=ff;}}if(!best)return null;const c=path.centroid(best),b=path.bounds(best);if(!c||!isFinite(c[0]))return null;return{x:c[0],y:c[1],bw:b[1][0]-b[0][0],w:bestA,ll:d3.geoCentroid(best)};}
 function updateLabels(){
   if(!gLabel||!mapT)return;const W=960,H=500;
   const cand=mapLabels.map(L=>({L,p:mapT.apply([L.x,L.y])})).filter(o=>o.p[0]>=4&&o.p[0]<=W-4&&o.p[1]>=4&&o.p[1]<=H-4);
@@ -663,18 +1220,25 @@ function updateLabels(){
     .attr("class","mlabel").attr("text-anchor","middle").attr("x",d=>d.sx).attr("y",d=>d.sy).text(d=>d.text);
 }
 function drawMap(visISO3){
-  if(!svg)return;
+  if(!svg)return;lastVis=visISO3||{};
+  const globe=view==="globe",cen=[-rotation[0],-rotation[1]];
+  const vis=ll=>!globe||d3.geoDistance(ll,cen)<1.5708;
+  gSphere.attr("d",globe?path({type:"Sphere"}):null).attr("display",globe?null:"none");
   const solo=selYears.size>0, inSel=f=>selYears.size===0||selYears.has(f.year);
   gLand.selectAll("path").data(WORLDF).join("path").attr("d",path)
-    .attr("fill",d=>mode==="countries"&&visISO3[d.id]?"var(--amber)":"#16233A")
-    .attr("stroke",d=>mode==="countries"&&visISO3[d.id]?"var(--amber-d)":"#1E2B40").attr("stroke-width",0.5)
+    .attr("fill",d=>{if(mode!=="countries")return "#16233A";if(visISO3[d.id])return "var(--amber)";if(WISH.has(d.id))return "var(--cyan)";return "#16233A";})
+    .attr("stroke",d=>{if(mode==="countries"&&visISO3[d.id])return "var(--amber-d)";if(mode==="countries"&&WISH.has(d.id))return "var(--cyan)";return "#1E2B40";}).attr("stroke-width",0.5)
     .on("mousemove",function(ev,d){if(d.properties&&d.properties.name){const t=$("tip"),b=$("mapwrap").getBoundingClientRect();t.style.left=(ev.clientX-b.left)+"px";t.style.top=(ev.clientY-b.top)+"px";t.style.opacity=1;t.innerHTML=d.properties.name;}})
     .on("mouseleave",()=>$("tip").style.opacity=0);
   const shown=mode==="routes"?FLIGHTS.filter(inSel):[];
+  const hlSet=hlTrip?new Set(hlTrip):null;
   gArc.selectAll("path").data(shown).join("path").attr("d",d=>{const A=ap(d.from),B=ap(d.to);return(A&&B)?path({type:"LineString",coordinates:[[A[0],A[1]],[B[0],B[1]]]}):null;})
-    .attr("stroke",d=>yColor(d.year)).attr("stroke-width",solo?1.5:0.9).attr("stroke-opacity",solo?0.75:0.42);
-  const cc={};if(mode==="routes")shown.forEach(f=>{cc[f.from]=(cc[f.from]||0)+1;cc[f.to]=(cc[f.to]||0)+1;});
-  const names=Object.keys(cc).filter(c=>ap(c));const r=d3.scaleSqrt().domain([1,d3.max(Object.values(cc))||1]).range([2.4,10]);
+    .attr("stroke",d=>yColor(d.year))
+    .attr("stroke-width",d=>hlSet?(hlSet.has(d)?2.4:0.6):(solo?1.5:0.9))
+    .attr("stroke-opacity",d=>hlSet?(hlSet.has(d)?0.98:0.05):(solo?0.75:0.42));
+  const ccSrc=hlTrip?hlTrip:shown;
+  const cc={};if(mode==="routes")ccSrc.forEach(f=>{cc[f.from]=(cc[f.from]||0)+1;cc[f.to]=(cc[f.to]||0)+1;});
+  const names=Object.keys(cc).filter(c=>ap(c)&&vis([ap(c)[0],ap(c)[1]]));const r=d3.scaleSqrt().domain([1,d3.max(Object.values(cc))||1]).range([2.4,10]);
   const tip=$("tip"),wrapEl=$("mapwrap");
   gDot.selectAll("circle").data(names,d=>d).join(
     en=>en.append("circle").attr("stroke","#0A0F1C").attr("stroke-width",1).style("cursor","pointer"),
@@ -685,16 +1249,40 @@ function drawMap(visISO3){
     .on("mouseleave",()=>tip.style.opacity=0);
   mapLabels=[];
   if(mode==="routes"){names.forEach(n=>{const a=ap(n),p=proj([a[0],a[1]]);if(p&&isFinite(p[0]))mapLabels.push({x:p[0],y:p[1],text:cityOf(n),w:cc[n],r:r(cc[n])});});}
-  else{WORLDF.forEach(f=>{if(!f.properties||!f.properties.name)return;const an=bestAnchor(f);if(!an)return;mapLabels.push({x:an.x,y:an.y,text:NAME_FIX[f.properties.name]||f.properties.name,w:an.w,bw:an.bw});});}
+  else{WORLDF.forEach(f=>{if(!f.properties||!f.properties.name)return;const an=bestAnchor(f);if(!an)return;if(globe&&d3.geoDistance(an.ll,cen)>=1.5708)return;mapLabels.push({x:an.x,y:an.y,text:NAME_FIX[f.properties.name]||f.properties.name,w:an.w,bw:an.bw});});}
   updateLabels();
 }
 function chips(yrs,perYear){const box=$("chips");box.style.display=mode==="routes"?"flex":"none";box.innerHTML="";
-  const all=document.createElement("button");all.className="chip"+(selYears.size===0?" on":"");all.textContent="All";all.onclick=()=>{selYears.clear();render();};box.appendChild(all);
-  yrs.forEach(y=>{const b=document.createElement("button");b.className="chip"+(selYears.has(y)?" on":"");b.textContent=String(y);b.onclick=()=>{selYears.has(y)?selYears.delete(y):selYears.add(y);render();};box.appendChild(b);});}
+  const all=document.createElement("button");all.className="chip"+(selYears.size===0?" on":"");all.textContent="All";all.onclick=()=>{clearTripHighlight(false);selYears.clear();render();};box.appendChild(all);
+  yrs.forEach(y=>{const b=document.createElement("button");b.className="chip"+(selYears.has(y)?" on":"");b.textContent=String(y);b.onclick=()=>{clearTripHighlight(false);selYears.has(y)?selYears.delete(y):selYears.add(y);render();};box.appendChild(b);});}
 function legend(yrs,perYear,cN){const lg=$("legend");lg.innerHTML="";
   if(mode==="routes"){const show=yrs.filter(y=>selYears.size===0||selYears.has(y));show.forEach(y=>{const s=document.createElement("span");s.innerHTML='<i style="background:'+yColor(y)+'"></i>'+y+" ("+perYear[y]+")";lg.appendChild(s);});}
-  else{const s=document.createElement("span");s.innerHTML='<i style="background:var(--amber);height:12px;width:16px"></i>Visited ('+cN+" countries)";lg.appendChild(s);}}
-document.querySelectorAll("#mapmode button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#mapmode button").forEach(x=>x.classList.remove("on"));b.classList.add("on");mode=b.dataset.m;render();});
+  else{const s=document.createElement("span");s.innerHTML='<i style="background:var(--amber);height:12px;width:16px"></i>Visited ('+cN+" countries)";lg.appendChild(s);
+    if(WISH.size){const w=document.createElement("span");w.innerHTML='<i style="background:var(--cyan);height:12px;width:16px"></i>Want to visit ('+WISH.size+")";lg.appendChild(w);}}}
+document.querySelectorAll("#mapmode button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#mapmode button").forEach(x=>x.classList.remove("on"));b.classList.add("on");mode=b.dataset.m;clearTripHighlight(false);render();});
+document.querySelectorAll("#viewmode button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#viewmode button").forEach(x=>x.classList.remove("on"));b.classList.add("on");view=b.dataset.v;buildProj();applyInteraction();render();});
+["cmpA","cmpB"].forEach(id=>{const el=$(id);if(el)el.onchange=drawCmp;});
+let playing=false;
+function animateRoutes(){
+  const inSel=f=>selYears.size===0||selYears.has(f.year);
+  const shown=FLIGHTS.filter(inSel).slice().sort((a,b)=>a.date<b.date?-1:1);
+  if(!shown.length){playing=false;$("mapPlay").textContent="Play routes";return;}
+  playing=true;$("mapPlay").textContent="Stop";
+  gArc.selectAll("path").remove();gLabel.selectAll("text").remove();
+  let i=0;
+  (function step(){
+    if(!playing||i>=shown.length){playing=false;$("mapPlay").textContent="Play routes";render();return;}
+    const f=shown[i++],A=ap(f.from),B=ap(f.to);
+    if(A&&B){const p=gArc.append("path").attr("d",path({type:"LineString",coordinates:[[A[0],A[1]],[B[0],B[1]]]})).attr("fill","none").attr("stroke",yColor(f.year)).attr("stroke-width",1.6).attr("stroke-opacity",0.9);
+      try{const L=p.node().getTotalLength();p.attr("stroke-dasharray",L+" "+L).attr("stroke-dashoffset",L).transition().duration(300).attr("stroke-dashoffset",0);}catch(e){}}
+    setTimeout(step,190);
+  })();
+}
+$("mapPlay").onclick=()=>{
+  if(playing){playing=false;$("mapPlay").textContent="Play routes";render();return;}
+  if(mode!=="routes"){mode="routes";document.querySelectorAll("#mapmode button").forEach(x=>x.classList.toggle("on",x.dataset.m==="routes"));render();setTimeout(animateRoutes,60);}
+  else animateRoutes();
+};
 
 /* ---------- ask ---------- */
 $("askbtn").onclick=ask;$("q").addEventListener("keydown",e=>{if(e.key==="Enter")ask();});
