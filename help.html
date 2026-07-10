@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Help - Travelers Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0A0F1C;--ink2:#111A2B;--ink3:#0D1523;--line:#1E2B40;--line2:#2A3B54;--paper:#ECF1F8;--muted:#8494A8;--dim:#57677E;--amber:#37D1BE;--amber-d:#1E9E8E;--cyan:#F2B34A;--disp:'Fraunces',Georgia,serif;--body:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--disp);font-weight:500;letter-spacing:-.01em;margin:0}
+a{color:var(--amber);text-decoration:none}
+a:hover{text-decoration:underline}
+.top{display:flex;justify-content:space-between;align-items:center;padding:26px 0;border-bottom:1px solid var(--line2)}
+.brand{font-family:var(--disp);font-weight:700;font-size:20px;color:var(--paper)}
+.back{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.hero{padding:52px 0 12px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.hero h1{font-size:clamp(32px,6vw,46px);margin:14px 0 10px;line-height:1.1}
+.lede{font-size:17px;color:var(--muted);max-width:600px}
+.qa{padding:20px 0;border-top:1px solid var(--line)}
+.qa h3{font-size:20px;color:var(--paper);margin-bottom:6px}
+.qa p{margin:0;color:var(--muted)}
+.qa code{font-family:var(--mono);background:var(--ink2);border:1px solid var(--line2);border-radius:6px;padding:1px 6px;font-size:13px;color:var(--paper)}
+footer{padding:34px 0;border-top:1px solid var(--line2);color:var(--dim);font-family:var(--mono);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="index.html">Travelers <b style="color:var(--amber)">Log</b></a>
+    <a class="back" href="index.html">&larr; Back to the app</a>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">Help &amp; tips</div>
+    <h1>Getting the most out of Travelers Log</h1>
+    <p class="lede">Short answers to the things people ask most. Still stuck? Use Contact / feedback in the app footer.</p>
+  </div>
+
+  <div class="qa"><h3>Adding a flight</h3><p>Tap <b>+ Add flight</b> to type one in. Inside that window you can also choose <b>Upload photos/files</b> to add flights automatically from boarding-pass photos or PDFs.</p></div>
+
+  <div class="qa"><h3>Uploading boarding passes</h3><p>Open <b>+ Add flight</b> &rarr; <b>Upload photos/files</b>, pick one or more images or PDFs, and the flights are read out for you to confirm before saving.</p></div>
+
+  <div class="qa"><h3>Importing from another app</h3><p>Open the <b>Data</b> menu &rarr; <b>Import CSV</b>. It works with exports from Flighty, MyFlightradar24 and App in the Air; the date, from, to and airline columns are matched automatically.</p></div>
+
+  <div class="qa"><h3>Places you visited before logging</h3><p>Been somewhere before you started tracking flights? Scroll to <b>Countries visited</b> and add it there. It counts toward your totals and continents without needing a flight.</p></div>
+
+  <div class="qa"><h3>Goals and bucket list</h3><p>From the dashboard you can set a <b>country goal</b> and a <b>continents goal</b>, and keep a bucket list of places you want to visit. Wishlist countries show in gold on the map.</p></div>
+
+  <div class="qa"><h3>Sharing your map</h3><p>Tap <b>Share</b> to publish a read-only public link, then post it to WhatsApp, X or Facebook, or copy it. Turn it off any time and the link stops working.</p></div>
+
+  <div class="qa"><h3>Saving a PDF</h3><p>Open the <b>Data</b> menu &rarr; <b>Save PDF</b> for a clean, printable copy of your dashboard.</p></div>
+
+  <div class="qa"><h3>Signing in on another device</h3><p>Your flights and settings follow you. Sign in with the same email and password anywhere and everything is there.</p></div>
+
+  <div class="qa"><h3>Password &amp; security</h3><p>Change your password in <b>Settings</b>. You will need your current password, and the new one needs at least 8 characters with a capital letter, a lowercase letter and a number.</p></div>
+
+  <footer>&copy; <span id="y"></span> Travelers Log.</footer>
+</div>
+<script>document.getElementById("y").textContent=new Date().getFullYear();</script>
+</body>
+</html>

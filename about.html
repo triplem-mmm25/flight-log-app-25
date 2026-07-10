@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>About - Travelers Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0A0F1C;--ink2:#111A2B;--ink3:#0D1523;--line:#1E2B40;--line2:#2A3B54;--paper:#ECF1F8;--muted:#8494A8;--dim:#57677E;--amber:#37D1BE;--amber-d:#1E9E8E;--cyan:#F2B34A;--disp:'Fraunces',Georgia,serif;--body:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--disp);font-weight:500;letter-spacing:-.01em;margin:0}
+a{color:var(--amber);text-decoration:none}
+a:hover{text-decoration:underline}
+.top{display:flex;justify-content:space-between;align-items:center;padding:26px 0;border-bottom:1px solid var(--line2)}
+.brand{font-family:var(--disp);font-weight:700;font-size:20px;color:var(--paper)}
+.back{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.hero{padding:60px 0 20px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.hero h1{font-size:clamp(34px,6vw,52px);margin:14px 0 10px;line-height:1.1}
+.lede{font-size:18px;color:var(--muted);max-width:620px}
+section{padding:26px 0;border-top:1px solid var(--line)}
+section h2{font-size:24px;margin-bottom:12px}
+p{margin:0 0 14px}
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+.card{background:var(--ink2);border:1px solid var(--line2);border-radius:14px;padding:18px}
+.card b{color:var(--amber);font-weight:600;display:block;margin-bottom:4px;font-family:var(--disp);font-size:17px}
+.card span{color:var(--muted);font-size:15px}
+.cta{display:inline-block;margin-top:10px;background:var(--amber);color:#0A0F1C;font-family:var(--disp);font-weight:600;padding:12px 22px;border-radius:10px}
+.cta:hover{text-decoration:none;background:var(--amber-d)}
+footer{padding:34px 0;border-top:1px solid var(--line2);color:var(--dim);font-family:var(--mono);font-size:12px}
+@media(max-width:620px){.feat{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="index.html">Travelers <b style="color:var(--amber)">Log</b></a>
+    <a class="back" href="index.html">&larr; Back to the app</a>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">About us</div>
+    <h1>Every flight you have taken, in one place.</h1>
+    <p class="lede">Travelers Log turns your flight history into a living map. Log where you have been, see it drawn across the world, and watch the numbers behind your travels add up.</p>
+  </div>
+
+  <section>
+    <h2>What it is</h2>
+    <p>Travelers Log is a personal home for your flight history. Add a trip in seconds by hand, snap a boarding pass, or import a CSV, and it becomes an interactive world map, a running count of countries and continents, and a set of personal records and yearly recaps.</p>
+    <p>It is built for people who love looking back on where they have been, and looking forward to where they are going next.</p>
+  </section>
+
+  <section>
+    <h2>What you can do</h2>
+    <div class="feat">
+      <div class="card"><b>Map your world</b><span>An interactive map of every route you have flown, plus a spinnable 3D globe and a shaded map of the countries you have reached.</span></div>
+      <div class="card"><b>Log flights three ways</b><span>Type them in, upload boarding-pass photos or PDFs that are read for you, or import a CSV from another tracker.</span></div>
+      <div class="card"><b>Count everything</b><span>Countries, continents, distance, time in the air, and personal records like your longest and shortest flights.</span></div>
+      <div class="card"><b>See patterns</b><span>A monthly travel heatmap, growth over time, the days and months you fly most, and your connections and layovers.</span></div>
+      <div class="card"><b>Set goals</b><span>Pick a country goal and a continents goal, keep a bucket list, and add places you visited before you started logging.</span></div>
+      <div class="card"><b>Look back and share</b><span>A Year in Review card, and an optional read-only public map you can share to WhatsApp, X or Facebook.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Your data is yours</h2>
+    <p>Everything is private to your account and synced across your devices when you sign in. Nothing is ever sold, and nothing is shared unless you choose to publish a read-only map. You can turn that off at any time.</p>
+    <a class="cta" href="index.html">Open Travelers Log</a>
+  </section>
+
+  <footer>&copy; <span id="y"></span> Travelers Log. Version 1.0.</footer>
+</div>
+<script>document.getElementById("y").textContent=new Date().getFullYear();</script>
+</body>
+</html>

@@ -48,7 +48,7 @@ img.fl{height:12px;width:auto;vertical-align:-1px;margin-right:5px;border-radius
 .flink{background:none;border:none;color:var(--muted);font-family:var(--body);font-size:14px;padding:0;cursor:pointer;text-align:left}
 .flink:hover{color:var(--paper)}
 .footbot{margin-top:26px;opacity:.7}
-.brand{cursor:pointer}
+.brand{cursor:pointer;color:inherit;text-decoration:none}
 .helprow{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
 .helprow b{color:var(--amber);font-weight:600}
 .helprow span{color:var(--muted)}
@@ -293,7 +293,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 <div id="app" class="hidden">
   <div class="wrap">
     <div class="topbar">
-      <div class="brand">Travelers <b>Log</b></div>
+      <a class="brand" href="about.html" target="_blank" rel="noopener">Travelers <b>Log</b></a>
       <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail"></span><button id="settingsBtn" class="linkbtn">Settings</button><button id="signout" class="linkbtn">Sign out</button></div>
     </div>
     <div class="toolbar">
@@ -449,12 +449,12 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
     <footer class="sitefoot">
       <div class="footcols">
         <div class="footabout">
-          <div class="brand">Travelers <b>Log</b></div>
-          <p class="cap" style="margin-top:8px;max-width:420px">A private home for every flight you have taken. Log trips by hand, from a boarding-pass photo, or a CSV, and watch your world map, countries and records grow.</p>
+          <a class="brand" href="about.html" target="_blank" rel="noopener">Travelers <b>Log</b></a>
+          <p class="cap" style="margin-top:8px;max-width:460px">A private home for every flight you have taken. Log trips by hand, from a boarding-pass photo, or a CSV, then explore an interactive world map and 3D globe, your countries and continents, personal records, yearly recaps and goals - all in one place.</p>
         </div>
         <div class="footlinks">
-          <button class="flink" id="aboutLink">About us</button>
-          <button class="flink" id="helpLink">Help</button>
+          <a class="flink" href="about.html" target="_blank" rel="noopener">About us</a>
+          <a class="flink" href="help.html" target="_blank" rel="noopener">Help</a>
           <button class="flink" id="contactLink">Contact / feedback</button>
         </div>
       </div>
@@ -487,28 +487,10 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <button id="c_cancel" class="btn ghost">Cancel</button>
 </div></div>
 
-<!-- SHARE MODAL -->
-<div id="aboutModal" class="modal hidden"><div class="modalbox">
-  <h3>About Travelers Log</h3>
-  <p style="margin-bottom:12px">Travelers Log is a personal home for your flight history. Log every trip by hand, from a boarding-pass photo, or a CSV, and see it come alive as an interactive world map, a running count of countries and continents, and a set of personal records and yearly recaps.</p>
-  <p style="margin-bottom:12px">It is built for people who love looking back on where they have been. Your data is yours: private to your account, never sold, and never shared unless you choose to publish a read-only map.</p>
-  <p class="cap">Version 1.0</p>
-  <button id="about_close" class="btn ghost" style="margin-top:16px">Close</button>
-</div></div>
-<div id="helpModal" class="modal hidden"><div class="modalbox">
-  <h3>Help &amp; tips</h3>
-  <div class="helprow"><b>Add a flight</b><span>Tap "+ Add flight" to type one in, or use "Upload photos/files" inside it to add flights from boarding-pass photos or PDFs automatically.</span></div>
-  <div class="helprow"><b>Bulk import</b><span>Data &rarr; Import CSV. Works with exports from Flighty, MyFlightradar24 and App in the Air.</span></div>
-  <div class="helprow"><b>Older trips</b><span>Been somewhere before you started logging? Add it under "Countries visited" without a flight.</span></div>
-  <div class="helprow"><b>Goals</b><span>Set a country goal and a continents goal from the dashboard to track progress.</span></div>
-  <div class="helprow"><b>Share</b><span>Publish a read-only map link and post it to WhatsApp, X or Facebook.</span></div>
-  <div class="helprow"><b>Save PDF</b><span>Data &rarr; Save PDF for a printable copy of your dashboard.</span></div>
-  <div class="helprow"><b>Across devices</b><span>Your flights and settings follow you on any device you sign in on.</span></div>
-  <button id="help_close" class="btn ghost" style="margin-top:16px">Close</button>
-</div></div>
+<!-- CONTACT MODAL -->
 <div id="contactModal" class="modal hidden"><div class="modalbox">
   <h3>Contact &amp; feedback</h3>
-  <p class="cap" style="margin-bottom:12px">Found a bug or have an idea? Tell us how we can improve. This opens your email app with the message ready to send.</p>
+  <p class="cap" style="margin-bottom:12px">Found a bug or have an idea? Tell us how we can improve. Your message is sent straight to us - no email app needed.</p>
   <textarea id="fb_msg" class="fld" rows="5" placeholder="Your message..." style="resize:vertical"></textarea>
   <div id="fb_note" class="msg"></div>
   <button id="fb_send" class="btn" style="margin-top:8px">Send</button>
@@ -758,23 +740,26 @@ function shareSocial(net){
   if(u)window.open(u,"_blank","noopener");
 }
 document.querySelectorAll("#shareSocialRow .sbtn").forEach(b=>b.onclick=()=>shareSocial(b.dataset.snet));
-/* ---- footer + info modals ---- */
-const CONTACT_EMAIL="hello@travelerslog.app";
+/* ---- footer + contact ---- */
+const FEEDBACK_ACCESS_KEY="YOUR_WEB3FORMS_KEY";
 (function(){const fy=$("footYear");if(fy)fy.textContent=new Date().getFullYear();})();
 function openInfo(id){$(id).classList.remove("hidden");}
 function closeInfo(id){$(id).classList.add("hidden");}
-document.querySelectorAll(".brand").forEach(b=>{b.style.cursor="pointer";b.onclick=()=>openInfo("aboutModal");});
-if($("aboutLink"))$("aboutLink").onclick=()=>openInfo("aboutModal");
-if($("helpLink"))$("helpLink").onclick=()=>openInfo("helpModal");
 if($("contactLink"))$("contactLink").onclick=()=>openInfo("contactModal");
-if($("about_close"))$("about_close").onclick=()=>closeInfo("aboutModal");
-if($("help_close"))$("help_close").onclick=()=>closeInfo("helpModal");
 if($("contact_close"))$("contact_close").onclick=()=>closeInfo("contactModal");
-["aboutModal","helpModal","contactModal"].forEach(id=>{const m=$(id);if(m)m.addEventListener("click",e=>{if(e.target===m)closeInfo(id);});});
-if($("fb_send"))$("fb_send").onclick=()=>{const msg=$("fb_msg").value.trim();if(!msg){$("fb_note").textContent="Write a message first.";$("fb_note").className="msg err";return;}
-  const body=encodeURIComponent(msg+"\n\n— sent from Travelers Log");
-  try{location.href="mailto:"+CONTACT_EMAIL+"?subject="+encodeURIComponent("Travelers Log feedback")+"&body="+body;}catch(e){}
-  $("fb_note").textContent="Opening your email app...";$("fb_note").className="msg ok";};
+["contactModal"].forEach(id=>{const m=$(id);if(m)m.addEventListener("click",e=>{if(e.target===m)closeInfo(id);});});
+if($("fb_send"))$("fb_send").onclick=async()=>{const msg=$("fb_msg").value.trim(),N=$("fb_note");
+  if(!msg){N.textContent="Write a message first.";N.className="msg err";return;}
+  if(!FEEDBACK_ACCESS_KEY||FEEDBACK_ACCESS_KEY==="YOUR_WEB3FORMS_KEY"){N.textContent="Feedback is not set up yet.";N.className="msg err";return;}
+  N.textContent="Sending...";N.className="msg";
+  try{
+    const who=$("useremail").textContent||"unknown";
+    const r=await fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:FEEDBACK_ACCESS_KEY,subject:"Travelers Log feedback",from_name:"Travelers Log",email:who,message:msg+"\n\nFrom user: "+who})});
+    const j=await r.json();
+    if(j&&j.success){N.textContent="Thanks. Your feedback was sent.";N.className="msg ok";$("fb_msg").value="";setTimeout(()=>closeInfo("contactModal"),1300);}
+    else{N.textContent="Could not send: "+((j&&j.message)||"please try again later.");N.className="msg err";}
+  }catch(e){N.textContent="Could not send. Check your connection and try again.";N.className="msg err";}
+};
 var _askCb=null;
 function askModal(opts){opts=opts||{};$("askTitle").textContent=opts.title||"Set value";var hint=$("askHint");hint.textContent=opts.hint||"";hint.style.display=opts.hint?"":"none";var inp=$("askInput");inp.type=opts.type||"text";inp.value=opts.value!=null?opts.value:"";inp.placeholder=opts.placeholder||"";$("askErr").textContent="";$("askErr").className="msg";_askCb=opts.ok||null;$("askModal").classList.remove("hidden");setTimeout(function(){try{inp.focus();inp.select&&inp.select();}catch(e){}},40);}
 function askClose(){$("askModal").classList.add("hidden");_askCb=null;}
