@@ -125,7 +125,15 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .goalbar{height:12px;background:var(--ink);border-radius:6px;overflow:hidden;margin-top:8px}
 .goalfill{height:100%;background:var(--amber);width:0;border-radius:6px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
 .tripwrap{display:flex;flex-direction:column;gap:10px}
-.trip{background:var(--ink3);border:1px solid var(--line);border-radius:12px;padding:13px 16px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.trip{background:var(--ink3);border:1px solid var(--line);border-radius:12px;padding:13px 16px}
+.triphead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;user-select:none}
+.tripdetails{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:7px}
+.leg{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.chev{display:inline-block;width:16px;text-align:center;color:var(--amber);font-family:var(--mono)}
+.bulk{display:flex;align-items:center;gap:14px;margin-bottom:12px;background:var(--ink2);border:1px solid var(--line2);border-radius:10px;padding:9px 14px}
+.bulk #bulkCount{font-family:var(--mono);font-size:12px;color:var(--paper)}
+#mapReset{position:absolute;top:10px;right:10px;background:var(--ink2);border:1px solid var(--line2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;z-index:6}
+#mapReset:hover{color:var(--paper);border-color:var(--amber)}
 .trip .tl{font-weight:500;font-size:14px}
 .trip .td{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
 .trip .tr{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:right;white-space:nowrap}
@@ -172,7 +180,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       <section><div class="sec-head"><h2>This year &amp; goals</h2></div>
         <div class="grid2">
           <div class="panel"><h3>This year</h3><div class="cap">Your <span id="tyYear"></span> so far</div><div id="tyStats" class="tystats"></div></div>
-          <div class="panel"><h3>Country goal</h3><div class="cap" id="goalCap"></div>
+          <div class="panel"><h3>Country goal <button id="goalEdit" class="linkbtn" style="font-size:12px;margin-left:6px">edit</button></h3><div class="cap" id="goalCap"></div>
             <div class="goalbar"><div id="goalFill" class="goalfill"></div></div>
             <div class="cap" id="goalNote" style="margin-top:10px"></div>
             <h3 style="font-size:14px;margin-top:18px">Continents</h3><div class="cap" id="contList" style="margin-top:6px"></div>
@@ -184,7 +192,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
         <div class="card">
           <div class="toggle" id="mapmode"><button data-m="routes" class="on">Routes</button><button data-m="countries">Countries</button></div>
           <div class="chips" id="chips"></div>
-          <div id="mapwrap"><div id="map"></div><div id="tip"></div></div>
+          <div id="mapwrap"><div id="map"></div><div id="tip"></div><button id="mapReset">Reset view</button></div>
           <div class="legend" id="legend"></div>
         </div>
       </section>
@@ -216,9 +224,11 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
         <div class="controls">
           <input id="fSearch" placeholder="Search city, code or airline..."/>
           <select id="fYear"><option value="">All years</option></select>
+          <select id="fCountry"><option value="">All countries</option></select>
           <select id="fSort"><option value="date_desc">Newest first</option><option value="date_asc">Oldest first</option><option value="dist_desc">Longest first</option><option value="dist_asc">Shortest first</option></select>
         </div>
-        <div class="card" style="overflow:auto"><table class="flts"><thead><tr><th>Date</th><th>Route</th><th>Airline</th><th></th></tr></thead><tbody id="fltbody"></tbody></table></div>
+        <div id="bulkBar" class="bulk hidden"><span id="bulkCount"></span><button id="bulkDel" class="tool" style="padding:7px 14px">Delete selected</button><button id="bulkClear" class="linkbtn">clear</button></div>
+        <div class="card" style="overflow:auto"><table class="flts"><thead><tr><th style="width:26px"><input type="checkbox" id="selAll"></th><th>Date</th><th>Route</th><th>Airline</th><th></th></tr></thead><tbody id="fltbody"></tbody></table></div>
       </section>
     </div>
 
@@ -274,7 +284,10 @@ if(configured){ sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_
 const $=id=>document.getElementById(id);
 const YCOL={2022:"#5B8DEF",2023:"#35C4D7",2024:"#FFB020",2025:"#FF7A59",2026:"#F25F8E"};
 function yColor(y){return YCOL[y]|| "#9AA7B2";}
-let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set();
+let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set(), USERID=null;
+function goalKey(){return "flg_goal_"+(USERID||"anon");}
+function goalGet(){try{const v=parseInt(localStorage.getItem(goalKey()));return v>0?v:null;}catch(e){return null;}}
+function goalSet(v){try{localStorage.setItem(goalKey(),String(v));}catch(e){}}
 
 const CONTINENT2 = {"AW":"North America","AF":"Asia","AO":"Africa","AI":"North America","AX":"Europe","AL":"Europe","AD":"Europe","AE":"Asia","AR":"South America","AM":"Asia","AS":"Oceania","AG":"North America","AU":"Oceania","AT":"Europe","AZ":"Asia","BI":"Africa","BE":"Europe","BJ":"Africa","BQ":"North America","BF":"Africa","BD":"Asia","BG":"Europe","BH":"Asia","BS":"North America","BA":"Europe","BL":"North America","BY":"Europe","BZ":"North America","BM":"North America","BO":"South America","BR":"South America","BB":"North America","BN":"Asia","BT":"Asia","BV":"Antarctica","BW":"Africa","CF":"Africa","CA":"North America","CC":"Asia","CH":"Europe","CL":"South America","CN":"Asia","CI":"Africa","CM":"Africa","CD":"Africa","CG":"Africa","CK":"Oceania","CO":"South America","KM":"Africa","CV":"Africa","CR":"North America","CU":"North America","CW":"North America","CX":"Asia","KY":"North America","CY":"Asia","CZ":"Europe","DE":"Europe","DJ":"Africa","DM":"North America","DK":"Europe","DO":"North America","DZ":"Africa","EC":"South America","EG":"Africa","ER":"Africa","ES":"Europe","EE":"Europe","ET":"Africa","FI":"Europe","FJ":"Oceania","FK":"South America","FR":"Europe","FO":"Europe","FM":"Oceania","GA":"Africa","GB":"Europe","GE":"Asia","GG":"Europe","GH":"Africa","GI":"Europe","GN":"Africa","GP":"North America","GM":"Africa","GW":"Africa","GQ":"Africa","GR":"Europe","GD":"North America","GL":"North America","GT":"North America","GF":"South America","GU":"Oceania","GY":"South America","HK":"Asia","HM":"Antarctica","HN":"North America","HR":"Europe","HT":"North America","HU":"Europe","ID":"Asia","IM":"Europe","IN":"Asia","IO":"Asia","IE":"Europe","IR":"Asia","IQ":"Asia","IS":"Europe","IL":"Asia","IT":"Europe","JM":"North America","JE":"Europe","JO":"Asia","JP":"Asia","KZ":"Asia","KE":"Africa","KG":"Asia","KH":"Asia","KI":"Oceania","KN":"North America","KR":"Asia","KW":"Asia","LA":"Asia","LB":"Asia","LR":"Africa","LY":"Africa","LC":"North America","LI":"Europe","LK":"Asia","LS":"Africa","LT":"Europe","LU":"Europe","LV":"Europe","MO":"Asia","MF":"North America","MA":"Africa","MC":"Europe","MD":"Europe","MG":"Africa","MV":"Asia","MX":"North America","MH":"Oceania","MK":"Europe","ML":"Africa","MT":"Europe","MM":"Asia","ME":"Europe","MN":"Asia","MP":"Oceania","MZ":"Africa","MR":"Africa","MS":"North America","MQ":"North America","MU":"Africa","MW":"Africa","MY":"Asia","YT":"Africa","NA":"Africa","NC":"Oceania","NE":"Africa","NF":"Oceania","NG":"Africa","NI":"North America","NU":"Oceania","NL":"Europe","NO":"Europe","NP":"Asia","NR":"Oceania","NZ":"Oceania","OM":"Asia","PK":"Asia","PA":"North America","PE":"South America","PH":"Asia","PW":"Oceania","PG":"Oceania","PL":"Europe","PR":"North America","KP":"Asia","PT":"Europe","PY":"South America","PS":"Asia","PF":"Oceania","QA":"Asia","RE":"Africa","RO":"Europe","RU":"Europe","RW":"Africa","SA":"Asia","SD":"Africa","SN":"Africa","SG":"Asia","GS":"South America","SH":"Africa","SJ":"Europe","SB":"Oceania","SL":"Africa","SV":"North America","SM":"Europe","SO":"Africa","PM":"North America","RS":"Europe","SS":"Africa","ST":"Africa","SR":"South America","SK":"Europe","SI":"Europe","SE":"Europe","SZ":"Africa","SC":"Africa","SY":"Asia","TC":"North America","TD":"Africa","TG":"Africa","TH":"Asia","TJ":"Asia","TK":"Oceania","TM":"Asia","TO":"Oceania","TT":"North America","TN":"Africa","TR":"Asia","TV":"Oceania","TW":"Asia","TZ":"Africa","UG":"Africa","UA":"Europe","UY":"South America","US":"North America","UZ":"Asia","VC":"North America","VE":"South America","VG":"North America","VI":"North America","VN":"Asia","VU":"Oceania","WF":"Oceania","WS":"Oceania","YE":"Asia","ZA":"Africa","ZM":"Africa","ZW":"Africa","XK":"Europe"};
 function flag(iso2){return iso2?'<img class="fl" src="https://flagcdn.com/20x15/'+iso2.toLowerCase()+'.png" onerror="this.style.display=\'none\'">':'';}
@@ -307,9 +320,10 @@ async function refreshUser(){
   showApp(data&&data.user?data.user:null);
 }
 function showApp(user){
-  if(user){$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("useremail").textContent=user.email;loadFlights();}
-  else{$("app").classList.add("hidden");$("auth").classList.remove("hidden");}
+  if(user){USERID=user.id||user.email||"anon";$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("useremail").textContent=user.email;loadFlights();}
+  else{USERID=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");}
 }
+$("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}render();}};
 $("signin").onclick=async()=>{
   if(!configured){authmsg("Not set up yet. See the README.","err");return;}
   const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});
@@ -508,27 +522,37 @@ function render(){
   let newThis=0;tyISO.forEach(x=>{if(!beforeISO.has(x))newThis++;});
   $("tyYear").textContent=curY;
   $("tyStats").innerHTML='<div class="ts"><b>'+tyFlights.length+'</b><span>Flights</span></div><div class="ts"><b>'+tyISO.size+'</b><span>Countries</span></div><div class="ts"><b>'+newThis+'</b><span>New countries</span></div>';
-  const target=Math.max(10,Math.ceil((countriesN+1)/10)*10);
-  $("goalCap").textContent=countriesN+" of "+target+" countries";
-  $("goalFill").style.width=Math.min(100,countriesN/target*100)+"%";
-  $("goalNote").textContent=(target-countriesN)+" to go to reach "+target+".";
+  const goal=goalGet();
+  if(goal){$("goalCap").textContent=countriesN+" of "+goal+" countries";$("goalFill").style.width=Math.min(100,countriesN/goal*100)+"%";$("goalNote").textContent=countriesN>=goal?"Reached. Set a new one?":((goal-countriesN)+" to go.");}
+  else{$("goalCap").textContent="No goal set.";$("goalFill").style.width="0%";$("goalNote").textContent="Set your own target with edit.";}
   $("contList").innerHTML=contN+" of 7 &middot; "+Object.keys(contSet).sort().join(", ");
   const home2=top(cityCount,1)[0][0];
   const sorted=FLIGHTS.slice().sort((a,b)=>a.date<b.date?-1:1);
   const trips=[];let curT=null;
-  sorted.forEach(f=>{if(!curT||f.from===home2){if(curT)trips.push(curT);curT={start:f.date,end:f.date,legs:[],dests:new Set()};}curT.legs.push(f);curT.end=f.date;if(f.to!==home2)curT.dests.add(cityOf(f.to));});
+  sorted.forEach(f=>{if(!curT||f.from===home2){if(curT)trips.push(curT);curT={start:f.date,end:f.date,legs:[],dests:new Set()};}curT.legs.push(f);curT.end=f.date;if(f.to!==home2)curT.dests.add(f.to);});
   if(curT)trips.push(curT);
   $("tripsTitle").textContent="Trips ("+trips.length+")";
   const tw=$("trips");tw.innerHTML="";
   const fmt2=s=>new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-  trips.slice().reverse().forEach(t=>{const dests=[...t.dests].slice(0,5).join(", ")||"local hops";const el=document.createElement("div");el.className="trip";
-    el.innerHTML='<div><div class="tl">'+dests+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr">'+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+'</div>';tw.appendChild(el);});
+  trips.slice().reverse().forEach(t=>{
+    const codes=[...t.dests].slice(0,8);
+    const destHtml=codes.map(c=>{const a=ap(c);return flag(a&&a[4])+cityOf(c);}).join(", ")||"local hops";
+    const legsHtml=t.legs.map(l=>{const a=ap(l.from),b=ap(l.to);return '<div class="leg">'+l.date+' &middot; '+flag(a&&a[4])+cityOf(l.from)+' &rarr; '+flag(b&&b[4])+cityOf(l.to)+(l.airline&&l.airline!=="Unknown"?' &middot; '+l.airline:'')+'</div>';}).join("");
+    const el=document.createElement("div");el.className="trip";
+    el.innerHTML='<div class="triphead"><div><div class="tl">'+destHtml+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr">'+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+' <span class="chev">+</span></div></div><div class="tripdetails hidden">'+legsHtml+'</div>';
+    const head=el.querySelector(".triphead"),det=el.querySelector(".tripdetails"),ch=el.querySelector(".chev");
+    head.style.cursor="pointer";head.onclick=()=>{det.classList.toggle("hidden");ch.textContent=det.classList.contains("hidden")?"+":"\u2013";};
+    tw.appendChild(el);});
 
   // flights table (with filters)
   $("fltitle").textContent="Your flights ("+FLIGHTS.length+")";
   const ysel=$("fYear"),cur=ysel.value;
   ysel.innerHTML='<option value="">All years</option>'+yrs.slice().reverse().map(y=>'<option value="'+y+'">'+y+'</option>').join("");
   ysel.value=cur;
+  const csel=$("fCountry"),curc=csel.value;
+  const allC=[...new Set(FLIGHTS.flatMap(f=>[ap(f.from),ap(f.to)].filter(Boolean).map(a=>a[3])))].sort();
+  csel.innerHTML='<option value="">All countries</option>'+allC.map(c=>'<option value="'+c+'">'+c+'</option>').join("");
+  csel.value=curc;
   renderTable();
 
   drawMap(visISO3);
@@ -541,30 +565,45 @@ function isoForCountry(name){if(COUNTRY_ISO2[name])return COUNTRY_ISO2[name];for
 
 /* ---------- flights table (filter / sort / search) ---------- */
 function renderTable(){
-  const q=($("fSearch").value||"").trim().toLowerCase(), yr=$("fYear").value, sort=$("fSort").value;
+  const q=($("fSearch").value||"").trim().toLowerCase(), yr=$("fYear").value, sort=$("fSort").value, ctry=$("fCountry").value;
   let rows=FLIGHTS.map(f=>{const A=ap(f.from),B=ap(f.to);return Object.assign({},f,{km:(A&&B)?hav([A[0],A[1]],[B[0],B[1]]):0});});
   if(yr)rows=rows.filter(f=>String(f.year)===yr);
+  if(ctry)rows=rows.filter(f=>{const A=ap(f.from),B=ap(f.to);return (A&&A[3]===ctry)||(B&&B[3]===ctry);});
   if(q)rows=rows.filter(f=>{const A=ap(f.from),B=ap(f.to);return (f.from+" "+f.to+" "+f.airline+" "+(A?A[2]+" "+A[3]:"")+" "+(B?B[2]+" "+B[3]:"")).toLowerCase().includes(q);});
   rows.sort((a,b)=> sort==="date_asc"?(a.date<b.date?-1:1) : sort==="dist_desc"?b.km-a.km : sort==="dist_asc"?a.km-b.km : (a.date<b.date?1:-1));
   const tb=$("fltbody");tb.innerHTML="";
-  if(!rows.length){tb.innerHTML='<tr><td colspan="4" style="color:var(--dim)">No matches.</td></tr>';return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="5" style="color:var(--dim)">No matches.</td></tr>';updateBulk();return;}
   rows.forEach(f=>{const a=ap(f.from),b=ap(f.to);const tr=document.createElement("tr");
-    tr.innerHTML='<td>'+f.date+'</td><td>'+flag(a&&a[4])+cityOf(f.from)+' &rarr; '+flag(b&&b[4])+cityOf(f.to)+'</td><td>'+logoImg(f.airline)+f.airline+'</td><td style="text-align:right;white-space:nowrap"><button class="edit" onclick="__editFlight(\''+f.id+'\')">edit</button><button class="del" onclick="__delFlight(\''+f.id+'\')">delete</button></td>';
+    tr.innerHTML='<td><input type="checkbox" class="rowsel" data-id="'+f.id+'"'+(selIds.has(f.id)?" checked":"")+'></td><td>'+f.date+'</td><td>'+flag(a&&a[4])+cityOf(f.from)+' &rarr; '+flag(b&&b[4])+cityOf(f.to)+'</td><td>'+logoImg(f.airline)+f.airline+'</td><td style="text-align:right;white-space:nowrap"><button class="edit" onclick="__editFlight(\''+f.id+'\')">edit</button><button class="del" onclick="__delFlight(\''+f.id+'\')">delete</button></td>';
     tb.appendChild(tr);});
+  const sa=$("selAll");if(sa)sa.checked=false;
+  updateBulk();
 }
-["fSearch","fYear","fSort"].forEach(id=>{const el=$(id);if(el){el.addEventListener("input",renderTable);el.addEventListener("change",renderTable);}});
+const selIds=new Set();
+function updateBulk(){const n=selIds.size,bb=$("bulkBar");if(bb){bb.classList.toggle("hidden",n===0);$("bulkCount").textContent=n+" selected";}}
+["fSearch","fYear","fSort","fCountry"].forEach(id=>{const el=$(id);if(el){el.addEventListener("input",renderTable);el.addEventListener("change",renderTable);}});
+$("fltbody").addEventListener("change",e=>{if(e.target.classList&&e.target.classList.contains("rowsel")){const id=e.target.dataset.id;e.target.checked?selIds.add(id):selIds.delete(id);updateBulk();}});
+(function(){const sa=$("selAll");if(sa)sa.addEventListener("change",e=>{document.querySelectorAll("#fltbody .rowsel").forEach(cb=>{cb.checked=e.target.checked;const id=cb.dataset.id;e.target.checked?selIds.add(id):selIds.delete(id);});updateBulk();});
+const bc=$("bulkClear");if(bc)bc.onclick=()=>{selIds.clear();const s=$("selAll");if(s)s.checked=false;document.querySelectorAll("#fltbody .rowsel").forEach(cb=>cb.checked=false);updateBulk();};
+const bd=$("bulkDel");if(bd)bd.onclick=async()=>{if(!selIds.size||!sb)return;if(!confirm("Delete "+selIds.size+" selected flight(s)?"))return;const ids=[...selIds];const {error}=await sb.from("flights").delete().in("id",ids);if(error){status("Delete error: "+error.message);return;}selIds.clear();await loadFlights();};})();
 
 /* ---------- map ---------- */
-let svg,proj,path,gLand,gArc,gDot;
+let svg,proj,path,gLand,gArc,gDot,mapZoom;
 function initMap(){const W=960,H=500;svg=d3.select("#map").append("svg").attr("viewBox","0 0 "+W+" "+H);
   proj=d3.geoNaturalEarth1().fitExtent([[8,10],[W-8,H-10]],{type:"Sphere"});path=d3.geoPath(proj);
-  gLand=svg.append("g");gArc=svg.append("g").attr("fill","none").attr("stroke-linecap","round");gDot=svg.append("g");}
+  const root=svg.append("g");
+  gLand=root.append("g");gArc=root.append("g").attr("fill","none").attr("stroke-linecap","round");gDot=root.append("g");
+  mapZoom=d3.zoom().scaleExtent([1,8]).on("zoom",ev=>root.attr("transform",ev.transform));
+  svg.call(mapZoom).on("dblclick.zoom",null);
+  const rb=$("mapReset");if(rb)rb.onclick=()=>svg.transition().duration(400).call(mapZoom.transform,d3.zoomIdentity);}
 function drawMap(visISO3){
   if(!svg)return;
   const solo=selYears.size>0, inSel=f=>selYears.size===0||selYears.has(f.year);
   gLand.selectAll("path").data(WORLDF).join("path").attr("d",path)
     .attr("fill",d=>mode==="countries"&&visISO3[d.id]?"var(--amber)":"#16233A")
-    .attr("stroke",d=>mode==="countries"&&visISO3[d.id]?"var(--amber-d)":"#1E2B40").attr("stroke-width",0.5);
+    .attr("stroke",d=>mode==="countries"&&visISO3[d.id]?"var(--amber-d)":"#1E2B40").attr("stroke-width",0.5)
+    .on("mousemove",function(ev,d){if(d.properties&&d.properties.name){const t=$("tip"),b=$("mapwrap").getBoundingClientRect();t.style.left=(ev.clientX-b.left)+"px";t.style.top=(ev.clientY-b.top)+"px";t.style.opacity=1;t.innerHTML=d.properties.name;}})
+    .on("mouseleave",()=>$("tip").style.opacity=0);
   const shown=mode==="routes"?FLIGHTS.filter(inSel):[];
   gArc.selectAll("path").data(shown).join("path").attr("d",d=>{const A=ap(d.from),B=ap(d.to);return(A&&B)?path({type:"LineString",coordinates:[[A[0],A[1]],[B[0],B[1]]]}):null;})
     .attr("stroke",d=>yColor(d.year)).attr("stroke-width",solo?1.5:0.9).attr("stroke-opacity",solo?0.75:0.42);
@@ -581,8 +620,7 @@ function drawMap(visISO3){
 }
 function chips(yrs,perYear){const box=$("chips");box.style.display=mode==="routes"?"flex":"none";box.innerHTML="";
   const all=document.createElement("button");all.className="chip"+(selYears.size===0?" on":"");all.textContent="All";all.onclick=()=>{selYears.clear();render();};box.appendChild(all);
-  yrs.forEach(y=>{const b=document.createElement("button");b.className="chip"+(selYears.has(y)?" on":"");b.textContent=String(y);b.onclick=()=>{selYears.has(y)?selYears.delete(y):selYears.add(y);render();};box.appendChild(b);});
-  if(mode==="routes"){const hint=document.createElement("span");hint.style.cssText="font-family:var(--mono);font-size:11px;color:var(--dim);align-self:center;margin-left:4px";hint.textContent="tap years to combine";box.appendChild(hint);}}
+  yrs.forEach(y=>{const b=document.createElement("button");b.className="chip"+(selYears.has(y)?" on":"");b.textContent=String(y);b.onclick=()=>{selYears.has(y)?selYears.delete(y):selYears.add(y);render();};box.appendChild(b);});}
 function legend(yrs,perYear,cN){const lg=$("legend");lg.innerHTML="";
   if(mode==="routes"){const show=yrs.filter(y=>selYears.size===0||selYears.has(y));show.forEach(y=>{const s=document.createElement("span");s.innerHTML='<i style="background:'+yColor(y)+'"></i>'+y+" ("+perYear[y]+")";lg.appendChild(s);});}
   else{const s=document.createElement("span");s.innerHTML='<i style="background:var(--amber);height:12px;width:16px"></i>Visited ('+cN+" countries)";lg.appendChild(s);}}
