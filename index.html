@@ -310,7 +310,10 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
             <div class="goalbar"><div id="goalFill" class="goalfill"></div></div>
             <div class="cap" id="goalNote" style="margin-top:10px"></div>
           </div>
-          <div class="panel"><h3>Continents</h3><div class="cap" id="contList" style="margin-top:6px"></div></div>
+          <div class="panel"><h3>Continents <button id="cgoalEdit" class="linkbtn" style="font-size:12px;margin-left:6px">edit</button></h3><div class="cap" id="contList" style="margin-top:6px"></div>
+            <div class="goalbar" style="margin-top:12px"><div id="cgoalFill" class="goalfill"></div></div>
+            <div class="cap" id="cgoalNote" style="margin-top:10px"></div>
+          </div>
         </div>
       </section>
 
@@ -380,7 +383,14 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 
       <section data-t="insights"><div class="sec-head"><h2>Milestones</h2></div><div class="card"><div class="timeline" id="timeline"></div></div></section>
 
-      <section data-t="overview"><div class="sec-head"><h2 id="ctitle">Countries visited</h2></div><div class="countries" id="countries"></div></section>
+      <section data-t="overview"><div class="sec-head"><h2 id="ctitle">Countries visited</h2><p>Been somewhere before you started logging flights? Add it here.</p></div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="controls"><input id="manualInput" list="manualList" placeholder="Add a country you've visited..."/><button class="tool" id="manualAdd">Add</button></div>
+          <datalist id="manualList"></datalist>
+          <div id="manualChips" class="wishwrap"></div>
+        </div>
+        <div class="countries" id="countries"></div>
+      </section>
 
       <section data-t="overview"><div class="sec-head"><h2>Want to visit <span id="wishCount"></span></h2><p>Build a bucket list. These show in gold on the Countries map.</p></div>
         <div class="card">
@@ -544,6 +554,12 @@ let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set(), USERID=null
 function goalKey(){return "flg_goal_"+(USERID||"anon");}
 function goalGet(){try{const v=parseInt(localStorage.getItem(goalKey()));return v>0?v:null;}catch(e){return null;}}
 function goalSet(v){try{localStorage.setItem(goalKey(),String(v));}catch(e){}}
+function cgoalKey(){return "flg_cgoal_"+(USERID||"anon");}
+function cgoalGet(){try{const v=parseInt(localStorage.getItem(cgoalKey()));return v>0?v:null;}catch(e){return null;}}
+function cgoalSet(v){try{localStorage.setItem(cgoalKey(),String(v));}catch(e){}}
+function manualKey(){return "flg_manual_"+(USERID||"anon");}
+function manualGet(){try{return JSON.parse(localStorage.getItem(manualKey())||"[]")||[];}catch(e){return [];}}
+function manualSet(a){try{localStorage.setItem(manualKey(),JSON.stringify(a));}catch(e){}}
 function homeKey(){return "flg_home_"+(USERID||"anon");}
 function homeGet(){try{return localStorage.getItem(homeKey())||null;}catch(e){return null;}}
 function homeSet(v){try{localStorage.setItem(homeKey(),v);}catch(e){}}
@@ -626,6 +642,14 @@ function addWish(){const v=$("wishInput").value.trim();if(!v)return;const id=NAM
   if(visited.has(id)){alert("You've already been to "+((ID2NAME&&ID2NAME[id])||v)+"! The bucket list is for places you haven't visited yet.");$("wishInput").value="";return;}
   const a=wishGet();if(!a.includes(id)){a.push(id);wishSet(a);}$("wishInput").value="";render();}
 $("wishAdd").onclick=addWish;
+function addManual(){const v=$("manualInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}
+  const a=manualGet();if(!a.includes(id))a.push(id);manualSet(a);
+  wishSet(wishGet().filter(x=>x!==id));
+  $("manualInput").value="";render();}
+$("manualAdd").onclick=addManual;
+$("manualInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addManual();}});
+$("manualChips").addEventListener("click",e=>{const b=e.target.closest("[data-mid]");if(b){const id=b.getAttribute("data-mid");manualSet(manualGet().filter(x=>x!==id));render();}});
+$("cgoalEdit").onclick=()=>{const cur=cgoalGet()||"";const v=prompt("Continents goal (1 to 7):",cur);if(v===null)return;const n=parseInt(v);if(n>0&&n<=7){cgoalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(cgoalKey());}catch(e){}render();}else alert("Enter a number from 1 to 7.");};
 $("wishInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addWish();}});
 $("wishList").addEventListener("click",e=>{const b=e.target.closest("[data-wid]");if(b){const id=b.getAttribute("data-wid");wishSet(wishGet().filter(x=>x!==id));render();}});
 $("signin").onclick=async()=>{
@@ -896,6 +920,8 @@ function render(){
   });
   const yrs=Object.keys(perYear).map(Number).sort();
   const uniqAir=Object.keys(cityCount).length;
+  const MANUAL=manualGet();
+  MANUAL.forEach(id=>{if(!visISO3[id]){visISO3[id]=id;const nm=(ID2NAME&&ID2NAME[id])||id;if(!visCities[nm])visCities[nm]=new Set();}});
   const countriesN=Object.keys(visISO3).length;
   const flyDays=Math.round(hours/24),earth=(km/40075).toFixed(1);
   const top=(o,n)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n);
@@ -967,18 +993,21 @@ function render(){
   $("ctitle").textContent="Countries visited ("+countriesN+")";
   const cbox=$("countries");cbox.innerHTML="";
   const list=Object.keys(visCities).sort();
-  list.forEach((cn,i)=>{const iso=isoForCountry(cn);const cities=[...visCities[cn]].slice(0,6).join(", ");const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
+  list.forEach((cn,i)=>{const iso=isoForCountry(cn)||((NAME2ID&&ID3TO2&&NAME2ID[cn.toLowerCase()])?ID3TO2[NAME2ID[cn.toLowerCase()]]:"");const cities=visCities[cn].size?[...visCities[cn]].slice(0,6).join(", "):"added manually";const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
 
   // want to visit
   if(ID2NAME){const opts=Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]).sort();$("countryList").innerHTML=opts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
   const wa=wishGet();$("wishCount").textContent="("+wa.length+")";
   const wl=$("wishList");
   wl.innerHTML=wa.length?wa.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-wid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">Nothing yet. Add a country above.</span>';
+  if(ID2NAME){const mopts=Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]).sort();$("manualList").innerHTML=mopts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+  const mc=$("manualChips");mc.innerHTML=MANUAL.length?MANUAL.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-mid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">None added yet. Flights already count automatically.</span>';
 
   // continents, this year, goal, trips
   const curY=new Date().getFullYear();
   const contSet={},contByArr={};
   FLIGHTS.forEach(f=>{[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[4]&&CONTINENT2[a[4]])contSet[CONTINENT2[a[4]]]=1;});const at=ap(f.to);if(at&&at[4]&&CONTINENT2[at[4]]){const cn=CONTINENT2[at[4]];contByArr[cn]=(contByArr[cn]||0)+1;}});
+  MANUAL.forEach(id=>{const i2=iso3to2(id);if(i2&&CONTINENT2[i2])contSet[CONTINENT2[i2]]=1;});
   const contN=Object.keys(contSet).length;
   const tyFlights=FLIGHTS.filter(f=>f.year===curY);
   const tyISO=new Set();tyFlights.forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])tyISO.add(a[5]);}));
@@ -990,6 +1019,9 @@ function render(){
   if(goal){$("goalCap").textContent=countriesN+" of "+goal+" countries";$("goalFill").style.width=Math.min(100,countriesN/goal*100)+"%";$("goalNote").textContent=countriesN>=goal?"Reached. Set a new one?":((goal-countriesN)+" to go.");}
   else{$("goalCap").textContent="No goal set.";$("goalFill").style.width="0%";$("goalNote").textContent="Set your own target with edit.";}
   $("contList").innerHTML=contN+" of 7 &middot; "+Object.keys(contSet).sort().join(", ");
+  const cgoal=cgoalGet();
+  if(cgoal){$("cgoalFill").style.width=Math.min(100,contN/cgoal*100)+"%";$("cgoalNote").textContent=contN>=cgoal?("Reached "+cgoal+" of 7. "+(cgoal<7?"Aim higher?":"All seven!")):((cgoal-contN)+" continent"+(cgoal-contN===1?"":"s")+" to go (goal: "+cgoal+").");}
+  else{$("cgoalFill").style.width="0%";$("cgoalNote").textContent="Set a continents goal with edit (e.g. all 7).";}
   const home2=HOME;
   const sorted=FLIGHTS.slice().sort((a,b)=>a.date<b.date?-1:1);
   const trips=[];let curT=null;
@@ -1134,6 +1166,7 @@ function fillPassport(){
     if(f.airline&&f.airline!=="Unknown")air[f.airline]=(air[f.airline]||0)+1;
     rte[[f.from,f.to].sort().join(" \u2013 ")]=(rte[[f.from,f.to].sort().join(" \u2013 ")]||0)+1;
     const y=+String(f.date).slice(0,4);if(y&&(!firstY||y<firstY))firstY=y;});
+  (typeof manualGet==="function"?manualGet():[]).forEach(id=>{iso.add(id);const i2=iso3to2(id);if(i2&&CONTINENT2[i2])cont.add(CONTINENT2[i2]);});
   const topAir=Object.entries(air).sort((a,b)=>b[1]-a[1])[0];
   const topRte=Object.entries(rte).sort((a,b)=>b[1]-a[1])[0];
   const st={flights:FLIGHTS.length,countries:iso.size,continents:cont.size,avgKm:FLIGHTS.length?km/FLIGHTS.length:0,longShare:FLIGHTS.length?longN/FLIGHTS.length:0};
