@@ -140,6 +140,11 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 #mapReset{position:absolute;top:10px;right:10px;background:var(--ink2);border:1px solid var(--line2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;z-index:6}
 #mapReset:hover{color:var(--paper);border-color:var(--amber)}
 .trip .tl{font-weight:500;font-size:14px;display:flex;flex-wrap:wrap;gap:5px 12px;line-height:1.5}
+.revactions{display:flex;gap:10px;margin-top:16px}
+.revactions .btn{margin-top:0;flex:1}
+.revsocial{display:flex;gap:8px;margin-top:10px}
+.sbtn{flex:1;background:var(--ink);border:1px solid var(--line2);color:var(--paper);font-family:var(--mono);font-size:12px;padding:9px 6px;border-radius:9px;cursor:pointer}
+.sbtn:hover{border-color:var(--amber);color:var(--amber)}
 .setrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--paper)}
 .setrow .setv{font-family:var(--mono);font-size:13px;color:var(--muted)}
 .dchip{white-space:nowrap;display:inline-flex;align-items:center}
@@ -282,7 +287,6 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       <button class="tool" id="reviewBtn">Year in review</button>
       <button class="tool" id="printBtn">Save PDF</button>
       <button class="tool" id="shareBtn">Share</button>
-      <div class="toggle" id="unitToggle"><button data-u="km" class="on">km</button><button data-u="mi">mi</button></div>
       <span id="status"></span>
     </div>
     <div id="cfgwarn" class="cfg-warn hidden"></div>
@@ -295,14 +299,17 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       </div>
       <div class="board" id="board" data-t="overview"></div>
 
-      <section data-t="overview"><div class="sec-head"><h2>This year &amp; goals</h2></div>
+      <section data-t="overview"><div class="sec-head"><h2>This year</h2></div>
+        <div class="panel"><div class="cap">Your <span id="tyYear"></span> so far</div><div id="tyStats" class="tystats"></div></div>
+      </section>
+
+      <section data-t="overview"><div class="sec-head"><h2>Goals &amp; continents</h2></div>
         <div class="grid2">
-          <div class="panel"><h3>This year</h3><div class="cap">Your <span id="tyYear"></span> so far</div><div id="tyStats" class="tystats"></div></div>
           <div class="panel"><h3>Country goal <button id="goalEdit" class="linkbtn" style="font-size:12px;margin-left:6px">edit</button></h3><div class="cap" id="goalCap"></div>
             <div class="goalbar"><div id="goalFill" class="goalfill"></div></div>
             <div class="cap" id="goalNote" style="margin-top:10px"></div>
-            <h3 style="font-size:14px;margin-top:18px">Continents</h3><div class="cap" id="contList" style="margin-top:6px"></div>
           </div>
+          <div class="panel"><h3>Continents</h3><div class="cap" id="contList" style="margin-top:6px"></div></div>
         </div>
       </section>
 
@@ -498,8 +505,17 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
     <select id="revYear" class="fld" style="width:auto;padding:6px 10px"></select>
   </div>
   <div id="revCard"></div>
-  <button id="revDownload" class="btn" style="margin-top:14px">Download image</button>
-  <button id="rev_close" class="btn ghost">Close</button>
+  <div class="revactions">
+    <button id="rev_native" class="btn">Share</button>
+    <button id="revDownload" class="btn ghost">Download</button>
+  </div>
+  <div class="revsocial">
+    <button class="sbtn" data-net="wa">WhatsApp</button>
+    <button class="sbtn" data-net="x">X</button>
+    <button class="sbtn" data-net="fb">Facebook</button>
+  </div>
+  <div class="cap" id="rev_hint" style="margin-top:10px">Tip: Share opens your phone's share sheet (Instagram, Stories, and more). WhatsApp / X / Facebook post the text and your public link.</div>
+  <button id="rev_close" class="btn ghost" style="margin-top:12px">Close</button>
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -604,7 +620,10 @@ $("shareCopy").onclick=()=>{const i=$("shareLink");i.select();try{navigator.clip
 $("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}render();}};
 $("tripsTitle").onclick=()=>{const t=$("trips"),c=$("tripsChev");t.classList.toggle("hidden");if(c)c.textContent=t.classList.contains("hidden")?"+":"\u2013";};
 $("homeEdit").onclick=()=>{const cur=homeGet()||"";const v=prompt("Home airport code (e.g. BEY):",cur);if(v===null)return;const c=v.trim().toUpperCase();if(!c){try{localStorage.removeItem(homeKey());}catch(e){}render();return;}if(!ap(c)){alert("Unknown airport code.");return;}homeSet(c);render();};
-function addWish(){const v=$("wishInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}const a=wishGet();if(!a.includes(id)){a.push(id);wishSet(a);}$("wishInput").value="";render();}
+function addWish(){const v=$("wishInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}
+  const visited=new Set();FLIGHTS.forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])visited.add(a[5]);}));
+  if(visited.has(id)){alert("You've already been to "+((ID2NAME&&ID2NAME[id])||v)+"! The bucket list is for places you haven't visited yet.");$("wishInput").value="";return;}
+  const a=wishGet();if(!a.includes(id)){a.push(id);wishSet(a);}$("wishInput").value="";render();}
 $("wishAdd").onclick=addWish;
 $("wishInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addWish();}});
 $("wishList").addEventListener("click",e=>{const b=e.target.closest("[data-wid]");if(b){const id=b.getAttribute("data-wid");wishSet(wishGet().filter(x=>x!==id));render();}});
@@ -758,18 +777,43 @@ function renderReview(Y){
     row("Top destination",s.topDest)+row("Busiest month",s.busiest)+row("Airlines",s.airlines)+'</div>';
 }
 function drawReviewImage(s){
-  const W=1080,H=1080,cv=document.createElement("canvas");cv.width=W;cv.height=H;
+  const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;
   const ctx=cv.getContext&&cv.getContext("2d");if(!ctx)return null;
-  ctx.fillStyle="#0A0F1C";ctx.fillRect(0,0,W,H);
-  ctx.fillStyle="#37D1BE";ctx.font="600 34px Georgia, serif";ctx.fillText("Travelers Log",80,110);
-  ctx.fillStyle="#ECF1F8";ctx.font="600 96px Georgia, serif";ctx.fillText(s.Y+" in review",80,240);
-  const items=[["Flights",String(s.flights)],["Countries",s.countries+(s.newC?"  ("+s.newC+" new)":"")],["Distance",dStr(s.km)],["Longest",s.longest.km?cityOf(s.longest.from)+" \u2192 "+cityOf(s.longest.to):"-"],["Top destination",s.topDest],["Busiest month",s.busiest]];
-  let y=380;items.forEach(([k,v])=>{
-    ctx.fillStyle="#57677E";ctx.font="500 26px monospace";ctx.fillText(k.toUpperCase(),80,y);
-    ctx.fillStyle="#F2B34A";ctx.font="600 58px Georgia, serif";ctx.fillText(String(v),80,y+62);y+=118;});
-  ctx.fillStyle="#57677E";ctx.font="400 24px monospace";ctx.fillText("travelers log",80,H-60);
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#0A0F1C");g.addColorStop(0.5,"#0E1A2B");g.addColorStop(1,"#0B2622");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="rgba(55,209,190,0.10)";ctx.beginPath();ctx.arc(W-90,150,300,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="rgba(242,179,74,0.07)";ctx.beginPath();ctx.arc(120,H-120,260,0,Math.PI*2);ctx.fill();
+  const P=(typeof profGet==="function"?profGet():{})||{};const name=P.name?P.name.trim():"";
+  ctx.textBaseline="alphabetic";
+  ctx.fillStyle="#37D1BE";ctx.font="600 30px Georgia, serif";ctx.fillText("\u2708  TRAVELERS LOG",80,130);
+  ctx.fillStyle="#ECF1F8";ctx.font="700 150px Georgia, serif";ctx.fillText(String(s.Y),78,300);
+  ctx.fillStyle="#8494A8";ctx.font="400 42px Georgia, serif";ctx.fillText(name?name+"\u2019s year in review":"in review",82,362);
+  const cell=(x,y,label,val,color)=>{ctx.fillStyle="#57677E";ctx.font="500 26px monospace";ctx.fillText(label,x,y);
+    ctx.fillStyle=color;ctx.font="700 84px Georgia, serif";
+    let t=String(val),fs=84;while(ctx.measureText(t).width>430&&fs>40){fs-=4;ctx.font="700 "+fs+"px Georgia, serif";}ctx.fillText(t,x,y+82);};
+  cell(80,500,"FLIGHTS",s.flights,"#37D1BE");
+  cell(570,500,"COUNTRIES",s.countries+(s.newC?" (+"+s.newC+")":""),"#F2B34A");
+  cell(80,700,"DISTANCE",Math.round(s.km).toLocaleString()+" km","#F2B34A");
+  cell(570,700,"AIRLINES",s.airlines,"#37D1BE");
+  const wide=(y,label,val)=>{ctx.fillStyle="#57677E";ctx.font="500 26px monospace";ctx.fillText(label,80,y);
+    ctx.fillStyle="#ECF1F8";ctx.font="600 44px Georgia, serif";let t=String(val),fs=44;while(ctx.measureText(t).width>W-160&&fs>26){fs-=3;ctx.font="600 "+fs+"px Georgia, serif";}ctx.fillText(t,80,y+52);};
+  wide(880,"TOP DESTINATION",s.topDest||"\u2013");
+  wide(1010,"LONGEST FLIGHT",s.longest.km?cityOf(s.longest.from)+" \u2192 "+cityOf(s.longest.to):"\u2013");
+  wide(1140,"BUSIEST MONTH",s.busiest||"\u2013");
+  ctx.strokeStyle="rgba(255,255,255,0.08)";ctx.beginPath();ctx.moveTo(80,1245);ctx.lineTo(W-80,1245);ctx.stroke();
+  ctx.fillStyle="#57677E";ctx.font="400 26px monospace";ctx.fillText("made with Travelers Log",80,H-55);
   return cv.toDataURL("image/png");
 }
+function revShareText(s){return s.Y+" in review: "+s.flights+" flights, "+s.countries+" countries, "+Math.round(s.km).toLocaleString()+" km flown \u2708\ufe0f";}
+function revShareLink(){try{if(PROFILE&&PROFILE.is_public&&PROFILE.share_slug){const dir=location.pathname.replace(/[^/]*$/,"");return location.origin+dir+"share.html?u="+PROFILE.share_slug;}}catch(e){}return location.origin+location.pathname.replace(/[^/]*$/,"");}
+async function revShareNative(){if(!REVSTATS)return;const url=drawReviewImage(REVSTATS);if(!url)return;
+  try{const blob=await(await fetch(url)).blob();const file=new File([blob],"travelers-log-"+REVSTATS.Y+".png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"My year in review",text:revShareText(REVSTATS)});return;}}catch(e){}
+  const a=document.createElement("a");a.href=url;a.download="travelers-log-"+REVSTATS.Y+".png";a.click();}
+function revOpenSocial(net){if(!REVSTATS)return;const t=revShareText(REVSTATS),link=revShareLink();
+  const msg=encodeURIComponent(t+(link?" "+link:"")),lk=encodeURIComponent(link||location.origin);let url="";
+  if(net==="wa")url="https://wa.me/?text="+msg;else if(net==="x")url="https://twitter.com/intent/tweet?text="+msg;else if(net==="fb")url="https://www.facebook.com/sharer/sharer.php?u="+lk;
+  if(url)window.open(url,"_blank","noopener");}
 $("reviewBtn").onclick=()=>{
   const yrs=[...new Set(FLIGHTS.map(f=>f.year))].sort((a,b)=>b-a);
   if(!yrs.length)return;
@@ -779,6 +823,8 @@ $("reviewBtn").onclick=()=>{
 $("revYear").onchange=()=>renderReview(+$("revYear").value);
 $("rev_close").onclick=()=>$("reviewModal").classList.add("hidden");
 $("revDownload").onclick=()=>{if(!REVSTATS)return;const url=drawReviewImage(REVSTATS);if(!url)return;const a=document.createElement("a");a.href=url;a.download="travelers-log-"+REVSTATS.Y+".png";a.click();};
+$("rev_native").onclick=revShareNative;
+document.querySelectorAll(".revsocial .sbtn").forEach(b=>b.onclick=()=>revOpenSocial(b.dataset.net));
 
 /* ---------- photo upload ---------- */
 $("uploadBtn").onclick=()=>$("fileInput").click();
@@ -856,7 +902,6 @@ function render(){
   $("homeLabel").innerHTML=flag((ap(HOME)||[])[4])+cityOf(HOME);
   if(!NAME2ID&&WORLDF.length)buildNameMaps();
   WISH=new Set(wishGet());
-  UNIT=unitGet();document.querySelectorAll("#unitToggle button").forEach(b=>b.classList.toggle("on",b.dataset.u===UNIT));
 
   const board=$("board");board.innerHTML="";
   [["Flights",FLIGHTS.length,""],["Airlines",Object.keys(airCount).length,""],["Airports",uniqAir,""],
@@ -924,7 +969,7 @@ function render(){
   list.forEach((cn,i)=>{const iso=isoForCountry(cn);const cities=[...visCities[cn]].slice(0,6).join(", ");const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
 
   // want to visit
-  if(ID2NAME&&$("countryList").children.length===0){const opts=Object.keys(ID2NAME).map(id=>ID2NAME[id]).sort();$("countryList").innerHTML=opts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+  if(ID2NAME){const opts=Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]).sort();$("countryList").innerHTML=opts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
   const wa=wishGet();$("wishCount").textContent="("+wa.length+")";
   const wl=$("wishList");
   wl.innerHTML=wa.length?wa.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-wid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">Nothing yet. Add a country above.</span>';
@@ -1029,7 +1074,6 @@ function setTab(name){currentTab=name;tabSet(name);
 }
 document.querySelectorAll("#tabs .tab").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 setTab("overview");
-document.querySelectorAll("#unitToggle button").forEach(b=>b.onclick=()=>{unitSet(b.dataset.u);render();});
 document.addEventListener("keydown",e=>{if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(document.querySelector(".modal:not(.hidden)"))return;if(e.key==="1")setTab("overview");else if(e.key==="2")setTab("insights");else if(e.key==="3")setTab("flights");});
 
 /* ---------- growth over time ---------- */
