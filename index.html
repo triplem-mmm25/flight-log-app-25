@@ -139,7 +139,10 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .bulk #bulkCount{font-family:var(--mono);font-size:12px;color:var(--paper)}
 #mapReset{position:absolute;top:10px;right:10px;background:var(--ink2);border:1px solid var(--line2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;z-index:6}
 #mapReset:hover{color:var(--paper);border-color:var(--amber)}
-.trip .tl{font-weight:500;font-size:14px}
+.trip .tl{font-weight:500;font-size:14px;display:flex;flex-wrap:wrap;gap:5px 12px;line-height:1.5}
+.setrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--paper)}
+.setrow .setv{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.dchip{white-space:nowrap;display:inline-flex;align-items:center}
 .trip .td{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
 .trip .tr{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:right;white-space:nowrap}
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
@@ -219,13 +222,13 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .tlbar i{display:block;height:100%;background:var(--amber)}
 .tlnum{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:22px;text-align:right}
 .timeline{display:flex;flex-direction:column}
-.tl{display:grid;grid-template-columns:14px 90px 1fr;gap:12px;align-items:start;padding:0 0 18px;position:relative}
-.tl:not(:last-child)::before{content:"";position:absolute;left:6px;top:13px;bottom:-1px;width:1px;background:var(--line2)}
+.mln{display:grid;grid-template-columns:14px 90px 1fr;gap:12px;align-items:start;padding:0 0 18px;position:relative}
+.mln:not(:last-child)::before{content:"";position:absolute;left:6px;top:13px;bottom:-1px;width:1px;background:var(--line2)}
 .tldot{width:11px;height:11px;border-radius:50%;background:var(--amber);margin-top:3px;z-index:1}
 .tldate{font-family:var(--mono);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
 .tltext{font-size:14px;color:var(--paper)}
 .tlsub{display:block;font-size:12px;color:var(--muted);margin-top:2px}
-@media(max-width:640px){.toppair{grid-template-columns:1fr}.tl{grid-template-columns:14px 74px 1fr;gap:9px}}
+@media(max-width:640px){.toppair{grid-template-columns:1fr}.mln{grid-template-columns:14px 74px 1fr;gap:9px}}
 .wishwrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .wishchip{display:inline-flex;align-items:center;gap:6px;background:var(--ink2);border:1px solid var(--line2);border-radius:20px;padding:5px 12px;font-size:13px}
 .wishchip .wx{background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;line-height:1;padding:0}
@@ -256,6 +259,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
     <input id="pw" class="fld" type="password" placeholder="Password (min 6 chars)" autocomplete="current-password"/>
     <button id="signin" class="btn">Sign in</button>
     <button id="signup" class="btn ghost">Create account</button>
+    <button id="forgot" class="linkbtn" style="margin-top:14px">Forgot password?</button>
     <div id="authmsg" class="msg"></div>
   </div>
 </div>
@@ -265,7 +269,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="wrap">
     <div class="topbar">
       <div class="brand">Travelers <b>Log</b></div>
-      <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail"></span><button id="signout" class="linkbtn">Sign out</button></div>
+      <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail"></span><button id="settingsBtn" class="linkbtn">Settings</button><button id="signout" class="linkbtn">Sign out</button></div>
     </div>
     <div class="toolbar">
       <button class="tool primary" id="addBtn">+ Add flight</button>
@@ -426,6 +430,21 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 </div></div>
 
 <!-- SHARE MODAL -->
+<div id="settingsModal" class="modal hidden"><div class="modalbox">
+  <h3>Settings</h3>
+  <div class="cap" style="margin-bottom:4px">Account</div>
+  <div class="setrow"><span>Email</span><span id="set_email" class="setv"></span></div>
+  <div class="setrow"><span>Stay signed in</span><span class="setv">On, this device</span></div>
+  <div class="cap" style="margin:20px 0 6px">Change password</div>
+  <input id="set_pw" class="fld" type="password" placeholder="New password (min 6 chars)" autocomplete="new-password"/>
+  <button id="set_pwsave" class="btn">Update password</button>
+  <div id="set_msg" class="msg" style="margin-top:10px"></div>
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button id="set_signout" class="btn ghost" style="flex:1;margin-top:0">Sign out</button>
+    <button id="set_close" class="btn ghost" style="flex:1;margin-top:0">Close</button>
+  </div>
+</div></div>
+
 <div id="profileModal" class="modal hidden"><div class="modalbox">
   <h3>Your profile</h3>
   <div class="profhead">
@@ -602,8 +621,25 @@ $("signup").onclick=async()=>{
   else authmsg("Account created.","ok");
 };
 $("signout").onclick=async()=>{if(sb)await sb.auth.signOut();};
+$("forgot").onclick=async()=>{const em=$("email").value.trim();const M=$("authmsg");
+  if(!em){M.textContent="Type your email above, then tap Forgot password.";M.className="msg err";return;}
+  M.textContent="Sending reset link...";M.className="msg";
+  try{const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});
+    M.textContent=error?("Error: "+error.message):("Reset link sent to "+em+". Open it on this device to set a new password.");M.className="msg "+(error?"err":"ok");}
+  catch(e){M.textContent="Error: "+e.message;M.className="msg err";}};
+$("settingsBtn").onclick=()=>{$("set_email").textContent=$("useremail").textContent||"";$("set_pw").value="";$("set_msg").textContent="";$("settingsModal").classList.remove("hidden");};
+$("set_close").onclick=()=>$("settingsModal").classList.add("hidden");
+$("set_signout").onclick=async()=>{$("settingsModal").classList.add("hidden");if(sb)await sb.auth.signOut();};
+$("set_pwsave").onclick=async()=>{const pw=$("set_pw").value,M=$("set_msg");
+  if(pw.length<6){M.textContent="Password must be at least 6 characters.";M.className="msg err";return;}
+  M.textContent="Updating...";M.className="msg";
+  try{const {error}=await sb.auth.updateUser({password:pw});M.textContent=error?("Error: "+error.message):"Password updated.";M.className="msg "+(error?"err":"ok");$("set_pw").value="";}
+  catch(e){M.textContent="Error: "+e.message;M.className="msg err";}};
 function authmsg(t,c){const m=$("authmsg");m.textContent=t;m.className="msg "+(c||"");}
-if(configured){sb.auth.onAuthStateChange((_e,session)=>showApp(session?session.user:null));}
+if(configured){sb.auth.onAuthStateChange((ev,session)=>{
+  if(ev==="PASSWORD_RECOVERY"){const np=prompt("Enter a new password (at least 6 characters):");if(np&&np.length>=6){sb.auth.updateUser({password:np}).then(({error})=>{alert(error?("Could not update password: "+error.message):"Password updated. You are signed in.");});}}
+  showApp(session?session.user:null);
+});}
 
 /* ---------- data ---------- */
 async function loadFlights(){
@@ -925,7 +961,7 @@ function render(){
     const ybody=document.createElement("div");ybody.className="yearbody hidden";
     list.slice().reverse().forEach(t=>{
       const codes=[...t.dests].slice(0,8);
-      const destHtml=codes.map(c=>{const a=ap(c);return flag(a&&a[4])+cityOf(c);}).join(", ")||"local hops";
+      const destHtml=codes.map(c=>{const a=ap(c);return '<span class="dchip">'+flag(a&&a[4])+cityOf(c)+'</span>';}).join("")||"local hops";
       const legsHtml=t.legs.map(l=>{const a=ap(l.from),b=ap(l.to);return '<div class="leg">'+l.date+' &middot; '+flag(a&&a[4])+cityOf(l.from)+' &rarr; '+flag(b&&b[4])+cityOf(l.to)+(l.airline&&l.airline!=="Unknown"?' &middot; '+l.airline:'')+'</div>';}).join("");
       const el=document.createElement("div");el.className="trip";
       el.innerHTML='<div class="triphead"><div><div class="tl">'+destHtml+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr"><button class="tripmap">Map</button> '+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+' <span class="chev">+</span></div></div><div class="tripdetails hidden">'+legsHtml+'</div>';
@@ -1006,7 +1042,7 @@ function areaChart(series,fmt){
   const pts=series.map((s,i)=>[x(i),y(s.value)]);
   const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
   const area=line+" L"+pts[n-1][0].toFixed(1)+" "+(H-pad)+" L"+pts[0][0].toFixed(1)+" "+(H-pad)+" Z";
-  const dots=pts.map(p=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6"/>').join("");
+  const dots=pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6"><title>'+series[i].label.replace(/^'/,"'")+": "+fmt(series[i].value)+'</title></circle>').join("");
   const xl=series.map((s,i)=>'<text x="'+x(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="middle" class="axl">'+s.label+'</text>').join("");
   const last=pts[n-1];
   return '<svg viewBox="0 0 '+W+' '+H+'" class="growthsvg"><path d="'+area+'" class="ga"/><path d="'+line+'" class="gl"/>'+dots+xl+
@@ -1146,7 +1182,7 @@ function renderMilestones(){
   if(gap.d>0)ev.push({date:gap.date,ord:3,text:"Longest break \u00b7 "+gap.d+" days","sub":"between trips"});
   ev.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.ord-b.ord);
   const df=s=>new Date(s).toLocaleDateString("en-GB",{month:"short",year:"numeric"});
-  box.innerHTML=ev.map(e=>'<div class="tl"><div class="tldot"></div><div class="tldate">'+df(e.date)+'</div><div class="tltext">'+e.text+'<span class="tlsub">'+e.sub+'</span></div></div>').join("");
+  box.innerHTML=ev.map(e=>'<div class="mln"><div class="tldot"></div><div class="tldate">'+df(e.date)+'</div><div class="tltext">'+e.text+'<span class="tlsub">'+e.sub+'</span></div></div>').join("");
 }
 
 // crude country name -> iso2 from the airports table (first airport in that country)
@@ -1199,7 +1235,7 @@ function initMap(){const W=960,H=500;svg=d3.select("#map").append("svg").attr("v
   gSphere=gRoot.append("path").attr("fill","#0E1A2B").attr("stroke","#1E2B40");
   gLand=gRoot.append("g");gArc=gRoot.append("g").attr("fill","none").attr("stroke-linecap","round");gDot=gRoot.append("g");
   gLabel=svg.append("g").attr("pointer-events","none");
-  mapZoom=d3.zoom().scaleExtent([1,8]).on("zoom",ev=>{mapT=ev.transform;gRoot.attr("transform",mapT);updateLabels();});
+  mapZoom=d3.zoom().scaleExtent([1,14]).on("zoom",ev=>{mapT=ev.transform;gRoot.attr("transform",mapT);updateLabels();});
   mapDrag=d3.drag().on("start",()=>stopSpin()).on("drag",ev=>{rotation[0]+=ev.dx*0.3;rotation[1]=Math.max(-90,Math.min(90,rotation[1]-ev.dy*0.3));buildProj();drawCurrent();});
   applyInteraction();
   const sp=$("mapSpin");if(sp)sp.onclick=toggleSpin;
@@ -1212,7 +1248,7 @@ function updateLabels(){
   cand.sort((a,b)=>b.L.w-a.L.w);
   const cap=Math.min(cand.length,Math.round(8*mapT.k)),placed=[],out=[];
   for(const o of cand){if(out.length>=cap)break;
-    const need=o.L.text.length*6.4+6, avail=o.L.bw?o.L.bw*mapT.k:Infinity; if(avail<need)continue;
+    const need=o.L.text.length*6.4+6, avail=o.L.bw?o.L.bw*mapT.k:Infinity; if(avail<need*0.5)continue;
     const sx=o.p[0],sy=o.p[1]-(o.L.r?o.L.r*mapT.k+5:0);
     let ok=true;for(const q of placed){if(Math.abs(q.x-sx)<52&&Math.abs(q.y-sy)<13){ok=false;break;}}
     if(ok){placed.push({x:sx,y:sy});out.push(Object.assign({},o.L,{sx:sx,sy:sy}));}}
