@@ -162,6 +162,21 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .revactions .btn{margin-top:0;flex:1}
 .revsocial{display:flex;gap:8px;margin-top:10px}
 .socialrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.tinybtn{padding:6px 12px;font-size:13px}
+.frrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.frbtns{display:flex;gap:6px;flex-shrink:0}
+.frname{font-family:var(--body);color:var(--paper);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frboardrow{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:10px;padding:7px 10px;border-radius:8px}
+.frboardrow.mine{background:var(--ink3);border:1px solid var(--line2)}
+.frrank{font-family:var(--mono);color:var(--dim);text-align:center}
+.frnum{font-family:var(--mono);color:var(--amber);font-weight:600}
+.frcard{background:var(--ink3);border:1px solid var(--line2);border-radius:12px;padding:14px;margin-bottom:10px}
+.frtop{display:flex;align-items:center;gap:10px}
+.frtop .frname{flex:1;font-family:var(--disp);font-size:17px}
+.fravatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.frstats{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px}
+.frcmp{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
+.frcmp b{color:var(--amber);font-weight:600}
 .sbtn{flex:1;background:var(--ink);border:1px solid var(--line2);color:var(--paper);font-family:var(--mono);font-size:12px;padding:9px 6px;border-radius:9px;cursor:pointer}
 .sbtn:hover{border-color:var(--amber);color:var(--amber)}
 .setrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--paper)}
@@ -294,7 +309,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="wrap">
     <div class="topbar">
       <a class="brand" href="about.html" target="_blank" rel="noopener">Travelers <b>Log</b></a>
-      <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail"></span><button id="settingsBtn" class="linkbtn">Settings</button><button id="signout" class="linkbtn">Sign out</button></div>
+      <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail"></span><button id="friendsBtn" class="linkbtn">Friends</button><button id="settingsBtn" class="linkbtn">Settings</button><button id="signout" class="linkbtn">Sign out</button></div>
     </div>
     <div class="toolbar">
       <button class="tool primary" id="addBtn">+ Add flight</button>
@@ -487,6 +502,16 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <button id="c_cancel" class="btn ghost">Cancel</button>
 </div></div>
 
+<div id="friendsModal" class="modal hidden"><div class="modalbox">
+  <h3>Friends</h3>
+  <p class="cap" style="margin-bottom:12px">Compare your travels. Friends see your totals and the countries you have visited - never your flight details or your profile.</p>
+  <div class="controls"><input id="fr_email" class="fld" type="email" placeholder="Add a friend by email"/><button class="tool" id="fr_add">Add</button></div>
+  <div id="fr_msg" class="msg"></div>
+  <div id="fr_requests"></div>
+  <div id="fr_board"></div>
+  <div id="fr_list"></div>
+  <button id="fr_close" class="btn ghost" style="margin-top:16px">Close</button>
+</div></div>
 <!-- CONTACT MODAL -->
 <div id="contactModal" class="modal hidden"><div class="modalbox">
   <h3>Contact &amp; feedback</h3>
@@ -708,6 +733,13 @@ function hydratePrefs(p){try{if(!p)return;
 }catch(e){}}
 let _prefT=null;
 function pushPrefs(){if(!sb||!USERID)return;clearTimeout(_prefT);_prefT=setTimeout(function(){try{const q=sb.from("profiles").upsert({user_id:USERID,prefs:collectPrefs()},{onConflict:"user_id"});if(q&&q.then)q.then(function(){},function(){});}catch(e){}},700);}
+function collectStats(){const iso=new Set(),cont=new Set();let km=0;
+  FLIGHTS.forEach(f=>{const A=ap(f.from),B=ap(f.to);if(A&&B)km+=hav([A[0],A[1]],[B[0],B[1]]);[f.from,f.to].forEach(c=>{const a=ap(c);if(a){if(a[5])iso.add(a[5]);if(a[4]&&CONTINENT2[a[4]])cont.add(CONTINENT2[a[4]]);}});});
+  (typeof manualGet==="function"?manualGet():[]).forEach(id=>{iso.add(id);const i2=iso3to2(id);if(i2&&CONTINENT2[i2])cont.add(CONTINENT2[i2]);});
+  const p=(typeof profGet==="function")?profGet():{};const em=($("useremail").textContent||"Traveler");
+  return {name:((p.name||"").trim())||em.split("@")[0],emoji:p.emoji||"🌍",color:p.color||"#1E9E8E",flights:FLIGHTS.length,countries:iso.size,continents:cont.size,km:Math.round(km),iso:[...iso],updated:Date.now()};}
+let _statT=null;
+function pushStats(){if(!sb||!USERID)return;clearTimeout(_statT);_statT=setTimeout(function(){try{const q=sb.from("friend_stats").upsert({user_id:USERID,data:collectStats(),updated_at:new Date().toISOString()},{onConflict:"user_id"});if(q&&q.then)q.then(function(){},function(){});}catch(e){}},900);}
 function shareLinkFor(slug){try{return new URL("share.html?u="+slug,location.href).href;}catch(e){return "share.html?u="+slug;}}
 function updateShareUI(){const pub=PROFILE&&PROFILE.is_public&&PROFILE.share_slug;$("shareLinkWrap").classList.toggle("hidden",!pub);if(pub)$("shareLink").value=shareLinkFor(PROFILE.share_slug);}
 async function saveProfile(isPublic,name){
@@ -759,6 +791,70 @@ function closeInfo(id){$(id).classList.add("hidden");}
 if($("contactLink"))$("contactLink").onclick=()=>openInfo("contactModal");
 if($("contact_close"))$("contact_close").onclick=()=>closeInfo("contactModal");
 ["contactModal"].forEach(id=>{const m=$(id);if(m)m.addEventListener("click",e=>{if(e.target===m)closeInfo(id);});});
+/* ---- friends ---- */
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function frMsg(t,c){const m=$("fr_msg");if(m){m.textContent=t||"";m.className="msg "+(c||"");}}
+function myName(){const p=(typeof profGet==="function")?profGet():{};return ((p.name||"").trim())||(($("useremail").textContent||"You").split("@")[0]);}
+function otherName(r){return r.requester===USERID?(r.addressee_name||"Friend"):(r.requester_name||"Friend");}
+async function loadFriends(){
+  if(!sb||!USERID){$("fr_list").innerHTML='<div class="cap">Sign in to use friends.</div>';return;}
+  let rows;
+  try{const r=await sb.from("friendships").select("*").or("requester.eq."+USERID+",addressee.eq."+USERID);if(r.error)throw r.error;rows=r.data||[];}
+  catch(e){$("fr_requests").innerHTML="";$("fr_board").innerHTML="";$("fr_list").innerHTML='<div class="cap">Friends need the latest setup. Run schema-friends.sql in Supabase, then reload.</div>';return;}
+  const incoming=rows.filter(r=>r.addressee===USERID&&r.status==="pending");
+  const outgoing=rows.filter(r=>r.requester===USERID&&r.status==="pending");
+  const accepted=rows.filter(r=>r.status==="accepted");
+  const fids=accepted.map(r=>r.requester===USERID?r.addressee:r.requester);
+  let statsById={};
+  if(fids.length){try{const s=await sb.from("friend_stats").select("*").in("user_id",fids);(s.data||[]).forEach(x=>statsById[x.user_id]=x.data||{});}catch(e){}}
+  renderRequests(incoming,outgoing);renderBoard(accepted,statsById);renderFriendList(accepted,statsById);
+}
+function renderRequests(incoming,outgoing){let h="";
+  if(incoming.length){h+='<div class="cap" style="margin:14px 0 6px">Requests</div>'+incoming.map(r=>'<div class="frrow"><span class="frname">'+esc(r.requester_name||"Someone")+' wants to connect</span><span class="frbtns"><button class="tool tinybtn" data-fr-acc="'+r.id+'">Accept</button><button class="tool tinybtn" data-fr-dec="'+r.id+'">Decline</button></span></div>').join("");}
+  if(outgoing.length){h+='<div class="cap" style="margin:14px 0 6px">Pending</div>'+outgoing.map(r=>'<div class="frrow"><span class="frname">'+esc(r.addressee_name||"Invitation")+' &middot; waiting</span><span class="frbtns"><button class="tool tinybtn" data-fr-cancel="'+r.id+'">Cancel</button></span></div>').join("");}
+  $("fr_requests").innerHTML=h;}
+function renderBoard(accepted,statsById){if(!accepted.length){$("fr_board").innerHTML="";return;}
+  const me=collectStats();const rb=[{name:myName()+" (you)",countries:me.countries,me:true}];
+  accepted.forEach(r=>{const id=r.requester===USERID?r.addressee:r.requester;const s=statsById[id]||{};rb.push({name:(s.name||otherName(r)),countries:s.countries||0});});
+  rb.sort((a,b)=>b.countries-a.countries);
+  $("fr_board").innerHTML='<div class="cap" style="margin:16px 0 6px">Leaderboard &middot; countries</div>'+rb.map((x,i)=>'<div class="frboardrow'+(x.me?" mine":"")+'"><span class="frrank">'+(i+1)+'</span><span class="frname">'+esc(x.name)+'</span><span class="frnum">'+x.countries+'</span></div>').join("");}
+function renderFriendList(accepted,statsById){
+  if(!accepted.length){$("fr_list").innerHTML='<div class="cap" style="margin-top:14px">No friends yet. Add one by email above.</div>';return;}
+  const me=collectStats();const mine=new Set(me.iso);
+  $("fr_list").innerHTML='<div class="cap" style="margin:16px 0 6px">Your friends</div>'+accepted.map(r=>{const id=r.requester===USERID?r.addressee:r.requester;const s=statsById[id]||{};
+    const theirs=new Set(s.iso||[]);let shared=0,meOnly=0,themOnly=0;
+    mine.forEach(x=>{if(theirs.has(x))shared++;else meOnly++;});theirs.forEach(x=>{if(!mine.has(x))themOnly++;});
+    return '<div class="frcard"><div class="frtop"><span class="fravatar" style="background:'+(s.color||"#1E9E8E")+'">'+(s.emoji||"🌍")+'</span><span class="frname">'+esc(s.name||otherName(r))+'</span><button class="tool tinybtn" data-fr-rm="'+r.id+'">Remove</button></div>'+
+      '<div class="frstats">'+(s.countries||0)+' countries &middot; '+(s.flights||0)+' flights &middot; '+((s.km||0)).toLocaleString()+' km</div>'+
+      '<div class="frcmp">You share <b>'+shared+'</b>. They have <b>'+themOnly+'</b> you do not. You have <b>'+meOnly+'</b> they do not.</div></div>';}).join("");}
+async function addFriend(){
+  const email=($("fr_email").value||"").trim();if(!email){frMsg("Enter an email.","err");return;}
+  if(email.toLowerCase()===($("useremail").textContent||"").trim().toLowerCase()){frMsg("That is your own email.","err");return;}
+  frMsg("Looking up...","");
+  try{
+    const {data,error}=await sb.rpc("friend_find",{p_email:email});if(error)throw error;
+    const found=(data&&data[0])||null;
+    if(!found||!found.uid){frMsg("No account found with that email.","err");return;}
+    const ex=await sb.from("friendships").select("id").or("and(requester.eq."+USERID+",addressee.eq."+found.uid+"),and(requester.eq."+found.uid+",addressee.eq."+USERID+")");
+    if(ex.data&&ex.data.length){frMsg("You are already connected, or a request is pending.","err");return;}
+    const ins=await sb.from("friendships").insert({requester:USERID,addressee:found.uid,requester_name:myName(),addressee_name:found.name||null,status:"pending"});
+    if(ins.error)throw ins.error;
+    $("fr_email").value="";frMsg("Request sent to "+(found.name||email)+".","ok");loadFriends();
+  }catch(e){frMsg("Could not add. Make sure schema-friends.sql has been run.","err");}
+}
+async function frAccept(id){try{await sb.from("friendships").update({status:"accepted"}).eq("id",id);pushStats();loadFriends();}catch(e){}}
+async function frDelete(id){try{await sb.from("friendships").delete().eq("id",id);loadFriends();}catch(e){}}
+if($("friendsBtn"))$("friendsBtn").onclick=()=>{frMsg("");$("fr_email").value="";$("friendsModal").classList.remove("hidden");loadFriends();};
+if($("fr_close"))$("fr_close").onclick=()=>$("friendsModal").classList.add("hidden");
+if($("fr_add"))$("fr_add").onclick=addFriend;
+if($("fr_email"))$("fr_email").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addFriend();}});
+if($("friendsModal"))$("friendsModal").addEventListener("click",e=>{
+  if(e.target===$("friendsModal")){$("friendsModal").classList.add("hidden");return;}
+  const acc=e.target.closest("[data-fr-acc]");if(acc)return frAccept(acc.getAttribute("data-fr-acc"));
+  const dec=e.target.closest("[data-fr-dec]");if(dec)return frDelete(dec.getAttribute("data-fr-dec"));
+  const can=e.target.closest("[data-fr-cancel]");if(can)return frDelete(can.getAttribute("data-fr-cancel"));
+  const rm=e.target.closest("[data-fr-rm]");if(rm)return frDelete(rm.getAttribute("data-fr-rm"));
+});
 if($("fb_send"))$("fb_send").onclick=async()=>{const msg=$("fb_msg").value.trim(),N=$("fb_note");
   if(!msg){N.textContent="Write a message first.";N.className="msg err";return;}
   if(!FEEDBACK_ACCESS_KEY||FEEDBACK_ACCESS_KEY==="YOUR_WEB3FORMS_KEY"){N.textContent="Feedback is not set up yet.";N.className="msg err";return;}
@@ -1242,7 +1338,7 @@ function render(){
   defs.forEach(([name,desc,got])=>{if(got)earned++;const e=document.createElement("div");e.className="badge"+(got?" got":"");e.innerHTML='<div class="bn">'+name+'</div><div class="bd">'+desc+'</div>';bb.appendChild(e);});
   $("badgeTitle").textContent="Achievements ("+earned+"/"+defs.length+")";
 
-  renderCompare();renderTopLists();renderMilestones();renderWhenYouFly();renderConnections();renderGrowth();applyProfileChrome();
+  renderCompare();renderTopLists();renderMilestones();renderWhenYouFly();renderConnections();renderGrowth();applyProfileChrome();pushStats();
   if(!tabRestored){tabRestored=true;const _t=tabGet();if(_t&&_t!==currentTab)setTab(_t);}
   drawMap(visISO3);
   chips(yrs,perYear);legend(yrs,perYear,countriesN);
