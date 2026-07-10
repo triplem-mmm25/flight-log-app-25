@@ -131,6 +131,10 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .tripdetails{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:7px}
 .leg{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .chev{display:inline-block;width:16px;text-align:center;color:var(--amber);font-family:var(--mono)}
+.yeargroup{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.yearhead{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;font-family:var(--disp);font-size:17px;background:var(--ink2);user-select:none}
+.yearhead .ycount{font-family:var(--mono);font-size:11px;color:var(--dim);margin-left:8px}
+.yearbody{padding:10px;display:flex;flex-direction:column;gap:10px}
 .bulk{display:flex;align-items:center;gap:14px;margin-bottom:12px;background:var(--ink2);border:1px solid var(--line2);border-radius:10px;padding:9px 14px}
 .bulk #bulkCount{font-family:var(--mono);font-size:12px;color:var(--paper)}
 #mapReset{position:absolute;top:10px;right:10px;background:var(--ink2);border:1px solid var(--line2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;z-index:6}
@@ -171,6 +175,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       <input id="fileInput" type="file" accept="image/*,application/pdf" multiple class="hidden"/>
       <button class="tool" id="exportCsv">Export CSV</button>
       <button class="tool" id="exportJson">Export JSON</button>
+      <button class="tool" id="shareBtn">Share</button>
       <span id="status"></span>
     </div>
     <div id="cfgwarn" class="cfg-warn hidden"></div>
@@ -264,6 +269,20 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <button id="c_cancel" class="btn ghost">Cancel</button>
 </div></div>
 
+<!-- SHARE MODAL -->
+<div id="shareModal" class="modal hidden"><div class="modalbox">
+  <h3>Share your map</h3>
+  <p class="cap" style="margin-bottom:16px">Turn this on for a public, read-only link to your map and stats. It shows only what is on your dashboard, can never be edited by anyone, and you can turn it off anytime.</p>
+  <label style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="sharePublic"/> <span>Make my map public</span></label>
+  <input id="shareName" class="fld" placeholder="Display name (optional, shown on the page)"/>
+  <div id="shareLinkWrap" class="hidden" style="margin-top:4px">
+    <div class="cap" style="margin-bottom:6px">Your public link</div>
+    <div style="display:flex;gap:8px"><input id="shareLink" class="fld" readonly style="flex:1;min-width:0"/><button id="shareCopy" class="btn" style="width:auto;padding:0 18px">Copy</button></div>
+  </div>
+  <div id="share_msg" class="msg" style="margin-top:12px"></div>
+  <button id="share_close" class="btn ghost" style="margin-top:16px">Close</button>
+</div></div>
+
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -283,9 +302,9 @@ let sb=null;
 if(configured){ sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY); }
 
 const $=id=>document.getElementById(id);
-const YCOL={2022:"#5B8DEF",2023:"#35C4D7",2024:"#FFB020",2025:"#FF7A59",2026:"#F25F8E"};
+const YCOL={2022:"#6EA8FE",2023:"#37D1BE",2024:"#F2B34A",2025:"#FF8FA3",2026:"#A98CFF"};
 function yColor(y){return YCOL[y]|| "#9AA7B2";}
-let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set(), USERID=null;
+let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set(), USERID=null, PROFILE=null;
 function goalKey(){return "flg_goal_"+(USERID||"anon");}
 function goalGet(){try{const v=parseInt(localStorage.getItem(goalKey()));return v>0?v:null;}catch(e){return null;}}
 function goalSet(v){try{localStorage.setItem(goalKey(),String(v));}catch(e){}}
@@ -321,9 +340,26 @@ async function refreshUser(){
   showApp(data&&data.user?data.user:null);
 }
 function showApp(user){
-  if(user){USERID=user.id||user.email||"anon";$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("useremail").textContent=user.email;loadFlights();}
-  else{USERID=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");}
+  if(user){USERID=user.id||user.email||"anon";$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("useremail").textContent=user.email;loadFlights();loadProfile();}
+  else{USERID=null;PROFILE=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");}
 }
+async function loadProfile(){try{const {data}=await sb.from("profiles").select("*").eq("user_id",USERID).limit(1);PROFILE=(data&&data[0])||null;}catch(e){PROFILE=null;}}
+function shareLinkFor(slug){try{return new URL("share.html?u="+slug,location.href).href;}catch(e){return "share.html?u="+slug;}}
+function updateShareUI(){const pub=PROFILE&&PROFILE.is_public&&PROFILE.share_slug;$("shareLinkWrap").classList.toggle("hidden",!pub);if(pub)$("shareLink").value=shareLinkFor(PROFILE.share_slug);}
+async function saveProfile(isPublic,name){
+  if(!sb||!USERID)return;
+  const slug=(PROFILE&&PROFILE.share_slug)||Math.random().toString(36).slice(2,10);
+  const row={user_id:USERID,share_slug:slug,display_name:(name||"").trim()||null,is_public:!!isPublic};
+  const {error}=await sb.from("profiles").upsert(row);
+  const m=$("share_msg");
+  if(error){m.textContent="Could not save. Did you run schema-public.sql? ("+error.message+")";m.className="msg err";return;}
+  PROFILE=row;m.textContent=isPublic?"Public. Copy your link below.":"Now private.";m.className="msg ok";updateShareUI();
+}
+$("shareBtn").onclick=()=>{$("share_msg").textContent="";$("sharePublic").checked=!!(PROFILE&&PROFILE.is_public);$("shareName").value=(PROFILE&&PROFILE.display_name)||"";updateShareUI();$("shareModal").classList.remove("hidden");};
+$("share_close").onclick=()=>$("shareModal").classList.add("hidden");
+$("sharePublic").onchange=()=>saveProfile($("sharePublic").checked,$("shareName").value);
+$("shareName").onchange=()=>{if(PROFILE)saveProfile($("sharePublic").checked,$("shareName").value);};
+$("shareCopy").onclick=()=>{const i=$("shareLink");i.select();try{navigator.clipboard.writeText(i.value);}catch(e){}try{document.execCommand("copy");}catch(e){}$("share_msg").textContent="Link copied.";$("share_msg").className="msg ok";};
 $("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}render();}};
 $("tripsTitle").onclick=()=>{const t=$("trips"),c=$("tripsChev");t.classList.toggle("hidden");if(c)c.textContent=t.classList.contains("hidden")?"+":"\u2013";};
 $("signin").onclick=async()=>{
@@ -538,15 +574,25 @@ function render(){
   $("tripsCount").textContent="("+trips.length+")";
   const tw=$("trips");tw.innerHTML="";
   const fmt2=s=>new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-  trips.slice().reverse().forEach(t=>{
-    const codes=[...t.dests].slice(0,8);
-    const destHtml=codes.map(c=>{const a=ap(c);return flag(a&&a[4])+cityOf(c);}).join(", ")||"local hops";
-    const legsHtml=t.legs.map(l=>{const a=ap(l.from),b=ap(l.to);return '<div class="leg">'+l.date+' &middot; '+flag(a&&a[4])+cityOf(l.from)+' &rarr; '+flag(b&&b[4])+cityOf(l.to)+(l.airline&&l.airline!=="Unknown"?' &middot; '+l.airline:'')+'</div>';}).join("");
-    const el=document.createElement("div");el.className="trip";
-    el.innerHTML='<div class="triphead"><div><div class="tl">'+destHtml+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr">'+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+' <span class="chev">+</span></div></div><div class="tripdetails hidden">'+legsHtml+'</div>';
-    const head=el.querySelector(".triphead"),det=el.querySelector(".tripdetails"),ch=el.querySelector(".chev");
-    head.style.cursor="pointer";head.onclick=()=>{det.classList.toggle("hidden");ch.textContent=det.classList.contains("hidden")?"+":"\u2013";};
-    tw.appendChild(el);});
+  const byYear={};trips.forEach(t=>{const y=+t.start.slice(0,4);(byYear[y]=byYear[y]||[]).push(t);});
+  Object.keys(byYear).map(Number).sort((a,b)=>b-a).forEach(y=>{
+    const list=byYear[y];
+    const grp=document.createElement("div");grp.className="yeargroup";
+    const yhead=document.createElement("div");yhead.className="yearhead";
+    yhead.innerHTML='<span>'+y+' <span class="ycount">'+list.length+' trip'+(list.length>1?'s':'')+'</span></span><span class="chev">+</span>';
+    const ybody=document.createElement("div");ybody.className="yearbody hidden";
+    list.slice().reverse().forEach(t=>{
+      const codes=[...t.dests].slice(0,8);
+      const destHtml=codes.map(c=>{const a=ap(c);return flag(a&&a[4])+cityOf(c);}).join(", ")||"local hops";
+      const legsHtml=t.legs.map(l=>{const a=ap(l.from),b=ap(l.to);return '<div class="leg">'+l.date+' &middot; '+flag(a&&a[4])+cityOf(l.from)+' &rarr; '+flag(b&&b[4])+cityOf(l.to)+(l.airline&&l.airline!=="Unknown"?' &middot; '+l.airline:'')+'</div>';}).join("");
+      const el=document.createElement("div");el.className="trip";
+      el.innerHTML='<div class="triphead"><div><div class="tl">'+destHtml+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr">'+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+' <span class="chev">+</span></div></div><div class="tripdetails hidden">'+legsHtml+'</div>';
+      const th=el.querySelector(".triphead"),det=el.querySelector(".tripdetails"),ch=el.querySelector(".chev");
+      th.style.cursor="pointer";th.onclick=()=>{det.classList.toggle("hidden");ch.textContent=det.classList.contains("hidden")?"+":"\u2013";};
+      ybody.appendChild(el);});
+    yhead.onclick=()=>{ybody.classList.toggle("hidden");yhead.querySelector(".chev").textContent=ybody.classList.contains("hidden")?"+":"\u2013";};
+    grp.appendChild(yhead);grp.appendChild(ybody);tw.appendChild(grp);
+  });
 
   // flights table (with filters)
   $("fltitle").textContent="Your flights ("+FLIGHTS.length+")";
@@ -601,12 +647,16 @@ function initMap(){const W=960,H=500;svg=d3.select("#map").append("svg").attr("v
   mapZoom=d3.zoom().scaleExtent([1,8]).on("zoom",ev=>{mapT=ev.transform;root.attr("transform",mapT);updateLabels();});
   svg.call(mapZoom).on("dblclick.zoom",null);
   const rb=$("mapReset");if(rb)rb.onclick=()=>svg.transition().duration(400).call(mapZoom.transform,d3.zoomIdentity);}
+const NAME_FIX={"United States of America":"United States","Russian Federation":"Russia","Republic of Korea":"South Korea","Korea, Republic of":"South Korea","Democratic Republic of the Congo":"DR Congo","Republic of the Congo":"Congo","United Republic of Tanzania":"Tanzania","Bolivia (Plurinational State of)":"Bolivia","Venezuela (Bolivarian Republic of)":"Venezuela","Iran (Islamic Republic of)":"Iran","Syrian Arab Republic":"Syria","Czech Republic":"Czechia","Dominican Republic":"Dominican Rep.","Central African Republic":"C.A.R.","United Arab Emirates":"UAE","Bosnia and Herzegovina":"Bosnia"};
+function bestAnchor(f){const g=f.geometry;if(!g)return null;let polys;if(g.type==="Polygon")polys=[g.coordinates];else if(g.type==="MultiPolygon")polys=g.coordinates;else return null;let best=null,bestA=-1;for(const coords of polys){const ff={type:"Feature",geometry:{type:"Polygon",coordinates:coords}};const a=Math.abs(path.area(ff));if(a>bestA){bestA=a;best=ff;}}if(!best)return null;const c=path.centroid(best),b=path.bounds(best);if(!c||!isFinite(c[0]))return null;return{x:c[0],y:c[1],bw:b[1][0]-b[0][0],w:bestA};}
 function updateLabels(){
   if(!gLabel||!mapT)return;const W=960,H=500;
   const cand=mapLabels.map(L=>({L,p:mapT.apply([L.x,L.y])})).filter(o=>o.p[0]>=4&&o.p[0]<=W-4&&o.p[1]>=4&&o.p[1]<=H-4);
   cand.sort((a,b)=>b.L.w-a.L.w);
   const cap=Math.min(cand.length,Math.round(8*mapT.k)),placed=[],out=[];
-  for(const o of cand){if(out.length>=cap)break;const sx=o.p[0],sy=o.p[1]-(o.L.r?o.L.r*mapT.k+5:0);
+  for(const o of cand){if(out.length>=cap)break;
+    const need=o.L.text.length*6.4+6, avail=o.L.bw?o.L.bw*mapT.k:Infinity; if(avail<need)continue;
+    const sx=o.p[0],sy=o.p[1]-(o.L.r?o.L.r*mapT.k+5:0);
     let ok=true;for(const q of placed){if(Math.abs(q.x-sx)<52&&Math.abs(q.y-sy)<13){ok=false;break;}}
     if(ok){placed.push({x:sx,y:sy});out.push(Object.assign({},o.L,{sx:sx,sy:sy}));}}
   gLabel.selectAll("text").data(out,d=>d.text).join("text")
@@ -635,7 +685,7 @@ function drawMap(visISO3){
     .on("mouseleave",()=>tip.style.opacity=0);
   mapLabels=[];
   if(mode==="routes"){names.forEach(n=>{const a=ap(n),p=proj([a[0],a[1]]);if(p&&isFinite(p[0]))mapLabels.push({x:p[0],y:p[1],text:cityOf(n),w:cc[n],r:r(cc[n])});});}
-  else{WORLDF.forEach(f=>{if(!f.properties||!f.properties.name)return;const c=path.centroid(f);if(c&&isFinite(c[0])&&isFinite(c[1]))mapLabels.push({x:c[0],y:c[1],text:f.properties.name,w:d3.geoArea(f)});});}
+  else{WORLDF.forEach(f=>{if(!f.properties||!f.properties.name)return;const an=bestAnchor(f);if(!an)return;mapLabels.push({x:an.x,y:an.y,text:NAME_FIX[f.properties.name]||f.properties.name,w:an.w,bw:an.bw});});}
   updateLabels();
 }
 function chips(yrs,perYear){const box=$("chips");box.style.display=mode==="routes"?"flex":"none";box.innerHTML="";
