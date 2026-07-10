@@ -140,6 +140,7 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 #mapReset{position:absolute;top:10px;right:10px;background:var(--ink2);border:1px solid var(--line2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;z-index:6}
 #mapReset:hover{color:var(--paper);border-color:var(--amber)}
 .trip .tl{font-weight:500;font-size:14px;display:flex;flex-wrap:wrap;gap:5px 12px;line-height:1.5}
+#gtip{position:fixed;z-index:9999;pointer-events:none;background:var(--ink3);border:1px solid var(--line2);color:var(--paper);font-family:var(--mono);font-size:12px;padding:6px 9px;border-radius:8px;opacity:0;transition:opacity .1s;white-space:nowrap;max-width:260px}
 .revactions{display:flex;gap:10px;margin-top:16px}
 .revactions .btn{margin-top:0;flex:1}
 .revsocial{display:flex;gap:8px;margin-top:10px}
@@ -911,13 +912,13 @@ function render(){
 
   // year cols
   const yc=$("yearcols");yc.innerHTML="";const maxY=Math.max(...yrs.map(y=>perYear[y]));
-  yrs.forEach(y=>{const c=document.createElement("div");c.className="col";c.title=y+": "+perYear[y]+" flights";
+  yrs.forEach(y=>{const c=document.createElement("div");c.className="col";c.title=y+": "+perYear[y]+" flights";c.setAttribute("data-tip",y+": "+perYear[y]+" flights");
     c.innerHTML='<div class="cn" style="color:'+yColor(y)+'">'+perYear[y]+'</div><div class="bar2" style="background:'+yColor(y)+';height:'+(perYear[y]/maxY*100)+'%"></div><div class="cy">\''+String(y).slice(2)+'</div>';yc.appendChild(c);});
 
   function bars(id,rows,color,deco){const box=$(id);box.innerHTML="";if(!rows.length){box.innerHTML='<div style="color:var(--dim);font-size:13px">No data</div>';return;}const max=Math.max(...rows.map(r=>r[1]));
     rows.forEach(([lab,n])=>{const el=document.createElement("div");el.className="bar";
       const plain=(deco?deco(lab):String(lab)).replace(/<[^>]*>/g,"").replace(/&rarr;/g,"\u2192").replace(/\s+/g," ").trim();
-      el.title=plain+": "+n;
+      el.title=plain+": "+n;el.setAttribute("data-tip",plain+": "+n);
       el.innerHTML='<div class="lab">'+(deco?deco(lab):lab)+'</div><div class="track"><div class="fill" style="background:'+color+';width:'+(n/max*100)+'%"></div></div><div class="num">'+n+'</div>';box.appendChild(el);});}
   bars("routebars",top(routeCount,6).map(([k,v])=>[k,v]),"var(--cyan)",k=>{const p=k.split("|");const a=ap(p[0]),b=ap(p[1]);return flag(a&&a[4])+cityOf(p[0])+" &rarr; "+flag(b&&b[4])+cityOf(p[1]);});
   bars("countrybars",top(arrCountry,6),"var(--amber)",c=>{const iso=isoForCountry(c);return flag(iso)+c;});
@@ -929,7 +930,7 @@ function render(){
   MON.forEach(m=>{const d=document.createElement("div");d.className="hh";d.textContent=m;heat.appendChild(d);});
   const g={};let mx=0;FLIGHTS.forEach(f=>{const k=f.year+"-"+(+f.date.slice(5,7));g[k]=(g[k]||0)+1;mx=Math.max(mx,g[k]);});
   yrs.forEach(y=>{const yl=document.createElement("div");yl.className="hy";yl.textContent=y;heat.appendChild(yl);
-    for(let m=1;m<=12;m++){const v=g[y+"-"+m]||0,t=v/mx,c=document.createElement("div");c.className="hc";c.style.background=v?"rgba(55,209,190,"+(0.15+t*0.85)+")":"var(--ink)";c.style.color=t>0.5?"#04211D":"var(--muted)";c.textContent=v||"";c.title=MON[m-1]+" "+y+": "+v+" flight"+(v===1?"":"s");heat.appendChild(c);}});
+    for(let m=1;m<=12;m++){const v=g[y+"-"+m]||0,t=v/mx,c=document.createElement("div");c.className="hc";c.style.background=v?"rgba(55,209,190,"+(0.15+t*0.85)+")":"var(--ink)";c.style.color=t>0.5?"#04211D":"var(--muted)";c.textContent=v||"";c.title=MON[m-1]+" "+y+": "+v+" flight"+(v===1?"":"s");c.setAttribute("data-tip",MON[m-1]+" "+y+": "+v+" flight"+(v===1?"":"s"));heat.appendChild(c);}});
 
   // records
   const D=FLIGHTS.map(f=>{const A=ap(f.from),B=ap(f.to);return Object.assign({},f,{km:(A&&B)?hav([A[0],A[1]],[B[0],B[1]]):0});}).filter(f=>f.km>0);
@@ -1075,6 +1076,12 @@ function setTab(name){currentTab=name;tabSet(name);
 document.querySelectorAll("#tabs .tab").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 setTab("overview");
 document.addEventListener("keydown",e=>{if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(document.querySelector(".modal:not(.hidden)"))return;if(e.key==="1")setTab("overview");else if(e.key==="2")setTab("insights");else if(e.key==="3")setTab("flights");});
+(function(){var gt=document.getElementById("gtip");if(!gt){gt=document.createElement("div");gt.id="gtip";document.body.appendChild(gt);}
+  function show(x,y,txt){gt.textContent=txt;gt.style.opacity="1";gt.style.left=(x+14)+"px";gt.style.top=(y+14)+"px";var r=gt.getBoundingClientRect();if(r.right>innerWidth-6)gt.style.left=(x-r.width-14)+"px";if(r.bottom>innerHeight-6)gt.style.top=(y-r.height-14)+"px";}
+  function hide(){gt.style.opacity="0";}
+  document.addEventListener("mousemove",function(e){var t=e.target&&e.target.closest?e.target.closest("[data-tip]"):null;if(t)show(e.clientX,e.clientY,t.getAttribute("data-tip"));else hide();});
+  document.addEventListener("touchstart",function(e){var el=e.target&&e.target.closest?e.target.closest("[data-tip]"):null;if(el&&e.touches[0]){show(e.touches[0].clientX,e.touches[0].clientY,el.getAttribute("data-tip"));setTimeout(hide,1500);}},{passive:true});
+})();
 
 /* ---------- growth over time ---------- */
 function areaChart(series,fmt){
@@ -1086,10 +1093,11 @@ function areaChart(series,fmt){
   const pts=series.map((s,i)=>[x(i),y(s.value)]);
   const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
   const area=line+" L"+pts[n-1][0].toFixed(1)+" "+(H-pad)+" L"+pts[0][0].toFixed(1)+" "+(H-pad)+" Z";
-  const dots=pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6"><title>'+series[i].label.replace(/^'/,"'")+": "+fmt(series[i].value)+'</title></circle>').join("");
+  const dots=pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6"></circle>').join("");
+  const hits=pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="18" fill="transparent" data-tip="'+String(series[i].label).replace(/[<>"]/g,"")+": "+String(fmt(series[i].value)).replace(/[<>"]/g,"")+'"></circle>').join("");
   const xl=series.map((s,i)=>'<text x="'+x(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="middle" class="axl">'+s.label+'</text>').join("");
   const last=pts[n-1];
-  return '<svg viewBox="0 0 '+W+' '+H+'" class="growthsvg"><path d="'+area+'" class="ga"/><path d="'+line+'" class="gl"/>'+dots+xl+
+  return '<svg viewBox="0 0 '+W+' '+H+'" class="growthsvg"><path d="'+area+'" class="ga"/><path d="'+line+'" class="gl"/>'+dots+xl+hits+
     '<text x="'+last[0].toFixed(1)+'" y="'+(last[1]-9).toFixed(1)+'" text-anchor="end" class="gval">'+fmt(series[n-1].value)+'</text></svg>';
 }
 function renderGrowth(){
@@ -1161,7 +1169,7 @@ function renderWhenYouFly(){
   FLIGHTS.forEach(f=>{if(!f.date)return;const dt=new Date(f.date+"T00:00:00");if(!isNaN(dt))dow[(dt.getDay()+6)%7]++;const m=+f.date.slice(5,7);if(m>=1&&m<=12)mon[m-1]++;});
   const dl=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],ml=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const bars=(vals,labels,box)=>{const el=$(box);if(!el)return;const mx=Math.max(1,...vals);
-    el.innerHTML=vals.map((v,i)=>'<div class="mb" title="'+labels[i]+': '+v+'"><div class="mbwrap"><div class="mbbar" style="height:'+(v/mx*100)+'%"></div></div><div class="mbv">'+v+'</div><div class="mbl">'+labels[i]+'</div></div>').join("");};
+    el.innerHTML=vals.map((v,i)=>'<div class="mb" data-tip="'+labels[i]+': '+v+'" title="'+labels[i]+': '+v+'"><div class="mbwrap"><div class="mbbar" style="height:'+(v/mx*100)+'%"></div></div><div class="mbv">'+v+'</div><div class="mbl">'+labels[i]+'</div></div>').join("");};
   bars(dow,dl,"dowChart");bars(mon,ml,"monChart");
 }
 
@@ -1206,9 +1214,9 @@ function renderTopLists(){
   const air={};FLIGHTS.forEach(f=>{if(f.airline&&f.airline!=="Unknown")air[f.airline]=(air[f.airline]||0)+1;});
   const rte={};FLIGHTS.forEach(f=>{const key=[f.from,f.to].sort().join(" \u2013 ");rte[key]=(rte[key]||0)+1;});
   const ta=$("topAir");if(ta){const list=Object.entries(air).sort((a,b)=>b[1]-a[1]).slice(0,8);const mx=list.length?list[0][1]:1;
-    ta.innerHTML=list.length?list.map(([name,n])=>'<div class="tlrow">'+logoImg(name)+'<span class="tlname">'+name+'</span><span class="tlbar"><i style="width:'+(n/mx*100)+'%"></i></span><span class="tlnum">'+n+'</span></div>').join(""):'<span class="cap">No airline data yet.</span>';}
+    ta.innerHTML=list.length?list.map(([name,n])=>'<div class="tlrow" data-tip="'+name+': '+n+' flights">'+logoImg(name)+'<span class="tlname">'+name+'</span><span class="tlbar"><i style="width:'+(n/mx*100)+'%"></i></span><span class="tlnum">'+n+'</span></div>').join(""):'<span class="cap">No airline data yet.</span>';}
   const tr=$("topRoute");if(tr){const list=Object.entries(rte).sort((a,b)=>b[1]-a[1]).slice(0,8);const mx=list.length?list[0][1]:1;
-    tr.innerHTML=list.length?list.map(([key,n])=>{const [x,y]=key.split(" \u2013 ");return '<div class="tlrow"><span class="tlname">'+cityOf(x)+' \u2013 '+cityOf(y)+'</span><span class="tlbar"><i style="width:'+(n/mx*100)+'%"></i></span><span class="tlnum">'+n+'</span></div>';}).join(""):'<span class="cap">No routes yet.</span>';}
+    tr.innerHTML=list.length?list.map(([key,n])=>{const [x,y]=key.split(" \u2013 ");return '<div class="tlrow" data-tip="'+cityOf(x)+' \u2013 '+cityOf(y)+': '+n+' flights">'+'<span class="tlname">'+cityOf(x)+' \u2013 '+cityOf(y)+'</span><span class="tlbar"><i style="width:'+(n/mx*100)+'%"></i></span><span class="tlnum">'+n+'</span></div>';}).join(""):'<span class="cap">No routes yet.</span>';}
 }
 
 /* ---------- milestones timeline ---------- */
@@ -1289,10 +1297,10 @@ function bestAnchor(f){const g=f.geometry;if(!g)return null;let polys;if(g.type=
 function updateLabels(){
   if(!gLabel||!mapT)return;const W=960,H=500;
   const cand=mapLabels.map(L=>({L,p:mapT.apply([L.x,L.y])})).filter(o=>o.p[0]>=4&&o.p[0]<=W-4&&o.p[1]>=4&&o.p[1]<=H-4);
-  cand.sort((a,b)=>b.L.w-a.L.w);
-  const cap=Math.min(cand.length,Math.round(8*mapT.k)),placed=[],out=[];
+  cand.sort((a,b)=>((b.L.visited?1:0)-(a.L.visited?1:0))||(b.L.w-a.L.w));
+  const cap=Math.min(cand.length,Math.round(10*mapT.k)),placed=[],out=[];
   for(const o of cand){if(out.length>=cap)break;
-    const need=o.L.text.length*6.4+6, avail=o.L.bw?o.L.bw*mapT.k:Infinity; if(avail<need*0.5)continue;
+    const need=o.L.text.length*6.4+6, avail=o.L.bw?o.L.bw*mapT.k:Infinity; if(avail<need*(o.L.visited?0.28:0.5))continue;
     const sx=o.p[0],sy=o.p[1]-(o.L.r?o.L.r*mapT.k+5:0);
     let ok=true;for(const q of placed){if(Math.abs(q.x-sx)<52&&Math.abs(q.y-sy)<13){ok=false;break;}}
     if(ok){placed.push({x:sx,y:sy});out.push(Object.assign({},o.L,{sx:sx,sy:sy}));}}
@@ -1329,7 +1337,7 @@ function drawMap(visISO3){
     .on("mouseleave",()=>tip.style.opacity=0);
   mapLabels=[];
   if(mode==="routes"){names.forEach(n=>{const a=ap(n),p=proj([a[0],a[1]]);if(p&&isFinite(p[0]))mapLabels.push({x:p[0],y:p[1],text:cityOf(n),w:cc[n],r:r(cc[n])});});}
-  else{WORLDF.forEach(f=>{if(!f.properties||!f.properties.name)return;const an=bestAnchor(f);if(!an)return;if(globe&&d3.geoDistance(an.ll,cen)>=1.5708)return;mapLabels.push({x:an.x,y:an.y,text:NAME_FIX[f.properties.name]||f.properties.name,w:an.w,bw:an.bw});});}
+  else{WORLDF.forEach(f=>{if(!f.properties||!f.properties.name)return;const an=bestAnchor(f);if(!an)return;if(globe&&d3.geoDistance(an.ll,cen)>=1.5708)return;mapLabels.push({x:an.x,y:an.y,text:NAME_FIX[f.properties.name]||f.properties.name,w:an.w,bw:an.bw,visited:!!visISO3[f.id]});});}
   updateLabels();
 }
 function chips(yrs,perYear){const box=$("chips");box.style.display=mode==="routes"?"flex":"none";box.innerHTML="";
