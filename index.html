@@ -511,12 +511,15 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="cap" style="margin-bottom:4px">Account</div>
   <div class="setrow"><span>Email</span><span id="set_email" class="setv"></span></div>
   <div class="setrow"><span>Stay signed in</span><span class="setv">On, this device</span></div>
-  <div class="cap" style="margin:20px 0 6px">Change password</div>
-  <input id="set_pwcur" class="fld" type="password" placeholder="Current password" autocomplete="current-password"/>
-  <input id="set_pw" class="fld" type="password" placeholder="New password" autocomplete="new-password"/>
-  <input id="set_pw2" class="fld" type="password" placeholder="Confirm new password" autocomplete="new-password"/>
-  <div class="cap" style="margin:2px 0 8px;opacity:.75">At least 8 characters, with a capital letter, a lowercase letter and a number.</div>
-  <button id="set_pwsave" class="btn">Update password</button>
+  <div class="cap" style="margin:20px 0 8px">Password</div>
+  <button id="set_pwtoggle" class="btn ghost" style="margin-top:0">Change password</button>
+  <div id="set_pwbox" class="hidden" style="margin-top:12px">
+    <input id="set_pwcur" class="fld" type="password" placeholder="Current password" autocomplete="current-password"/>
+    <input id="set_pw" class="fld" type="password" placeholder="New password" autocomplete="new-password"/>
+    <input id="set_pw2" class="fld" type="password" placeholder="Confirm new password" autocomplete="new-password"/>
+    <div class="cap" style="margin:2px 0 8px;opacity:.75">At least 8 characters, with a capital letter, a lowercase letter and a number.</div>
+    <button id="set_pwsave" class="btn">Update password</button>
+  </div>
   <div id="set_msg" class="msg" style="margin-top:10px"></div>
   <div style="display:flex;gap:10px;margin-top:18px">
     <button id="set_signout" class="btn ghost" style="flex:1;margin-top:0">Sign out</button>
@@ -533,6 +536,14 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       <input id="pf_tag" class="fld" placeholder="Tagline (e.g. Collecting boarding passes)"/>
     </div>
   </div>
+  <div id="pf_sum" class="cap" style="margin-top:10px"></div>
+  <div class="cap" style="margin:16px 0 6px">Details</div>
+  <input id="pf_city" class="fld" placeholder="Home city (e.g. Beirut)" style="margin-bottom:8px"/>
+  <input id="pf_nat" class="fld" list="pf_natlist" placeholder="Nationality" style="margin-bottom:8px"/>
+  <datalist id="pf_natlist"></datalist>
+  <select id="pf_gender" class="fld" style="margin-bottom:8px"><option value="">Gender (optional)</option><option value="Female">Female</option><option value="Male">Male</option><option value="Non-binary">Non-binary</option><option value="Prefer not to say">Prefer not to say</option></select>
+  <div class="cap" style="margin:2px 0 4px;opacity:.75">Date of birth</div>
+  <input id="pf_dob" class="fld" type="date"/>
   <div class="cap" style="margin:16px 0 6px">Avatar</div>
   <div id="pf_emojis" class="pickrow"></div>
   <div class="cap" style="margin:16px 0 6px">Accent</div>
@@ -713,7 +724,7 @@ $("profileBtn").onclick=openProfile;
 $("pf_close").onclick=()=>$("profileModal").classList.add("hidden");
 $("pf_emojis").addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(!b)return;pfDraft.emoji=b.getAttribute("data-e");$("avatarBig").textContent=pfDraft.emoji;document.querySelectorAll("#pf_emojis .pickchip").forEach(x=>x.classList.toggle("sel",x===b));});
 $("pf_colors").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;pfDraft.color=b.getAttribute("data-c");$("avatarBig").style.background=pfDraft.color;document.querySelectorAll("#pf_colors .swatch").forEach(x=>x.classList.toggle("sel",x===b));});
-$("pf_save").onclick=()=>{profSet({name:$("pf_name").value.trim(),tagline:$("pf_tag").value.trim(),emoji:pfDraft.emoji,color:pfDraft.color});applyProfileChrome();$("pf_msg").textContent="Saved.";$("pf_msg").className="msg ok";};
+$("pf_save").onclick=()=>{profSet({name:$("pf_name").value.trim(),tagline:$("pf_tag").value.trim(),emoji:pfDraft.emoji,color:pfDraft.color,city:$("pf_city").value.trim(),nationality:$("pf_nat").value.trim(),gender:$("pf_gender").value,dob:$("pf_dob").value});applyProfileChrome();updateProfSummary();$("pf_msg").textContent="Saved.";$("pf_msg").className="msg ok";};
 $("shareBtn").onclick=()=>{$("share_msg").textContent="";$("sharePublic").checked=!!(PROFILE&&PROFILE.is_public);$("shareName").value=(PROFILE&&PROFILE.display_name)||"";updateShareUI();$("shareModal").classList.remove("hidden");};
 $("share_close").onclick=()=>$("shareModal").classList.add("hidden");
 $("sharePublic").onchange=()=>saveProfile($("sharePublic").checked,$("shareName").value);
@@ -741,7 +752,7 @@ function shareSocial(net){
 }
 document.querySelectorAll("#shareSocialRow .sbtn").forEach(b=>b.onclick=()=>shareSocial(b.dataset.snet));
 /* ---- footer + contact ---- */
-const FEEDBACK_ACCESS_KEY="YOUR_WEB3FORMS_KEY";
+const FEEDBACK_ACCESS_KEY="7d19b9a9-8bd0-4d12-aafb-0a814afb2244";
 (function(){const fy=$("footYear");if(fy)fy.textContent=new Date().getFullYear();})();
 function openInfo(id){$(id).classList.remove("hidden");}
 function closeInfo(id){$(id).classList.add("hidden");}
@@ -803,7 +814,8 @@ $("forgot").onclick=async()=>{const em=$("email").value.trim();const M=$("authms
   try{const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});
     M.textContent=error?("Error: "+error.message):("Reset link sent to "+em+". Open it on this device to set a new password.");M.className="msg "+(error?"err":"ok");}
   catch(e){M.textContent="Error: "+e.message;M.className="msg err";}};
-$("settingsBtn").onclick=()=>{$("set_email").textContent=$("useremail").textContent||"";$("set_pwcur").value=$("set_pw").value=$("set_pw2").value="";$("set_msg").textContent="";$("settingsModal").classList.remove("hidden");};
+$("settingsBtn").onclick=()=>{$("set_email").textContent=$("useremail").textContent||"";$("set_pwcur").value=$("set_pw").value=$("set_pw2").value="";$("set_msg").textContent="";$("set_pwbox").classList.add("hidden");$("set_pwtoggle").classList.remove("hidden");$("settingsModal").classList.remove("hidden");};
+$("set_pwtoggle").onclick=()=>{$("set_pwcur").value=$("set_pw").value=$("set_pw2").value="";$("set_msg").textContent="";$("set_pwbox").classList.remove("hidden");$("set_pwtoggle").classList.add("hidden");setTimeout(()=>{try{$("set_pwcur").focus();}catch(e){}},40);};
 $("set_close").onclick=()=>$("settingsModal").classList.add("hidden");
 $("set_signout").onclick=async()=>{$("settingsModal").classList.add("hidden");if(sb)await sb.auth.signOut();};
 $("set_pwsave").onclick=async()=>{const cur=$("set_pwcur").value,nw=$("set_pw").value,cf=$("set_pw2").value,M=$("set_msg");
@@ -1322,10 +1334,19 @@ function fillPassport(){
 }
 function openProfile(){const p=profGet();pfDraft={emoji:p.emoji||"🌍",color:p.color||"#1E9E8E"};
   $("pf_name").value=p.name||"";$("pf_tag").value=p.tagline||"";
+  $("pf_city").value=p.city||"";$("pf_nat").value=p.nationality||"";$("pf_gender").value=p.gender||"";$("pf_dob").value=p.dob||"";
+  if(ID2NAME){const names=[...new Set(Object.values(ID2NAME))].sort();$("pf_natlist").innerHTML=names.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+  updateProfSummary(p);
   $("avatarBig").textContent=pfDraft.emoji;$("avatarBig").style.background=pfDraft.color;
   $("pf_emojis").innerHTML=PF_EMOJIS.map(e=>'<button class="pickchip'+(e===pfDraft.emoji?" sel":"")+'" data-e="'+e+'">'+e+'</button>').join("");
   $("pf_colors").innerHTML=PF_COLORS.map(c=>'<button class="swatch'+(c===pfDraft.color?" sel":"")+'" data-c="'+c+'" style="background:'+c+'"></button>').join("");
   $("pf_msg").textContent="";fillPassport();$("profileModal").classList.remove("hidden");}
+function updateProfSummary(p){p=p||profGet();const bits=[];
+  if(p.nationality){const id=NAME2ID?NAME2ID[p.nationality.toLowerCase()]:null;const fl=id&&ID3TO2?flag(ID3TO2[id]):"";bits.push((fl||"")+p.nationality);}
+  if(p.city)bits.push(p.city);
+  if(p.dob){const d=new Date(p.dob);if(!isNaN(d)){const a=Math.floor((Date.now()-d.getTime())/(365.25*24*3600*1000));if(a>0&&a<130)bits.push(a+" yrs");}}
+  if(p.gender)bits.push(p.gender);
+  const el=$("pf_sum");if(el)el.innerHTML=bits.join(" &middot; ");}
 
 /* ---------- trip highlight on map ---------- */
 function highlightTripOnMap(legs,label){
