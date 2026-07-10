@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Flight Log</title>
+<title>Travelers Log</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0A0F1C">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -57,6 +57,7 @@ section{padding:34px 0}
 .toggle button.on{background:var(--cyan);color:var(--ink);font-weight:500}
 #mapwrap{position:relative}#map svg{display:block;width:100%;height:auto}
 #tip{position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-135%);background:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font-family:var(--mono);font-size:12px;white-space:nowrap;transition:opacity .12s;z-index:5}
+.mlabel{font-family:var(--mono);font-size:11px;fill:var(--paper);paint-order:stroke;stroke:var(--ink);stroke-width:3px;stroke-linejoin:round;opacity:.92}
 .legend{display:flex;flex-wrap:wrap;gap:16px;padding:12px 6px 4px;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .legend span{display:flex;align-items:center;gap:7px}.legend i{width:16px;height:3px;border-radius:2px;display:inline-block}
 .ask-shell{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:20px}
@@ -146,7 +147,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 <!-- AUTH -->
 <div id="auth">
   <div class="authcard">
-    <div class="eyebrow">Flight Log</div>
+    <div class="eyebrow">Travelers Log</div>
     <h1>Sign in</h1>
     <p>Track every flight you take. Add them by hand or drop in a boarding-pass photo.</p>
     <input id="email" class="fld" type="email" placeholder="you@email.com" autocomplete="email"/>
@@ -161,7 +162,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 <div id="app" class="hidden">
   <div class="wrap">
     <div class="topbar">
-      <div class="brand">Flight <b>Log</b></div>
+      <div class="brand">Travelers <b>Log</b></div>
       <div class="who"><span id="useremail"></span><button id="signout" class="linkbtn">Sign out</button></div>
     </div>
     <div class="toolbar">
@@ -212,13 +213,13 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
         </div>
       </section>
 
-      <section><div class="sec-head"><h2 id="tripsTitle">Trips</h2><p>Consecutive flights grouped into journeys from your home base.</p></div>
-        <div id="trips" class="tripwrap"></div>
-      </section>
-
       <section><div class="sec-head"><h2>Records</h2></div><div class="recs" id="records"></div></section>
 
       <section><div class="sec-head"><h2 id="ctitle">Countries visited</h2></div><div class="countries" id="countries"></div></section>
+
+      <section><div class="sec-head"><h2 id="tripsTitle" style="cursor:pointer">Trips <span id="tripsCount"></span> <span class="chev" id="tripsChev">+</span></h2><p>Journeys grouped from your home base. Tap the heading to show or hide.</p></div>
+        <div id="trips" class="tripwrap hidden"></div>
+      </section>
 
       <section><div class="sec-head"><h2 id="fltitle">Your flights</h2></div>
         <div class="controls">
@@ -324,6 +325,7 @@ function showApp(user){
   else{USERID=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");}
 }
 $("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}render();}};
+$("tripsTitle").onclick=()=>{const t=$("trips"),c=$("tripsChev");t.classList.toggle("hidden");if(c)c.textContent=t.classList.contains("hidden")?"+":"\u2013";};
 $("signin").onclick=async()=>{
   if(!configured){authmsg("Not set up yet. See the README.","err");return;}
   const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});
@@ -464,11 +466,13 @@ function render(){
 
   // year cols
   const yc=$("yearcols");yc.innerHTML="";const maxY=Math.max(...yrs.map(y=>perYear[y]));
-  yrs.forEach(y=>{const c=document.createElement("div");c.className="col";
+  yrs.forEach(y=>{const c=document.createElement("div");c.className="col";c.title=y+": "+perYear[y]+" flights";
     c.innerHTML='<div class="cn" style="color:'+yColor(y)+'">'+perYear[y]+'</div><div class="bar2" style="background:'+yColor(y)+';height:'+(perYear[y]/maxY*100)+'%"></div><div class="cy">\''+String(y).slice(2)+'</div>';yc.appendChild(c);});
 
   function bars(id,rows,color,deco){const box=$(id);box.innerHTML="";if(!rows.length){box.innerHTML='<div style="color:var(--dim);font-size:13px">No data</div>';return;}const max=Math.max(...rows.map(r=>r[1]));
     rows.forEach(([lab,n])=>{const el=document.createElement("div");el.className="bar";
+      const plain=(deco?deco(lab):String(lab)).replace(/<[^>]*>/g,"").replace(/&rarr;/g,"\u2192").replace(/\s+/g," ").trim();
+      el.title=plain+": "+n;
       el.innerHTML='<div class="lab">'+(deco?deco(lab):lab)+'</div><div class="track"><div class="fill" style="background:'+color+';width:'+(n/max*100)+'%"></div></div><div class="num">'+n+'</div>';box.appendChild(el);});}
   bars("routebars",top(routeCount,6).map(([k,v])=>[k,v]),"var(--cyan)",k=>{const p=k.split("|");const a=ap(p[0]),b=ap(p[1]);return flag(a&&a[4])+cityOf(p[0])+" &rarr; "+flag(b&&b[4])+cityOf(p[1]);});
   bars("countrybars",top(arrCountry,6),"var(--amber)",c=>{const iso=isoForCountry(c);return flag(iso)+c;});
@@ -480,7 +484,7 @@ function render(){
   MON.forEach(m=>{const d=document.createElement("div");d.className="hh";d.textContent=m;heat.appendChild(d);});
   const g={};let mx=0;FLIGHTS.forEach(f=>{const k=f.year+"-"+(+f.date.slice(5,7));g[k]=(g[k]||0)+1;mx=Math.max(mx,g[k]);});
   yrs.forEach(y=>{const yl=document.createElement("div");yl.className="hy";yl.textContent=y;heat.appendChild(yl);
-    for(let m=1;m<=12;m++){const v=g[y+"-"+m]||0,t=v/mx,c=document.createElement("div");c.className="hc";c.style.background=v?"rgba(255,176,32,"+(0.15+t*0.85)+")":"var(--ink)";c.style.color=t>0.5?"#20160A":"var(--muted)";c.textContent=v||"";heat.appendChild(c);}});
+    for(let m=1;m<=12;m++){const v=g[y+"-"+m]||0,t=v/mx,c=document.createElement("div");c.className="hc";c.style.background=v?"rgba(55,209,190,"+(0.15+t*0.85)+")":"var(--ink)";c.style.color=t>0.5?"#04211D":"var(--muted)";c.textContent=v||"";c.title=MON[m-1]+" "+y+": "+v+" flight"+(v===1?"":"s");heat.appendChild(c);}});
 
   // records
   const D=FLIGHTS.map(f=>{const A=ap(f.from),B=ap(f.to);return Object.assign({},f,{km:(A&&B)?hav([A[0],A[1]],[B[0],B[1]]):0});}).filter(f=>f.km>0);
@@ -531,7 +535,7 @@ function render(){
   const trips=[];let curT=null;
   sorted.forEach(f=>{if(!curT||f.from===home2){if(curT)trips.push(curT);curT={start:f.date,end:f.date,legs:[],dests:new Set()};}curT.legs.push(f);curT.end=f.date;if(f.to!==home2)curT.dests.add(f.to);});
   if(curT)trips.push(curT);
-  $("tripsTitle").textContent="Trips ("+trips.length+")";
+  $("tripsCount").textContent="("+trips.length+")";
   const tw=$("trips");tw.innerHTML="";
   const fmt2=s=>new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
   trips.slice().reverse().forEach(t=>{
@@ -588,14 +592,26 @@ const bc=$("bulkClear");if(bc)bc.onclick=()=>{selIds.clear();const s=$("selAll")
 const bd=$("bulkDel");if(bd)bd.onclick=async()=>{if(!selIds.size||!sb)return;if(!confirm("Delete "+selIds.size+" selected flight(s)?"))return;const ids=[...selIds];const {error}=await sb.from("flights").delete().in("id",ids);if(error){status("Delete error: "+error.message);return;}selIds.clear();await loadFlights();};})();
 
 /* ---------- map ---------- */
-let svg,proj,path,gLand,gArc,gDot,mapZoom;
+let svg,proj,path,gLand,gArc,gDot,gLabel,mapZoom,mapT=null,mapLabels=[];
 function initMap(){const W=960,H=500;svg=d3.select("#map").append("svg").attr("viewBox","0 0 "+W+" "+H);
-  proj=d3.geoNaturalEarth1().fitExtent([[8,10],[W-8,H-10]],{type:"Sphere"});path=d3.geoPath(proj);
+  proj=d3.geoNaturalEarth1().fitExtent([[8,10],[W-8,H-10]],{type:"Sphere"});path=d3.geoPath(proj);mapT=d3.zoomIdentity;
   const root=svg.append("g");
   gLand=root.append("g");gArc=root.append("g").attr("fill","none").attr("stroke-linecap","round");gDot=root.append("g");
-  mapZoom=d3.zoom().scaleExtent([1,8]).on("zoom",ev=>root.attr("transform",ev.transform));
+  gLabel=svg.append("g").attr("pointer-events","none");
+  mapZoom=d3.zoom().scaleExtent([1,8]).on("zoom",ev=>{mapT=ev.transform;root.attr("transform",mapT);updateLabels();});
   svg.call(mapZoom).on("dblclick.zoom",null);
   const rb=$("mapReset");if(rb)rb.onclick=()=>svg.transition().duration(400).call(mapZoom.transform,d3.zoomIdentity);}
+function updateLabels(){
+  if(!gLabel||!mapT)return;const W=960,H=500;
+  const cand=mapLabels.map(L=>({L,p:mapT.apply([L.x,L.y])})).filter(o=>o.p[0]>=4&&o.p[0]<=W-4&&o.p[1]>=4&&o.p[1]<=H-4);
+  cand.sort((a,b)=>b.L.w-a.L.w);
+  const cap=Math.min(cand.length,Math.round(8*mapT.k)),placed=[],out=[];
+  for(const o of cand){if(out.length>=cap)break;const sx=o.p[0],sy=o.p[1]-(o.L.r?o.L.r*mapT.k+5:0);
+    let ok=true;for(const q of placed){if(Math.abs(q.x-sx)<52&&Math.abs(q.y-sy)<13){ok=false;break;}}
+    if(ok){placed.push({x:sx,y:sy});out.push(Object.assign({},o.L,{sx:sx,sy:sy}));}}
+  gLabel.selectAll("text").data(out,d=>d.text).join("text")
+    .attr("class","mlabel").attr("text-anchor","middle").attr("x",d=>d.sx).attr("y",d=>d.sy).text(d=>d.text);
+}
 function drawMap(visISO3){
   if(!svg)return;
   const solo=selYears.size>0, inSel=f=>selYears.size===0||selYears.has(f.year);
@@ -617,6 +633,10 @@ function drawMap(visISO3){
     .attr("cx",n=>proj([ap(n)[0],ap(n)[1]])[0]).attr("cy",n=>proj([ap(n)[0],ap(n)[1]])[1]).attr("r",n=>r(cc[n]))
     .on("mousemove",function(ev,n){const b=wrapEl.getBoundingClientRect();tip.style.left=(ev.clientX-b.left)+"px";tip.style.top=(ev.clientY-b.top)+"px";tip.style.opacity=1;tip.innerHTML=cityOf(n)+" · "+cc[n]+" flights";})
     .on("mouseleave",()=>tip.style.opacity=0);
+  mapLabels=[];
+  if(mode==="routes"){names.forEach(n=>{const a=ap(n),p=proj([a[0],a[1]]);if(p&&isFinite(p[0]))mapLabels.push({x:p[0],y:p[1],text:cityOf(n),w:cc[n],r:r(cc[n])});});}
+  else{WORLDF.forEach(f=>{if(!f.properties||!f.properties.name)return;const c=path.centroid(f);if(c&&isFinite(c[0])&&isFinite(c[1]))mapLabels.push({x:c[0],y:c[1],text:f.properties.name,w:d3.geoArea(f)});});}
+  updateLabels();
 }
 function chips(yrs,perYear){const box=$("chips");box.style.display=mode==="routes"?"flex":"none";box.innerHTML="";
   const all=document.createElement("button");all.className="chip"+(selYears.size===0?" on":"");all.textContent="All";all.onclick=()=>{selYears.clear();render();};box.appendChild(all);
