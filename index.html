@@ -36,6 +36,11 @@ img.fl{height:12px;width:auto;vertical-align:-1px;margin-right:5px;border-radius
 .topbar .brand b{color:var(--amber)}
 .topbar .who{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:14px}
 .linkbtn{background:none;border:none;color:var(--cyan);font-family:var(--mono);font-size:12px;padding:0}
+.navbtn{background:var(--ink2);border:1px solid var(--line2);color:var(--paper);font-family:var(--body);font-size:13px;border-radius:9px;padding:7px 13px;cursor:pointer}
+.navbtn:hover{border-color:var(--amber-d)}
+.navbtn.out{color:var(--muted)}
+.navbtn.out:hover{color:var(--paper);border-color:var(--red)}
+.flabel{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:0 0 4px}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0;align-items:center}
 .tbsep{width:1px;align-self:stretch;background:var(--line2);margin:2px 2px}
 .tbmenu{position:relative}
@@ -309,7 +314,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="wrap">
     <div class="topbar">
       <a class="brand" href="about.html" target="_blank" rel="noopener">Travelers <b>Log</b></a>
-      <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail"></span><button id="friendsBtn" class="linkbtn">Friends</button><button id="settingsBtn" class="linkbtn">Settings</button><button id="signout" class="linkbtn">Sign out</button></div>
+      <div class="who"><button id="profileBtn" class="avatarchip"><span id="avatarSm" class="avatarSm">🌍</span><span id="profileNameTop">Traveler</span></button><span id="useremail" style="display:none"></span><button id="friendsBtn" class="navbtn">Friends</button><button id="settingsBtn" class="navbtn">Settings</button><button id="signout" class="navbtn out">Sign out</button></div>
     </div>
     <div class="toolbar">
       <button class="tool primary" id="addBtn">+ Add flight</button>
@@ -557,17 +562,22 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="profhead">
     <div id="avatarBig" class="avatarBig">🌍</div>
     <div style="flex:1;min-width:0">
-      <input id="pf_name" class="fld" placeholder="Your name" style="margin-bottom:8px"/>
-      <input id="pf_tag" class="fld" placeholder="Tagline (e.g. Collecting boarding passes)"/>
+      <div class="flabel">Name</div>
+      <input id="pf_name" class="fld" placeholder="Your name" style="margin-bottom:10px"/>
+      <div class="flabel">Tagline</div>
+      <input id="pf_tag" class="fld" placeholder="e.g. Collecting boarding passes"/>
     </div>
   </div>
   <div id="pf_sum" class="cap" style="margin-top:10px"></div>
   <div class="cap" style="margin:16px 0 6px">Details</div>
-  <input id="pf_city" class="fld" placeholder="Home city (e.g. Beirut)" style="margin-bottom:8px"/>
-  <input id="pf_nat" class="fld" list="pf_natlist" placeholder="Nationality" style="margin-bottom:8px"/>
+  <div class="flabel">Home airport (your home base)</div>
+  <div class="ac"><input id="pf_home" class="fld" placeholder="e.g. BEY or Beirut" autocomplete="off" style="margin-bottom:8px"/><div id="ac_home" class="aclist hidden"></div></div>
+  <div class="flabel">Nationality</div>
+  <input id="pf_nat" class="fld" list="pf_natlist" placeholder="e.g. Lebanon" style="margin-bottom:8px"/>
   <datalist id="pf_natlist"></datalist>
-  <select id="pf_gender" class="fld" style="margin-bottom:8px"><option value="">Gender (optional)</option><option value="Female">Female</option><option value="Male">Male</option><option value="Non-binary">Non-binary</option><option value="Prefer not to say">Prefer not to say</option></select>
-  <div class="cap" style="margin:2px 0 4px;opacity:.75">Date of birth</div>
+  <div class="flabel">Gender</div>
+  <select id="pf_gender" class="fld" style="margin-bottom:8px"><option value="">Select...</option><option value="Female">Female</option><option value="Male">Male</option><option value="Non-binary">Non-binary</option><option value="Prefer not to say">Prefer not to say</option></select>
+  <div class="flabel">Date of birth</div>
   <input id="pf_dob" class="fld" type="date"/>
   <div class="cap" style="margin:16px 0 6px">Avatar</div>
   <div id="pf_emojis" class="pickrow"></div>
@@ -756,7 +766,12 @@ $("profileBtn").onclick=openProfile;
 $("pf_close").onclick=()=>$("profileModal").classList.add("hidden");
 $("pf_emojis").addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(!b)return;pfDraft.emoji=b.getAttribute("data-e");$("avatarBig").textContent=pfDraft.emoji;document.querySelectorAll("#pf_emojis .pickchip").forEach(x=>x.classList.toggle("sel",x===b));});
 $("pf_colors").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;pfDraft.color=b.getAttribute("data-c");$("avatarBig").style.background=pfDraft.color;document.querySelectorAll("#pf_colors .swatch").forEach(x=>x.classList.toggle("sel",x===b));});
-$("pf_save").onclick=()=>{profSet({name:$("pf_name").value.trim(),tagline:$("pf_tag").value.trim(),emoji:pfDraft.emoji,color:pfDraft.color,city:$("pf_city").value.trim(),nationality:$("pf_nat").value.trim(),gender:$("pf_gender").value,dob:$("pf_dob").value});applyProfileChrome();updateProfSummary();$("pf_msg").textContent="Saved.";$("pf_msg").className="msg ok";};
+$("pf_save").onclick=()=>{
+  const hv=($("pf_home").value||"").trim().toUpperCase();
+  if(hv){if(!ap(hv)){$("pf_msg").textContent="Pick your home airport from the suggestions (3-letter code).";$("pf_msg").className="msg err";return;}homeSet(hv);}
+  else{try{localStorage.removeItem(homeKey());}catch(e){}pushPrefs();}
+  profSet({name:$("pf_name").value.trim(),tagline:$("pf_tag").value.trim(),emoji:pfDraft.emoji,color:pfDraft.color,nationality:$("pf_nat").value.trim(),gender:$("pf_gender").value,dob:$("pf_dob").value});
+  applyProfileChrome();updateProfSummary();render();$("pf_msg").textContent="Saved.";$("pf_msg").className="msg ok";};
 $("shareBtn").onclick=()=>{$("share_msg").textContent="";$("sharePublic").checked=!!(PROFILE&&PROFILE.is_public);$("shareName").value=(PROFILE&&PROFILE.display_name)||"";updateShareUI();$("shareModal").classList.remove("hidden");};
 $("share_close").onclick=()=>$("shareModal").classList.add("hidden");
 $("sharePublic").onchange=()=>saveProfile($("sharePublic").checked,$("shareName").value);
@@ -1430,7 +1445,7 @@ function fillPassport(){
 }
 function openProfile(){const p=profGet();pfDraft={emoji:p.emoji||"🌍",color:p.color||"#1E9E8E"};
   $("pf_name").value=p.name||"";$("pf_tag").value=p.tagline||"";
-  $("pf_city").value=p.city||"";$("pf_nat").value=p.nationality||"";$("pf_gender").value=p.gender||"";$("pf_dob").value=p.dob||"";
+  $("pf_home").value=(typeof homeGet==="function"&&homeGet())||"";$("pf_nat").value=p.nationality||"";$("pf_gender").value=p.gender||"";$("pf_dob").value=p.dob||"";
   if(ID2NAME){const names=[...new Set(Object.values(ID2NAME))].sort();$("pf_natlist").innerHTML=names.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
   updateProfSummary(p);
   $("avatarBig").textContent=pfDraft.emoji;$("avatarBig").style.background=pfDraft.color;
@@ -1439,7 +1454,7 @@ function openProfile(){const p=profGet();pfDraft={emoji:p.emoji||"🌍",color:p.
   $("pf_msg").textContent="";fillPassport();$("profileModal").classList.remove("hidden");}
 function updateProfSummary(p){p=p||profGet();const bits=[];
   if(p.nationality){const id=NAME2ID?NAME2ID[p.nationality.toLowerCase()]:null;const fl=id&&ID3TO2?flag(ID3TO2[id]):"";bits.push((fl||"")+p.nationality);}
-  if(p.city)bits.push(p.city);
+  const hb=(typeof homeGet==="function")?homeGet():null;if(hb&&ap(hb))bits.push(cityOf(hb));
   if(p.dob){const d=new Date(p.dob);if(!isNaN(d)){const a=Math.floor((Date.now()-d.getTime())/(365.25*24*3600*1000));if(a>0&&a<130)bits.push(a+" yrs");}}
   if(p.gender)bits.push(p.gender);
   const el=$("pf_sum");if(el)el.innerHTML=bits.join(" &middot; ");}
@@ -1681,7 +1696,7 @@ Promise.all([
   fetch("airports.json").then(r=>r.json()).catch(()=>({})),
   fetch("world.geo.json").then(r=>r.json()).catch(()=>({features:[]}))
 ]).then(([airports,world])=>{
-  AP=airports;WORLDF=(world.features||[]);initMap();wireAC("a_from","ac_from");wireAC("a_to","ac_to");refreshUser();
+  AP=airports;WORLDF=(world.features||[]);initMap();wireAC("a_from","ac_from");wireAC("a_to","ac_to");wireAC("pf_home","ac_home");refreshUser();
 });
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
