@@ -4,6 +4,9 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Flight Log</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B1622">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -116,6 +119,16 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .acitem .code{font-family:var(--mono);color:var(--amber);font-size:12px;margin-right:6px}
 .edit{background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:14px;cursor:pointer;margin-right:12px}
 .edit:hover{color:var(--cyan)}
+.tystats{display:flex;gap:26px;flex-wrap:wrap}
+.tystats .ts b{font-family:var(--mono);font-size:26px;color:var(--amber);display:block;line-height:1.1}
+.tystats .ts span{font-family:var(--mono);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+.goalbar{height:12px;background:var(--ink);border-radius:6px;overflow:hidden;margin-top:8px}
+.goalfill{height:100%;background:var(--amber);width:0;border-radius:6px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.tripwrap{display:flex;flex-direction:column;gap:10px}
+.trip{background:var(--ink3);border:1px solid var(--line);border-radius:12px;padding:13px 16px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.trip .tl{font-weight:500;font-size:14px}
+.trip .td{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
+.trip .tr{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:right;white-space:nowrap}
 footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font-family:var(--mono);font-size:12px;color:var(--dim)}
 @media(max-width:820px){.board{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.recs{grid-template-columns:1fr}.countries{grid-template-columns:1fr 1fr}.bar{grid-template-columns:110px 1fr auto}.frow{grid-template-columns:1fr}.cfields{grid-template-columns:1fr 1fr}}
 </style>
@@ -156,6 +169,17 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
     <div id="dash">
       <div class="board" id="board"></div>
 
+      <section><div class="sec-head"><h2>This year &amp; goals</h2></div>
+        <div class="grid2">
+          <div class="panel"><h3>This year</h3><div class="cap">Your <span id="tyYear"></span> so far</div><div id="tyStats" class="tystats"></div></div>
+          <div class="panel"><h3>Country goal</h3><div class="cap" id="goalCap"></div>
+            <div class="goalbar"><div id="goalFill" class="goalfill"></div></div>
+            <div class="cap" id="goalNote" style="margin-top:10px"></div>
+            <h3 style="font-size:14px;margin-top:18px">Continents</h3><div class="cap" id="contList" style="margin-top:6px"></div>
+          </div>
+        </div>
+      </section>
+
       <section><div class="sec-head"><h2>Where I've been</h2></div>
         <div class="card">
           <div class="toggle" id="mapmode"><button data-m="routes" class="on">Routes</button><button data-m="countries">Countries</button></div>
@@ -178,6 +202,10 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
           <div class="panel"><h3>Most visited countries</h3><div class="cap">By arrivals</div><div class="bars" id="countrybars"></div></div>
           <div class="panel"><h3>Most used airlines</h3><div class="cap">By legs</div><div class="bars" id="airbars"></div></div>
         </div>
+      </section>
+
+      <section><div class="sec-head"><h2 id="tripsTitle">Trips</h2><p>Consecutive flights grouped into journeys from your home base.</p></div>
+        <div id="trips" class="tripwrap"></div>
       </section>
 
       <section><div class="sec-head"><h2>Records</h2></div><div class="recs" id="records"></div></section>
@@ -248,6 +276,7 @@ const YCOL={2022:"#5B8DEF",2023:"#35C4D7",2024:"#FFB020",2025:"#FF7A59",2026:"#F
 function yColor(y){return YCOL[y]|| "#9AA7B2";}
 let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", active="all";
 
+const CONTINENT2 = {"AW":"North America","AF":"Asia","AO":"Africa","AI":"North America","AX":"Europe","AL":"Europe","AD":"Europe","AE":"Asia","AR":"South America","AM":"Asia","AS":"Oceania","AG":"North America","AU":"Oceania","AT":"Europe","AZ":"Asia","BI":"Africa","BE":"Europe","BJ":"Africa","BQ":"North America","BF":"Africa","BD":"Asia","BG":"Europe","BH":"Asia","BS":"North America","BA":"Europe","BL":"North America","BY":"Europe","BZ":"North America","BM":"North America","BO":"South America","BR":"South America","BB":"North America","BN":"Asia","BT":"Asia","BV":"Antarctica","BW":"Africa","CF":"Africa","CA":"North America","CC":"Asia","CH":"Europe","CL":"South America","CN":"Asia","CI":"Africa","CM":"Africa","CD":"Africa","CG":"Africa","CK":"Oceania","CO":"South America","KM":"Africa","CV":"Africa","CR":"North America","CU":"North America","CW":"North America","CX":"Asia","KY":"North America","CY":"Asia","CZ":"Europe","DE":"Europe","DJ":"Africa","DM":"North America","DK":"Europe","DO":"North America","DZ":"Africa","EC":"South America","EG":"Africa","ER":"Africa","ES":"Europe","EE":"Europe","ET":"Africa","FI":"Europe","FJ":"Oceania","FK":"South America","FR":"Europe","FO":"Europe","FM":"Oceania","GA":"Africa","GB":"Europe","GE":"Asia","GG":"Europe","GH":"Africa","GI":"Europe","GN":"Africa","GP":"North America","GM":"Africa","GW":"Africa","GQ":"Africa","GR":"Europe","GD":"North America","GL":"North America","GT":"North America","GF":"South America","GU":"Oceania","GY":"South America","HK":"Asia","HM":"Antarctica","HN":"North America","HR":"Europe","HT":"North America","HU":"Europe","ID":"Asia","IM":"Europe","IN":"Asia","IO":"Asia","IE":"Europe","IR":"Asia","IQ":"Asia","IS":"Europe","IL":"Asia","IT":"Europe","JM":"North America","JE":"Europe","JO":"Asia","JP":"Asia","KZ":"Asia","KE":"Africa","KG":"Asia","KH":"Asia","KI":"Oceania","KN":"North America","KR":"Asia","KW":"Asia","LA":"Asia","LB":"Asia","LR":"Africa","LY":"Africa","LC":"North America","LI":"Europe","LK":"Asia","LS":"Africa","LT":"Europe","LU":"Europe","LV":"Europe","MO":"Asia","MF":"North America","MA":"Africa","MC":"Europe","MD":"Europe","MG":"Africa","MV":"Asia","MX":"North America","MH":"Oceania","MK":"Europe","ML":"Africa","MT":"Europe","MM":"Asia","ME":"Europe","MN":"Asia","MP":"Oceania","MZ":"Africa","MR":"Africa","MS":"North America","MQ":"North America","MU":"Africa","MW":"Africa","MY":"Asia","YT":"Africa","NA":"Africa","NC":"Oceania","NE":"Africa","NF":"Oceania","NG":"Africa","NI":"North America","NU":"Oceania","NL":"Europe","NO":"Europe","NP":"Asia","NR":"Oceania","NZ":"Oceania","OM":"Asia","PK":"Asia","PA":"North America","PE":"South America","PH":"Asia","PW":"Oceania","PG":"Oceania","PL":"Europe","PR":"North America","KP":"Asia","PT":"Europe","PY":"South America","PS":"Asia","PF":"Oceania","QA":"Asia","RE":"Africa","RO":"Europe","RU":"Europe","RW":"Africa","SA":"Asia","SD":"Africa","SN":"Africa","SG":"Asia","GS":"South America","SH":"Africa","SJ":"Europe","SB":"Oceania","SL":"Africa","SV":"North America","SM":"Europe","SO":"Africa","PM":"North America","RS":"Europe","SS":"Africa","ST":"Africa","SR":"South America","SK":"Europe","SI":"Europe","SE":"Europe","SZ":"Africa","SC":"Africa","SY":"Asia","TC":"North America","TD":"Africa","TG":"Africa","TH":"Asia","TJ":"Asia","TK":"Oceania","TM":"Asia","TO":"Oceania","TT":"North America","TN":"Africa","TR":"Asia","TV":"Oceania","TW":"Asia","TZ":"Africa","UG":"Africa","UA":"Europe","UY":"South America","US":"North America","UZ":"Asia","VC":"North America","VE":"South America","VG":"North America","VI":"North America","VN":"Asia","VU":"Oceania","WF":"Oceania","WS":"Oceania","YE":"Asia","ZA":"Africa","ZM":"Africa","ZW":"Africa","XK":"Europe"};
 function flag(iso2){return iso2?'<img class="fl" src="https://flagcdn.com/20x15/'+iso2.toLowerCase()+'.png" onerror="this.style.display=\'none\'">':'';}
 const AIRLINE_ICAO={"MEA":"MEA","Middle East Airlines":"MEA","Saudia":"SVA","Emirates":"UAE","Air Arabia":"ABY","Etihad":"ETD","Etihad Airways":"ETD","Turkish Airlines":"THY","Qatar Airways":"QTR","Flydubai":"FDB","flydubai":"FDB","Lufthansa":"DLH","Air France":"AFR","Wizz Air":"WZZ","Wizz":"WZZ","Ryanair":"RYR","Pegasus":"PGT","Aegean":"AEE","Vueling":"VLG","SriLankan":"ALK","SriLankan Airlines":"ALK","United":"UAL","United Airlines":"UAL","American":"AAL","American Airlines":"AAL","Delta":"DAL","Aeromexico":"AMX","Cathay Pacific":"CPA","Singapore Airlines":"SIA","Thai Airways":"THA","Qantas":"QFA","British Airways":"BAW","KLM":"KLM","Swiss":"SWR","Iberia":"IBE","EgyptAir":"MSR","Royal Jordanian":"RJA","Oman Air":"OMA","Gulf Air":"GFA"};
 function logoImg(al){const c=AIRLINE_ICAO[al];return c?'<img class="lg" src="https://raw.githubusercontent.com/Jxck-S/airline-logos/main/flightaware_logos/'+c+'.png" onerror="this.style.display=\'none\'">':'';}
@@ -468,6 +497,33 @@ function render(){
   const list=Object.keys(visCities).sort();
   list.forEach((cn,i)=>{const iso=isoForCountry(cn);const cities=[...visCities[cn]].slice(0,6).join(", ");const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
 
+  // continents, this year, goal, trips
+  const curY=new Date().getFullYear();
+  const contSet={},contByArr={};
+  FLIGHTS.forEach(f=>{[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[4]&&CONTINENT2[a[4]])contSet[CONTINENT2[a[4]]]=1;});const at=ap(f.to);if(at&&at[4]&&CONTINENT2[at[4]]){const cn=CONTINENT2[at[4]];contByArr[cn]=(contByArr[cn]||0)+1;}});
+  const contN=Object.keys(contSet).length;
+  const tyFlights=FLIGHTS.filter(f=>f.year===curY);
+  const tyISO=new Set();tyFlights.forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])tyISO.add(a[5]);}));
+  const beforeISO=new Set();FLIGHTS.filter(f=>f.year<curY).forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])beforeISO.add(a[5]);}));
+  let newThis=0;tyISO.forEach(x=>{if(!beforeISO.has(x))newThis++;});
+  $("tyYear").textContent=curY;
+  $("tyStats").innerHTML='<div class="ts"><b>'+tyFlights.length+'</b><span>Flights</span></div><div class="ts"><b>'+tyISO.size+'</b><span>Countries</span></div><div class="ts"><b>'+newThis+'</b><span>New countries</span></div>';
+  const target=Math.max(10,Math.ceil((countriesN+1)/10)*10);
+  $("goalCap").textContent=countriesN+" of "+target+" countries";
+  $("goalFill").style.width=Math.min(100,countriesN/target*100)+"%";
+  $("goalNote").textContent=(target-countriesN)+" to go to reach "+target+".";
+  $("contList").innerHTML=contN+" of 7 &middot; "+Object.keys(contSet).sort().join(", ");
+  const home2=top(cityCount,1)[0][0];
+  const sorted=FLIGHTS.slice().sort((a,b)=>a.date<b.date?-1:1);
+  const trips=[];let curT=null;
+  sorted.forEach(f=>{if(!curT||f.from===home2){if(curT)trips.push(curT);curT={start:f.date,end:f.date,legs:[],dests:new Set()};}curT.legs.push(f);curT.end=f.date;if(f.to!==home2)curT.dests.add(cityOf(f.to));});
+  if(curT)trips.push(curT);
+  $("tripsTitle").textContent="Trips ("+trips.length+")";
+  const tw=$("trips");tw.innerHTML="";
+  const fmt2=s=>new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+  trips.slice().reverse().forEach(t=>{const dests=[...t.dests].slice(0,5).join(", ")||"local hops";const el=document.createElement("div");el.className="trip";
+    el.innerHTML='<div><div class="tl">'+dests+'</div><div class="td">'+t.legs.length+' leg'+(t.legs.length>1?'s':'')+'</div></div><div class="tr">'+fmt2(t.start)+(t.start!==t.end?' to '+fmt2(t.end):'')+'</div>';tw.appendChild(el);});
+
   // flights table (with filters)
   $("fltitle").textContent="Your flights ("+FLIGHTS.length+")";
   const ysel=$("fYear"),cur=ysel.value;
@@ -549,6 +605,7 @@ Promise.all([
   AP=airports;WORLDF=(world.features||[]);initMap();wireAC("a_from","ac_from");wireAC("a_to","ac_to");refreshUser();
 });
 
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 }catch(err){
   const d=document.createElement("div");d.style.cssText="position:fixed;top:0;left:0;right:0;background:#7a1f1f;color:#fff;font-family:monospace;font-size:12px;padding:10px 14px;z-index:9999";
   d.textContent="Error: "+((err&&err.message)||err);document.body.appendChild(d);console.error(err);
