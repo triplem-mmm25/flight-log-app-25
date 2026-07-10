@@ -281,7 +281,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
     <h1>Sign in</h1>
     <p>Track every flight you take. Add them by hand or drop in a boarding-pass photo.</p>
     <input id="email" class="fld" type="email" placeholder="you@email.com" autocomplete="email"/>
-    <input id="pw" class="fld" type="password" placeholder="Password (min 6 chars)" autocomplete="current-password"/>
+    <input id="pw" class="fld" type="password" placeholder="Password" autocomplete="current-password"/>
     <button id="signin" class="btn">Sign in</button>
     <button id="signup" class="btn ghost">Create account</button>
     <button id="forgot" class="linkbtn" style="margin-top:14px">Forgot password?</button>
@@ -530,7 +530,10 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="setrow"><span>Email</span><span id="set_email" class="setv"></span></div>
   <div class="setrow"><span>Stay signed in</span><span class="setv">On, this device</span></div>
   <div class="cap" style="margin:20px 0 6px">Change password</div>
-  <input id="set_pw" class="fld" type="password" placeholder="New password (min 6 chars)" autocomplete="new-password"/>
+  <input id="set_pwcur" class="fld" type="password" placeholder="Current password" autocomplete="current-password"/>
+  <input id="set_pw" class="fld" type="password" placeholder="New password" autocomplete="new-password"/>
+  <input id="set_pw2" class="fld" type="password" placeholder="Confirm new password" autocomplete="new-password"/>
+  <div class="cap" style="margin:2px 0 8px;opacity:.75">At least 8 characters, with a capital letter, a lowercase letter and a number.</div>
   <button id="set_pwsave" class="btn">Update password</button>
   <div id="set_msg" class="msg" style="margin-top:10px"></div>
   <div style="display:flex;gap:10px;margin-top:18px">
@@ -802,6 +805,7 @@ $("signin").onclick=async()=>{
 };
 $("signup").onclick=async()=>{
   if(!configured){authmsg("Not set up yet. See the README.","err");return;}
+  const pe=pwError($("pw").value);if(pe){authmsg(pe,"err");return;}
   const {data,error}=await sb.auth.signUp({email:$("email").value.trim(),password:$("pw").value});
   if(error)authmsg(error.message,"err");
   else if(data.user&&!data.session)authmsg("Check your email to confirm, then sign in.","ok");
@@ -814,17 +818,27 @@ $("forgot").onclick=async()=>{const em=$("email").value.trim();const M=$("authms
   try{const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});
     M.textContent=error?("Error: "+error.message):("Reset link sent to "+em+". Open it on this device to set a new password.");M.className="msg "+(error?"err":"ok");}
   catch(e){M.textContent="Error: "+e.message;M.className="msg err";}};
-$("settingsBtn").onclick=()=>{$("set_email").textContent=$("useremail").textContent||"";$("set_pw").value="";$("set_msg").textContent="";$("settingsModal").classList.remove("hidden");};
+$("settingsBtn").onclick=()=>{$("set_email").textContent=$("useremail").textContent||"";$("set_pwcur").value=$("set_pw").value=$("set_pw2").value="";$("set_msg").textContent="";$("settingsModal").classList.remove("hidden");};
 $("set_close").onclick=()=>$("settingsModal").classList.add("hidden");
 $("set_signout").onclick=async()=>{$("settingsModal").classList.add("hidden");if(sb)await sb.auth.signOut();};
-$("set_pwsave").onclick=async()=>{const pw=$("set_pw").value,M=$("set_msg");
-  if(pw.length<6){M.textContent="Password must be at least 6 characters.";M.className="msg err";return;}
+$("set_pwsave").onclick=async()=>{const cur=$("set_pwcur").value,nw=$("set_pw").value,cf=$("set_pw2").value,M=$("set_msg");
+  if(!cur){M.textContent="Enter your current password.";M.className="msg err";return;}
+  if(nw!==cf){M.textContent="New passwords do not match.";M.className="msg err";return;}
+  const pe=pwError(nw);if(pe){M.textContent=pe;M.className="msg err";return;}
+  if(nw===cur){M.textContent="New password must be different from the current one.";M.className="msg err";return;}
+  const email=$("set_email").textContent||$("useremail").textContent||"";
   M.textContent="Updating...";M.className="msg";
-  try{const {error}=await sb.auth.updateUser({password:pw});M.textContent=error?("Error: "+error.message):"Password updated.";M.className="msg "+(error?"err":"ok");$("set_pw").value="";}
-  catch(e){M.textContent="Error: "+e.message;M.className="msg err";}};
+  try{
+    const {error:ae}=await sb.auth.signInWithPassword({email:email,password:cur});
+    if(ae){M.textContent="Current password is incorrect.";M.className="msg err";return;}
+    const {error}=await sb.auth.updateUser({password:nw});
+    if(error){M.textContent="Error: "+error.message;M.className="msg err";return;}
+    M.textContent="Password updated.";M.className="msg ok";$("set_pwcur").value=$("set_pw").value=$("set_pw2").value="";
+  }catch(e){M.textContent="Error: "+((e&&e.message)||e);M.className="msg err";}};
+function pwError(pw){if(!pw||pw.length<8)return "Use at least 8 characters.";if(!/[A-Z]/.test(pw))return "Add at least one capital letter.";if(!/[a-z]/.test(pw))return "Add at least one lowercase letter.";if(!/[0-9]/.test(pw))return "Add at least one number.";return null;}
 function authmsg(t,c){const m=$("authmsg");m.textContent=t;m.className="msg "+(c||"");}
 if(configured){sb.auth.onAuthStateChange((ev,session)=>{
-  if(ev==="PASSWORD_RECOVERY"){askModal({title:"Set a new password",hint:"At least 6 characters.",value:"",placeholder:"New password",type:"password",ok:function(v){if(!v||v.length<6)return "Password must be at least 6 characters.";sb.auth.updateUser({password:v}).then(function(r){var e=r&&r.error;alert(e?("Could not update password: "+e.message):"Password updated. You are signed in.");});return null;}});}
+  if(ev==="PASSWORD_RECOVERY"){askModal({title:"Set a new password",hint:"At least 8 characters, with a capital letter, a lowercase letter and a number.",value:"",placeholder:"New password",type:"password",ok:function(v){var pe=pwError(v);if(pe)return pe;sb.auth.updateUser({password:v}).then(function(r){var e=r&&r.error;alert(e?("Could not update password: "+e.message):"Password updated. You are signed in.");});return null;}});}
   showApp(session?session.user:null);
 });}
 
