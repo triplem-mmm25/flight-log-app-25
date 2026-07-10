@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Flight Log</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0B1622">
+<meta name="theme-color" content="#0A0F1C">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#0B1622;--ink2:#12202F;--ink3:#0E1A27;--line:#1E3346;--line2:#294057;--paper:#EAF1F6;--muted:#7E96A8;--dim:#546A7C;--amber:#FFB020;--cyan:#35C4D7;--y22:#5B8DEF;--y23:#35C4D7;--y24:#FFB020;--y25:#FF7A59;--y26:#F25F8E;--red:#E5624C;--disp:'Space Grotesk',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;}
+:root{--ink:#0A0F1C;--ink2:#111A2B;--ink3:#0D1523;--line:#1E2B40;--line2:#2A3B54;--paper:#ECF1F8;--muted:#8494A8;--dim:#57677E;--amber:#37D1BE;--amber-d:#1E9E8E;--cyan:#F2B34A;--y22:#6EA8FE;--y23:#37D1BE;--y24:#F2B34A;--y25:#FF8FA3;--y26:#A98CFF;--red:#E5624C;--disp:'Fraunces',Georgia,serif;--body:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;}
 *{box-sizing:border-box}
 body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);line-height:1.6;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
@@ -153,7 +153,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 <div id="app" class="hidden">
   <div class="wrap">
     <div class="topbar">
-      <div class="brand">MMM <b>Flight Log</b></div>
+      <div class="brand">Flight <b>Log</b></div>
       <div class="who"><span id="useremail"></span><button id="signout" class="linkbtn">Sign out</button></div>
     </div>
     <div class="toolbar">
@@ -227,7 +227,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       <p>Add your first flight, or upload a boarding pass and it will be read for you.</p>
     </div>
 
-    <footer>Your data is private to your account. Built with Supabase and Claude.</footer>
+    <footer>Your flights stay private to your account.</footer>
   </div>
 </div>
 
@@ -274,7 +274,7 @@ if(configured){ sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_
 const $=id=>document.getElementById(id);
 const YCOL={2022:"#5B8DEF",2023:"#35C4D7",2024:"#FFB020",2025:"#FF7A59",2026:"#F25F8E"};
 function yColor(y){return YCOL[y]|| "#9AA7B2";}
-let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", active="all";
+let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set();
 
 const CONTINENT2 = {"AW":"North America","AF":"Asia","AO":"Africa","AI":"North America","AX":"Europe","AL":"Europe","AD":"Europe","AE":"Asia","AR":"South America","AM":"Asia","AS":"Oceania","AG":"North America","AU":"Oceania","AT":"Europe","AZ":"Asia","BI":"Africa","BE":"Europe","BJ":"Africa","BQ":"North America","BF":"Africa","BD":"Asia","BG":"Europe","BH":"Asia","BS":"North America","BA":"Europe","BL":"North America","BY":"Europe","BZ":"North America","BM":"North America","BO":"South America","BR":"South America","BB":"North America","BN":"Asia","BT":"Asia","BV":"Antarctica","BW":"Africa","CF":"Africa","CA":"North America","CC":"Asia","CH":"Europe","CL":"South America","CN":"Asia","CI":"Africa","CM":"Africa","CD":"Africa","CG":"Africa","CK":"Oceania","CO":"South America","KM":"Africa","CV":"Africa","CR":"North America","CU":"North America","CW":"North America","CX":"Asia","KY":"North America","CY":"Asia","CZ":"Europe","DE":"Europe","DJ":"Africa","DM":"North America","DK":"Europe","DO":"North America","DZ":"Africa","EC":"South America","EG":"Africa","ER":"Africa","ES":"Europe","EE":"Europe","ET":"Africa","FI":"Europe","FJ":"Oceania","FK":"South America","FR":"Europe","FO":"Europe","FM":"Oceania","GA":"Africa","GB":"Europe","GE":"Asia","GG":"Europe","GH":"Africa","GI":"Europe","GN":"Africa","GP":"North America","GM":"Africa","GW":"Africa","GQ":"Africa","GR":"Europe","GD":"North America","GL":"North America","GT":"North America","GF":"South America","GU":"Oceania","GY":"South America","HK":"Asia","HM":"Antarctica","HN":"North America","HR":"Europe","HT":"North America","HU":"Europe","ID":"Asia","IM":"Europe","IN":"Asia","IO":"Asia","IE":"Europe","IR":"Asia","IQ":"Asia","IS":"Europe","IL":"Asia","IT":"Europe","JM":"North America","JE":"Europe","JO":"Asia","JP":"Asia","KZ":"Asia","KE":"Africa","KG":"Asia","KH":"Asia","KI":"Oceania","KN":"North America","KR":"Asia","KW":"Asia","LA":"Asia","LB":"Asia","LR":"Africa","LY":"Africa","LC":"North America","LI":"Europe","LK":"Asia","LS":"Africa","LT":"Europe","LU":"Europe","LV":"Europe","MO":"Asia","MF":"North America","MA":"Africa","MC":"Europe","MD":"Europe","MG":"Africa","MV":"Asia","MX":"North America","MH":"Oceania","MK":"Europe","ML":"Africa","MT":"Europe","MM":"Asia","ME":"Europe","MN":"Asia","MP":"Oceania","MZ":"Africa","MR":"Africa","MS":"North America","MQ":"North America","MU":"Africa","MW":"Africa","MY":"Asia","YT":"Africa","NA":"Africa","NC":"Oceania","NE":"Africa","NF":"Oceania","NG":"Africa","NI":"North America","NU":"Oceania","NL":"Europe","NO":"Europe","NP":"Asia","NR":"Oceania","NZ":"Oceania","OM":"Asia","PK":"Asia","PA":"North America","PE":"South America","PH":"Asia","PW":"Oceania","PG":"Oceania","PL":"Europe","PR":"North America","KP":"Asia","PT":"Europe","PY":"South America","PS":"Asia","PF":"Oceania","QA":"Asia","RE":"Africa","RO":"Europe","RU":"Europe","RW":"Africa","SA":"Asia","SD":"Africa","SN":"Africa","SG":"Asia","GS":"South America","SH":"Africa","SJ":"Europe","SB":"Oceania","SL":"Africa","SV":"North America","SM":"Europe","SO":"Africa","PM":"North America","RS":"Europe","SS":"Africa","ST":"Africa","SR":"South America","SK":"Europe","SI":"Europe","SE":"Europe","SZ":"Africa","SC":"Africa","SY":"Asia","TC":"North America","TD":"Africa","TG":"Africa","TH":"Asia","TJ":"Asia","TK":"Oceania","TM":"Asia","TO":"Oceania","TT":"North America","TN":"Africa","TR":"Asia","TV":"Oceania","TW":"Asia","TZ":"Africa","UG":"Africa","UA":"Europe","UY":"South America","US":"North America","UZ":"Asia","VC":"North America","VE":"South America","VG":"North America","VI":"North America","VN":"Asia","VU":"Oceania","WF":"Oceania","WS":"Oceania","YE":"Asia","ZA":"Africa","ZM":"Africa","ZW":"Africa","XK":"Europe"};
 function flag(iso2){return iso2?'<img class="fl" src="https://flagcdn.com/20x15/'+iso2.toLowerCase()+'.png" onerror="this.style.display=\'none\'">':'';}
@@ -311,12 +311,12 @@ function showApp(user){
   else{$("app").classList.add("hidden");$("auth").classList.remove("hidden");}
 }
 $("signin").onclick=async()=>{
-  if(!configured){authmsg("Add your Supabase keys in index.html first.","err");return;}
+  if(!configured){authmsg("Not set up yet. See the README.","err");return;}
   const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});
   if(error)authmsg(error.message,"err");
 };
 $("signup").onclick=async()=>{
-  if(!configured){authmsg("Add your Supabase keys in index.html first.","err");return;}
+  if(!configured){authmsg("Not set up yet. See the README.","err");return;}
   const {data,error}=await sb.auth.signUp({email:$("email").value.trim(),password:$("pw").value});
   if(error)authmsg(error.message,"err");
   else if(data.user&&!data.session)authmsg("Check your email to confirm, then sign in.","ok");
@@ -561,27 +561,31 @@ function initMap(){const W=960,H=500;svg=d3.select("#map").append("svg").attr("v
   gLand=svg.append("g");gArc=svg.append("g").attr("fill","none").attr("stroke-linecap","round");gDot=svg.append("g");}
 function drawMap(visISO3){
   if(!svg)return;
+  const solo=selYears.size>0, inSel=f=>selYears.size===0||selYears.has(f.year);
   gLand.selectAll("path").data(WORLDF).join("path").attr("d",path)
-    .attr("fill",d=>mode==="countries"&&visISO3[d.id]?"#FFB020":"#16283A")
-    .attr("stroke",d=>mode==="countries"&&visISO3[d.id]?"#C77800":"#1E3346").attr("stroke-width",0.5);
-  const shown=mode==="routes"?FLIGHTS.filter(f=>active==="all"||f.year===active):[];
+    .attr("fill",d=>mode==="countries"&&visISO3[d.id]?"var(--amber)":"#16233A")
+    .attr("stroke",d=>mode==="countries"&&visISO3[d.id]?"var(--amber-d)":"#1E2B40").attr("stroke-width",0.5);
+  const shown=mode==="routes"?FLIGHTS.filter(inSel):[];
   gArc.selectAll("path").data(shown).join("path").attr("d",d=>{const A=ap(d.from),B=ap(d.to);return(A&&B)?path({type:"LineString",coordinates:[[A[0],A[1]],[B[0],B[1]]]}):null;})
-    .attr("stroke",d=>yColor(d.year)).attr("stroke-width",active==="all"?0.9:1.5).attr("stroke-opacity",active==="all"?0.42:0.75);
-  const cc={};if(mode==="routes")FLIGHTS.forEach(f=>{cc[f.from]=(cc[f.from]||0)+1;cc[f.to]=(cc[f.to]||0)+1;});
+    .attr("stroke",d=>yColor(d.year)).attr("stroke-width",solo?1.5:0.9).attr("stroke-opacity",solo?0.75:0.42);
+  const cc={};if(mode==="routes")shown.forEach(f=>{cc[f.from]=(cc[f.from]||0)+1;cc[f.to]=(cc[f.to]||0)+1;});
   const names=Object.keys(cc).filter(c=>ap(c));const r=d3.scaleSqrt().domain([1,d3.max(Object.values(cc))||1]).range([2.4,10]);
   const tip=$("tip"),wrapEl=$("mapwrap");
   gDot.selectAll("circle").data(names,d=>d).join(
-    en=>en.append("circle").attr("fill","var(--amber)").attr("stroke","#0B1622").attr("stroke-width",1).style("cursor","pointer"),
+    en=>en.append("circle").attr("stroke","#0A0F1C").attr("stroke-width",1).style("cursor","pointer"),
     up=>up,ex=>ex.remove())
+    .attr("fill","var(--amber)")
     .attr("cx",n=>proj([ap(n)[0],ap(n)[1]])[0]).attr("cy",n=>proj([ap(n)[0],ap(n)[1]])[1]).attr("r",n=>r(cc[n]))
     .on("mousemove",function(ev,n){const b=wrapEl.getBoundingClientRect();tip.style.left=(ev.clientX-b.left)+"px";tip.style.top=(ev.clientY-b.top)+"px";tip.style.opacity=1;tip.innerHTML=cityOf(n)+" · "+cc[n]+" flights";})
     .on("mouseleave",()=>tip.style.opacity=0);
 }
 function chips(yrs,perYear){const box=$("chips");box.style.display=mode==="routes"?"flex":"none";box.innerHTML="";
-  [["all","All"]].concat(yrs.map(y=>[y,String(y)])).forEach(([v,l])=>{const b=document.createElement("button");b.className="chip"+(String(v)===String(active)?" on":"");b.textContent=l;b.onclick=()=>{active=v==="all"?"all":+v;render();};box.appendChild(b);});}
+  const all=document.createElement("button");all.className="chip"+(selYears.size===0?" on":"");all.textContent="All";all.onclick=()=>{selYears.clear();render();};box.appendChild(all);
+  yrs.forEach(y=>{const b=document.createElement("button");b.className="chip"+(selYears.has(y)?" on":"");b.textContent=String(y);b.onclick=()=>{selYears.has(y)?selYears.delete(y):selYears.add(y);render();};box.appendChild(b);});
+  if(mode==="routes"){const hint=document.createElement("span");hint.style.cssText="font-family:var(--mono);font-size:11px;color:var(--dim);align-self:center;margin-left:4px";hint.textContent="tap years to combine";box.appendChild(hint);}}
 function legend(yrs,perYear,cN){const lg=$("legend");lg.innerHTML="";
-  if(mode==="routes")yrs.forEach(y=>{const s=document.createElement("span");s.innerHTML='<i style="background:'+yColor(y)+'"></i>'+y+" ("+perYear[y]+")";lg.appendChild(s);});
-  else{const s=document.createElement("span");s.innerHTML='<i style="background:#FFB020;height:12px;width:16px"></i>Visited ('+cN+" countries)";lg.appendChild(s);}}
+  if(mode==="routes"){const show=yrs.filter(y=>selYears.size===0||selYears.has(y));show.forEach(y=>{const s=document.createElement("span");s.innerHTML='<i style="background:'+yColor(y)+'"></i>'+y+" ("+perYear[y]+")";lg.appendChild(s);});}
+  else{const s=document.createElement("span");s.innerHTML='<i style="background:var(--amber);height:12px;width:16px"></i>Visited ('+cN+" countries)";lg.appendChild(s);}}
 document.querySelectorAll("#mapmode button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#mapmode button").forEach(x=>x.classList.remove("on"));b.classList.add("on");mode=b.dataset.m;render();});
 
 /* ---------- ask ---------- */
@@ -596,7 +600,7 @@ function renderEmptyConfig(){$("dash").classList.add("hidden");$("emptystate").c
 /* ---------- boot ---------- */
 if(!configured){
   $("cfgwarn").classList.remove("hidden");
-  $("cfgwarn").textContent="Setup needed: open index.html and paste your Supabase URL and anon key into the CONFIG block near the bottom. See README.md.";
+  $("cfgwarn").textContent="Setup needed: add your database URL and key in the CONFIG block of index.html (see README).";
 }
 Promise.all([
   fetch("airports.json").then(r=>r.json()).catch(()=>({})),
