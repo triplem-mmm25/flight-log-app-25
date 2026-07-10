@@ -36,7 +36,12 @@ img.fl{height:12px;width:auto;vertical-align:-1px;margin-right:5px;border-radius
 .topbar .brand b{color:var(--amber)}
 .topbar .who{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:14px}
 .linkbtn{background:none;border:none;color:var(--cyan);font-family:var(--mono);font-size:12px;padding:0}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0;align-items:center}
+.tbsep{width:1px;align-self:stretch;background:var(--line2);margin:2px 2px}
+.tbmenu{position:relative}
+.tbpop{position:absolute;top:calc(100% + 8px);left:0;z-index:60;display:flex;flex-direction:column;gap:8px;padding:10px;background:var(--ink3);border:1px solid var(--line2);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.4);min-width:170px}
+.tbpop .tool{width:100%;text-align:left}
+@media(max-width:640px){.tbsep{display:none}.tbpop{left:auto;right:0}}
 .tool{background:var(--ink2);border:1px solid var(--line2);color:var(--paper);border-radius:10px;padding:11px 16px;font-size:14px;font-weight:500}
 .tool.primary{background:var(--amber);color:#20160A;border-color:var(--amber)}
 #status{font-family:var(--mono);font-size:12px;color:var(--muted);align-self:center}
@@ -179,7 +184,8 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .growthsvg{width:100%;height:auto;display:block}
 .growthsvg .ga{fill:var(--amber);opacity:.13}
 .growthsvg .gl{fill:none;stroke:var(--amber);stroke-width:2}
-.growthsvg circle{fill:var(--amber)}
+.growthsvg .gd{fill:var(--amber)}
+.growthsvg .ghit{fill:transparent}
 .growthsvg .axl{fill:var(--dim);font-family:var(--mono);font-size:9px}
 .growthsvg .gval{fill:var(--amber);font-family:var(--mono);font-size:12px;font-weight:600}
 .avatarchip{display:inline-flex;align-items:center;gap:8px;background:var(--ink2);border:1px solid var(--line2);border-radius:20px;padding:4px 13px 4px 4px;cursor:pointer;color:var(--paper);font-family:var(--body);font-size:13px}
@@ -281,13 +287,20 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
       <button class="tool primary" id="addBtn">+ Add flight</button>
       <button class="tool" id="uploadBtn">Upload photo(s)</button>
       <input id="fileInput" type="file" accept="image/*,application/pdf" multiple class="hidden"/>
-      <button class="tool" id="exportCsv">Export CSV</button>
-      <button class="tool" id="exportJson">Export JSON</button>
-      <button class="tool" id="csvBtn">Import CSV</button>
-      <input id="csvInput" type="file" accept=".csv,text/csv" class="hidden"/>
+      <span class="tbsep"></span>
       <button class="tool" id="reviewBtn">Year in review</button>
       <button class="tool" id="printBtn">Save PDF</button>
       <button class="tool" id="shareBtn">Share</button>
+      <span class="tbsep"></span>
+      <div class="tbmenu">
+        <button class="tool" id="dataBtn" aria-haspopup="true">Data &#9662;</button>
+        <div class="tbpop hidden" id="dataMenu">
+          <button class="tool" id="exportCsv">Export CSV</button>
+          <button class="tool" id="exportJson">Export JSON</button>
+          <button class="tool" id="csvBtn">Import CSV</button>
+        </div>
+      </div>
+      <input id="csvInput" type="file" accept=".csv,text/csv" class="hidden"/>
       <span id="status"></span>
     </div>
     <div id="cfgwarn" class="cfg-warn hidden"></div>
@@ -553,19 +566,19 @@ function yColor(y){return YCOL[y]|| "#9AA7B2";}
 let AP={}, WORLDF=[], FLIGHTS=[], mode="routes", selYears=new Set(), USERID=null, PROFILE=null, WISH=new Set(), UNIT="km";
 function goalKey(){return "flg_goal_"+(USERID||"anon");}
 function goalGet(){try{const v=parseInt(localStorage.getItem(goalKey()));return v>0?v:null;}catch(e){return null;}}
-function goalSet(v){try{localStorage.setItem(goalKey(),String(v));}catch(e){}}
+function goalSet(v){try{localStorage.setItem(goalKey(),String(v));}catch(e){}pushPrefs();}
 function cgoalKey(){return "flg_cgoal_"+(USERID||"anon");}
 function cgoalGet(){try{const v=parseInt(localStorage.getItem(cgoalKey()));return v>0?v:null;}catch(e){return null;}}
-function cgoalSet(v){try{localStorage.setItem(cgoalKey(),String(v));}catch(e){}}
+function cgoalSet(v){try{localStorage.setItem(cgoalKey(),String(v));}catch(e){}pushPrefs();}
 function manualKey(){return "flg_manual_"+(USERID||"anon");}
 function manualGet(){try{return JSON.parse(localStorage.getItem(manualKey())||"[]")||[];}catch(e){return [];}}
-function manualSet(a){try{localStorage.setItem(manualKey(),JSON.stringify(a));}catch(e){}}
+function manualSet(a){try{localStorage.setItem(manualKey(),JSON.stringify(a));}catch(e){}pushPrefs();}
 function homeKey(){return "flg_home_"+(USERID||"anon");}
 function homeGet(){try{return localStorage.getItem(homeKey())||null;}catch(e){return null;}}
-function homeSet(v){try{localStorage.setItem(homeKey(),v);}catch(e){}}
+function homeSet(v){try{localStorage.setItem(homeKey(),v);}catch(e){}pushPrefs();}
 function wishKey(){return "flg_wish_"+(USERID||"anon");}
 function wishGet(){try{return JSON.parse(localStorage.getItem(wishKey())||"[]");}catch(e){return [];}}
-function wishSet(a){try{localStorage.setItem(wishKey(),JSON.stringify(a));}catch(e){}}
+function wishSet(a){try{localStorage.setItem(wishKey(),JSON.stringify(a));}catch(e){}pushPrefs();}
 function unitKey(){return "flg_unit_"+(USERID||"anon");}
 function unitGet(){try{return localStorage.getItem(unitKey())||"km";}catch(e){return "km";}}
 function unitSet(u){try{localStorage.setItem(unitKey(),u);}catch(e){}}
@@ -611,7 +624,20 @@ function showApp(user){
   if(user){USERID=user.id||user.email||"anon";$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("useremail").textContent=user.email;loadFlights();loadProfile();}
   else{USERID=null;PROFILE=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");}
 }
-async function loadProfile(){try{const {data}=await sb.from("profiles").select("*").eq("user_id",USERID).limit(1);PROFILE=(data&&data[0])||null;}catch(e){PROFILE=null;}}
+async function loadProfile(){try{const {data}=await sb.from("profiles").select("*").eq("user_id",USERID).limit(1);PROFILE=(data&&data[0])||null;if(PROFILE&&PROFILE.prefs){hydratePrefs(PROFILE.prefs);if(typeof render==="function")render();if(typeof applyProfileChrome==="function")applyProfileChrome();}}catch(e){PROFILE=null;}}
+function collectPrefs(){let prof=null;try{prof=JSON.parse(localStorage.getItem(profKey())||"null");}catch(e){}
+  return {v:1,profile:prof,goal:goalGet(),cgoal:cgoalGet(),home:homeGet(),wish:wishGet(),manual:manualGet(),tab:(function(){try{return localStorage.getItem(tabKey());}catch(e){return null;}})()};}
+function hydratePrefs(p){try{if(!p)return;
+  if(p.profile)localStorage.setItem(profKey(),JSON.stringify(p.profile));
+  if(p.goal)localStorage.setItem(goalKey(),String(p.goal));else if(p.goal===null)localStorage.removeItem(goalKey());
+  if(p.cgoal)localStorage.setItem(cgoalKey(),String(p.cgoal));else if(p.cgoal===null)localStorage.removeItem(cgoalKey());
+  if(p.home)localStorage.setItem(homeKey(),p.home);else if(p.home===null)localStorage.removeItem(homeKey());
+  if(p.wish)localStorage.setItem(wishKey(),JSON.stringify(p.wish));
+  if(p.manual)localStorage.setItem(manualKey(),JSON.stringify(p.manual));
+  if(p.tab)localStorage.setItem(tabKey(),p.tab);
+}catch(e){}}
+let _prefT=null;
+function pushPrefs(){if(!sb||!USERID)return;clearTimeout(_prefT);_prefT=setTimeout(function(){try{const q=sb.from("profiles").upsert({user_id:USERID,prefs:collectPrefs()},{onConflict:"user_id"});if(q&&q.then)q.then(function(){},function(){});}catch(e){}},700);}
 function shareLinkFor(slug){try{return new URL("share.html?u="+slug,location.href).href;}catch(e){return "share.html?u="+slug;}}
 function updateShareUI(){const pub=PROFILE&&PROFILE.is_public&&PROFILE.share_slug;$("shareLinkWrap").classList.toggle("hidden",!pub);if(pub)$("shareLink").value=shareLinkFor(PROFILE.share_slug);}
 async function saveProfile(isPublic,name){
@@ -634,14 +660,19 @@ $("share_close").onclick=()=>$("shareModal").classList.add("hidden");
 $("sharePublic").onchange=()=>saveProfile($("sharePublic").checked,$("shareName").value);
 $("shareName").onchange=()=>{if(PROFILE)saveProfile($("sharePublic").checked,$("shareName").value);};
 $("shareCopy").onclick=()=>{const i=$("shareLink");i.select();try{navigator.clipboard.writeText(i.value);}catch(e){}try{document.execCommand("copy");}catch(e){}$("share_msg").textContent="Link copied.";$("share_msg").className="msg ok";};
-$("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}render();}};
+$("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}pushPrefs();render();}};
 $("tripsTitle").onclick=()=>{const t=$("trips"),c=$("tripsChev");t.classList.toggle("hidden");if(c)c.textContent=t.classList.contains("hidden")?"+":"\u2013";};
-$("homeEdit").onclick=()=>{const cur=homeGet()||"";const v=prompt("Home airport code (e.g. BEY):",cur);if(v===null)return;const c=v.trim().toUpperCase();if(!c){try{localStorage.removeItem(homeKey());}catch(e){}render();return;}if(!ap(c)){alert("Unknown airport code.");return;}homeSet(c);render();};
+$("homeEdit").onclick=()=>{const cur=homeGet()||"";const v=prompt("Home airport code (e.g. BEY):",cur);if(v===null)return;const c=v.trim().toUpperCase();if(!c){try{localStorage.removeItem(homeKey());}catch(e){}pushPrefs();render();return;}if(!ap(c)){alert("Unknown airport code.");return;}homeSet(c);render();};
 function addWish(){const v=$("wishInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}
   const visited=new Set();FLIGHTS.forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])visited.add(a[5]);}));
   if(visited.has(id)){alert("You've already been to "+((ID2NAME&&ID2NAME[id])||v)+"! The bucket list is for places you haven't visited yet.");$("wishInput").value="";return;}
   const a=wishGet();if(!a.includes(id)){a.push(id);wishSet(a);}$("wishInput").value="";render();}
 $("wishAdd").onclick=addWish;
+(function(){const b=$("dataBtn"),m=$("dataMenu");if(b&&m){
+  b.onclick=(e)=>{e.stopPropagation();m.classList.toggle("hidden");};
+  m.addEventListener("click",()=>m.classList.add("hidden"));
+  document.addEventListener("click",(e)=>{if(!m.classList.contains("hidden")&&!m.contains(e.target)&&e.target!==b)m.classList.add("hidden");});
+}})();
 function addManual(){const v=$("manualInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}
   const a=manualGet();if(!a.includes(id))a.push(id);manualSet(a);
   wishSet(wishGet().filter(x=>x!==id));
@@ -649,7 +680,7 @@ function addManual(){const v=$("manualInput").value.trim();if(!v)return;const id
 $("manualAdd").onclick=addManual;
 $("manualInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addManual();}});
 $("manualChips").addEventListener("click",e=>{const b=e.target.closest("[data-mid]");if(b){const id=b.getAttribute("data-mid");manualSet(manualGet().filter(x=>x!==id));render();}});
-$("cgoalEdit").onclick=()=>{const cur=cgoalGet()||"";const v=prompt("Continents goal (1 to 7):",cur);if(v===null)return;const n=parseInt(v);if(n>0&&n<=7){cgoalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(cgoalKey());}catch(e){}render();}else alert("Enter a number from 1 to 7.");};
+$("cgoalEdit").onclick=()=>{const cur=cgoalGet()||"";const v=prompt("Continents goal (1 to 7):",cur);if(v===null)return;const n=parseInt(v);if(n>0&&n<=7){cgoalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(cgoalKey());}catch(e){}pushPrefs();render();}else alert("Enter a number from 1 to 7.");};
 $("wishInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addWish();}});
 $("wishList").addEventListener("click",e=>{const b=e.target.closest("[data-wid]");if(b){const id=b.getAttribute("data-wid");wishSet(wishGet().filter(x=>x!==id));render();}});
 $("signin").onclick=async()=>{
@@ -1098,7 +1129,7 @@ function render(){
 let currentTab="overview",tabRestored=false;
 function tabKey(){return "flg_tab_"+(USERID||"anon");}
 function tabGet(){try{return localStorage.getItem(tabKey());}catch(e){return null;}}
-function tabSet(n){try{localStorage.setItem(tabKey(),n);}catch(e){}}
+function tabSet(n){try{localStorage.setItem(tabKey(),n);}catch(e){}pushPrefs();}
 function setTab(name){currentTab=name;tabSet(name);
   document.querySelectorAll("#tabs .tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===name));
   document.querySelectorAll("#dash > [data-t]").forEach(el=>{el.style.display=el.getAttribute("data-t").split(" ").indexOf(name)>=0?"":"none";});
@@ -1125,12 +1156,11 @@ function areaChart(series,fmt){
   const pts=series.map((s,i)=>[x(i),y(s.value)]);
   const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
   const area=line+" L"+pts[n-1][0].toFixed(1)+" "+(H-pad)+" L"+pts[0][0].toFixed(1)+" "+(H-pad)+" Z";
-  const dots=pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6"></circle>').join("");
-  const hits=pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="18" fill="transparent" data-tip="'+String(series[i].label).replace(/[<>"]/g,"")+": "+String(fmt(series[i].value)).replace(/[<>"]/g,"")+'"></circle>').join("");
+  const dots=pts.map((p,i)=>'<circle class="gd" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.4"></circle>').join("");
+  const hits=pts.map((p,i)=>'<circle class="ghit" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="12" data-tip="'+String(series[i].label).replace(/[<>"]/g,"")+": "+String(fmt(series[i].value)).replace(/[<>"]/g,"")+'"></circle>').join("");
   const xl=series.map((s,i)=>'<text x="'+x(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="middle" class="axl">'+s.label+'</text>').join("");
-  const last=pts[n-1];
   return '<svg viewBox="0 0 '+W+' '+H+'" class="growthsvg"><path d="'+area+'" class="ga"/><path d="'+line+'" class="gl"/>'+dots+xl+hits+
-    '<text x="'+last[0].toFixed(1)+'" y="'+(last[1]-9).toFixed(1)+'" text-anchor="end" class="gval">'+fmt(series[n-1].value)+'</text></svg>';
+    '<text x="'+pad+'" y="16" text-anchor="start" class="gval">'+fmt(series[n-1].value)+'</text></svg>';
 }
 function renderGrowth(){
   const years=[...new Set(FLIGHTS.map(f=>f.year))].filter(Boolean).sort((a,b)=>a-b);
@@ -1147,7 +1177,7 @@ const PF_COLORS=["#1E9E8E","#F2B34A","#FF8FA3","#A98CFF","#6EA8FE","#E5624C"];
 let pfDraft={emoji:"🌍",color:"#1E9E8E"};
 function profKey(){return "flg_profile_"+(USERID||"anon");}
 function profGet(){try{return JSON.parse(localStorage.getItem(profKey())||"{}")||{};}catch(e){return {};}}
-function profSet(o){try{localStorage.setItem(profKey(),JSON.stringify(o));}catch(e){}}
+function profSet(o){try{localStorage.setItem(profKey(),JSON.stringify(o));}catch(e){}pushPrefs();}
 function applyProfileChrome(){const p=profGet();const t=$("profileNameTop");if(t)t.textContent=p.name||"Traveler";const a=$("avatarSm");if(a){a.textContent=p.emoji||"🌍";a.style.background=p.color||"#1E9E8E";}}
 function travelerArchetype(st){
   if(st.flights===0)return "Ready for takeoff";
