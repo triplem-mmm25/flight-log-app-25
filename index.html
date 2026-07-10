@@ -123,8 +123,16 @@ table.flts tr:hover td{background:var(--ink3)}
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty h2{color:var(--paper);margin-bottom:8px}
 .modal{position:fixed;inset:0;background:rgba(5,10,16,.72);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
-.modalbox{background:var(--ink2);border:1px solid var(--line2);border-radius:16px;padding:26px;width:100%;max-width:520px;max-height:86vh;overflow:auto}
-.modalbox h3{font-size:20px;margin-bottom:16px}
+.modalbox{background:var(--ink2);border:1px solid var(--line2);border-radius:16px;padding:26px;width:100%;max-width:520px;max-height:86vh;overflow:auto;position:relative}
+.modalbox h3{font-size:20px;margin-bottom:16px;padding-right:34px}
+.modaltop{position:sticky;top:0;height:0;z-index:8;display:flex;justify-content:flex-end}
+.modalx{transform:translate(6px,-8px);width:32px;height:32px;border-radius:50%;background:var(--ink3);border:1px solid var(--line2);color:var(--muted);font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--body)}
+.modalx:hover{color:var(--paper);border-color:var(--red)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:20px;border:3px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--amber-d);background-clip:padding-box;border:3px solid transparent}
+html{scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .confirm-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .confirm-row input{background:var(--ink);border:1px solid var(--line2);border-radius:6px;color:var(--paper);padding:6px 8px;font-family:var(--mono);font-size:12px;width:100%}
@@ -487,6 +495,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 <div id="addModal" class="modal hidden"><div class="modalbox">
   <h3 id="a_title">Add a flight</h3>
   <button id="a_upload" class="btn ghost" style="margin-top:0">Upload photos/files to add automatically</button>
+  <button id="a_gmail" class="btn ghost" style="margin-top:8px">Scan Gmail for flight confirmations</button>
   <div class="cap oratext">or enter it manually</div>
   <input id="a_date" class="fld" type="date"/>
   <div class="frow">
@@ -806,6 +815,14 @@ function closeInfo(id){$(id).classList.add("hidden");}
 if($("contactLink"))$("contactLink").onclick=()=>openInfo("contactModal");
 if($("contact_close"))$("contact_close").onclick=()=>closeInfo("contactModal");
 ["contactModal"].forEach(id=>{const m=$(id);if(m)m.addEventListener("click",e=>{if(e.target===m)closeInfo(id);});});
+/* persistent close X on every modal */
+(function(){document.querySelectorAll(".modalbox").forEach(function(box){
+  if(box.querySelector(".modaltop"))return;
+  var bar=document.createElement("div");bar.className="modaltop";
+  var x=document.createElement("button");x.className="modalx";x.setAttribute("aria-label","Close");x.setAttribute("type","button");x.innerHTML="&times;";
+  x.onclick=function(){var m=box.closest(".modal");if(m)m.classList.add("hidden");};
+  bar.appendChild(x);box.insertBefore(bar,box.firstChild);
+});})();
 /* ---- friends ---- */
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function frMsg(t,c){const m=$("fr_msg");if(m){m.textContent=t||"";m.className="msg "+(c||"");}}
@@ -948,6 +965,7 @@ function authmsg(t,c){const m=$("authmsg");m.textContent=t;m.className="msg "+(c
 if(configured){sb.auth.onAuthStateChange((ev,session)=>{
   if(ev==="PASSWORD_RECOVERY"){askModal({title:"Set a new password",hint:"At least 8 characters, with a capital letter, a lowercase letter and a number.",value:"",placeholder:"New password",type:"password",ok:function(v){var pe=pwError(v);if(pe)return pe;sb.auth.updateUser({password:v}).then(function(r){var e=r&&r.error;alert(e?("Could not update password: "+e.message):"Password updated. You are signed in.");});return null;}});}
   showApp(session?session.user:null);
+  try{if(session&&session.provider_token&&localStorage.getItem("flg_gmail_pending")){localStorage.removeItem("flg_gmail_pending");setTimeout(function(){scanGmail(session.provider_token);},400);}}catch(e){}
 });}
 
 /* ---------- data ---------- */
@@ -1118,6 +1136,62 @@ document.querySelectorAll(".revsocial .sbtn").forEach(b=>b.onclick=()=>revOpenSo
 
 /* ---------- photo upload ---------- */
 $("a_upload").onclick=()=>{$("addModal").classList.add("hidden");$("fileInput").click();};
+/* ---------- Gmail import ---------- */
+function gmailLastKey(){return "flg_gmail_last_"+(USERID||"anon");}
+function b64urlDecode(s){try{s=String(s||"").replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";const bin=atob(s);try{return decodeURIComponent(escape(bin));}catch(e){return bin;}}catch(e){return "";}}
+function stripHtml(h){return String(h||"").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<[^>]+>/g," ").replace(/&nbsp;/gi," ").replace(/&amp;/gi,"&").replace(/&lt;/gi,"<").replace(/&gt;/gi,">").replace(/\s+/g," ").trim();}
+function looksLikeFlight(text){return /\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\s?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(text)||/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(text);}
+function gmailQuery(){
+  const subj='{subject:"boarding pass" subject:"e-ticket" subject:"eticket" subject:"booking confirmation" subject:"flight confirmation" subject:"booking reference" subject:"itinerary" subject:"your flight" subject:"trip confirmation" subject:"check-in"}';
+  let win="newer_than:2y";
+  try{const last=localStorage.getItem(gmailLastKey());if(last){const d=new Date(last);if(!isNaN(d)){const y=d.getFullYear(),m=("0"+(d.getMonth()+1)).slice(-2),day=("0"+d.getDate()).slice(-2);win="after:"+y+"/"+m+"/"+day;}}}catch(e){}
+  return subj+" "+win;
+}
+async function gmailFetch(url,token){const r=await fetch(url,{headers:{Authorization:"Bearer "+token}});if(!r.ok)throw new Error("Gmail API "+r.status);return r.json();}
+async function gmailList(token,q){const j=await gmailFetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50&q="+encodeURIComponent(q),token);return (j.messages||[]).map(m=>m.id);}
+function headerVal(headers,name){const h=(headers||[]).find(x=>x.name&&x.name.toLowerCase()===name);return h?h.value:"";}
+function bodyFromPayload(payload){
+  if(!payload)return "";
+  let plain="",html="";
+  (function walk(p){if(!p)return;if(p.mimeType==="text/plain"&&p.body&&p.body.data)plain+=b64urlDecode(p.body.data)+" ";else if(p.mimeType==="text/html"&&p.body&&p.body.data)html+=b64urlDecode(p.body.data)+" ";(p.parts||[]).forEach(walk);})(payload);
+  const txt=plain.trim()?plain:stripHtml(html);
+  return txt.replace(/\s+/g," ").trim().slice(0,1600);
+}
+async function gmailGet(token,id){const j=await gmailFetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/"+id+"?format=full",token);const hs=j.payload&&j.payload.headers;return {subject:headerVal(hs,"subject"),from:headerVal(hs,"from"),date:headerVal(hs,"date"),text:bodyFromPayload(j.payload)};}
+async function parseEmailsViaServer(emails){const r=await fetch("/api/parse-email",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({emails})});const t=await r.text();let d={};try{d=JSON.parse(t);}catch(_){}if(!r.ok)throw new Error((d&&d.error)||("server "+r.status));return d.flights||[];}
+async function gmailToken(){try{const {data}=await sb.auth.getSession();const s=data&&data.session;return s&&s.provider_token?s.provider_token:null;}catch(e){return null;}}
+async function startGmail(){
+  $("addModal").classList.add("hidden");
+  if(!sb){status("Sign in first.");return;}
+  const tok=await gmailToken();
+  if(tok){scanGmail(tok);return;}
+  try{localStorage.setItem("flg_gmail_pending","1");}catch(e){}
+  status("Connecting Google...");
+  try{
+    const {error}=await sb.auth.linkIdentity({provider:"google",options:{scopes:"https://www.googleapis.com/auth/gmail.readonly",queryParams:{access_type:"offline",prompt:"consent"}}});
+    if(error)throw error;
+  }catch(e){try{localStorage.removeItem("flg_gmail_pending");}catch(_){}status("Could not connect Google: "+((e&&e.message)||e));}
+}
+async function scanGmail(token){
+  try{
+    status("Searching your inbox for flight confirmations...");
+    const ids=await gmailList(token,gmailQuery());
+    if(!ids.length){status("No flight emails found since the last scan.");markGmailScanned();return;}
+    status("Reading "+ids.length+" email(s)...");
+    const emails=[];
+    for(const id of ids.slice(0,50)){try{const m=await gmailGet(token,id);if(m&&m.text&&looksLikeFlight(m.text))emails.push(m);}catch(e){}}
+    if(!emails.length){status("Found emails but no clear flight details.");markGmailScanned();return;}
+    status("Reading "+emails.length+" confirmation(s) with AI...");
+    const flights=await parseEmailsViaServer(emails);
+    const seen=new Set(FLIGHTS.map(f=>f.date+"|"+f.from+"|"+f.to));
+    const fresh=flights.filter(f=>f&&f.date&&f.from&&f.to&&!seen.has(f.date+"|"+String(f.from).toUpperCase()+"|"+String(f.to).toUpperCase()));
+    markGmailScanned();
+    if(!fresh.length){status("No new flights found - your log looks up to date.");return;}
+    status("");showConfirm(fresh);
+  }catch(e){status("Gmail scan failed: "+((e&&e.message)||e));}
+}
+function markGmailScanned(){try{localStorage.setItem(gmailLastKey(),new Date().toISOString());}catch(e){}}
+if($("a_gmail"))$("a_gmail").onclick=startGmail;
 $("fileInput").onchange=async e=>{const files=[...e.target.files];e.target.value="";if(!files.length)return;await handlePhotos(files);};
 function scale(file,max){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);
   img.onload=()=>{let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);const u=c.toDataURL("image/jpeg",0.85);URL.revokeObjectURL(url);res({kind:"image",data:u.split(",")[1],mediaType:"image/jpeg"});};
