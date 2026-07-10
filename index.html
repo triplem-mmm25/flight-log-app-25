@@ -461,6 +461,16 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 </div></div>
 
 <!-- SHARE MODAL -->
+<div id="askModal" class="modal hidden"><div class="modalbox">
+  <h3 id="askTitle">Set value</h3>
+  <div class="cap" id="askHint" style="margin:6px 0 12px"></div>
+  <input id="askInput" class="fld"/>
+  <div id="askErr" class="msg"></div>
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button id="askOk" class="btn" style="flex:1;margin-top:0">Save</button>
+    <button id="askCancel" class="btn ghost" style="flex:1;margin-top:0">Cancel</button>
+  </div>
+</div></div>
 <div id="settingsModal" class="modal hidden"><div class="modalbox">
   <h3>Settings</h3>
   <div class="cap" style="margin-bottom:4px">Account</div>
@@ -587,10 +597,14 @@ function dUnit(){return UNIT==="mi"?"mi":"km";}
 function dStr(km){return Math.round(dConv(km)).toLocaleString()+" "+dUnit();}
 function dStrK(km){const v=dConv(km);return (v>=1000?Math.round(v/1000)+"k":Math.round(v))+" "+dUnit();}
 let NAME2ID=null,ID2NAME=null,ID3TO2=null;
-function buildNameMaps(){NAME2ID={};ID2NAME={};WORLDF.forEach(f=>{if(f.properties&&f.properties.name){NAME2ID[f.properties.name.toLowerCase()]=f.id;ID2NAME[f.id]=f.properties.name;}});ID3TO2={};for(const k in AP){const a=AP[k];if(a[5]&&a[4])ID3TO2[a[5]]=a[4];}}
+function buildNameMaps(){NAME2ID={};ID2NAME={};WORLDF.forEach(f=>{if(f.properties&&f.properties.name){NAME2ID[f.properties.name.toLowerCase()]=f.id;ID2NAME[f.id]=f.properties.name;}});ID3TO2={};for(const k in AP){const a=AP[k];if(a[5]&&a[4])ID3TO2[a[5]]=a[4];}
+  SUPP_COUNTRIES.forEach(function(s){var id=s[0],i2=s[1],nm=s[2];if(!ID2NAME[id])ID2NAME[id]=nm;if(!NAME2ID[nm.toLowerCase()])NAME2ID[nm.toLowerCase()]=id;if(!ID3TO2[id])ID3TO2[id]=i2;});}
 function iso3to2(id){return ID3TO2?(ID3TO2[id]||""):"";}
 
 const CONTINENT2 = {"AW":"North America","AF":"Asia","AO":"Africa","AI":"North America","AX":"Europe","AL":"Europe","AD":"Europe","AE":"Asia","AR":"South America","AM":"Asia","AS":"Oceania","AG":"North America","AU":"Oceania","AT":"Europe","AZ":"Asia","BI":"Africa","BE":"Europe","BJ":"Africa","BQ":"North America","BF":"Africa","BD":"Asia","BG":"Europe","BH":"Asia","BS":"North America","BA":"Europe","BL":"North America","BY":"Europe","BZ":"North America","BM":"North America","BO":"South America","BR":"South America","BB":"North America","BN":"Asia","BT":"Asia","BV":"Antarctica","BW":"Africa","CF":"Africa","CA":"North America","CC":"Asia","CH":"Europe","CL":"South America","CN":"Asia","CI":"Africa","CM":"Africa","CD":"Africa","CG":"Africa","CK":"Oceania","CO":"South America","KM":"Africa","CV":"Africa","CR":"North America","CU":"North America","CW":"North America","CX":"Asia","KY":"North America","CY":"Asia","CZ":"Europe","DE":"Europe","DJ":"Africa","DM":"North America","DK":"Europe","DO":"North America","DZ":"Africa","EC":"South America","EG":"Africa","ER":"Africa","ES":"Europe","EE":"Europe","ET":"Africa","FI":"Europe","FJ":"Oceania","FK":"South America","FR":"Europe","FO":"Europe","FM":"Oceania","GA":"Africa","GB":"Europe","GE":"Asia","GG":"Europe","GH":"Africa","GI":"Europe","GN":"Africa","GP":"North America","GM":"Africa","GW":"Africa","GQ":"Africa","GR":"Europe","GD":"North America","GL":"North America","GT":"North America","GF":"South America","GU":"Oceania","GY":"South America","HK":"Asia","HM":"Antarctica","HN":"North America","HR":"Europe","HT":"North America","HU":"Europe","ID":"Asia","IM":"Europe","IN":"Asia","IO":"Asia","IE":"Europe","IR":"Asia","IQ":"Asia","IS":"Europe","IL":"Asia","IT":"Europe","JM":"North America","JE":"Europe","JO":"Asia","JP":"Asia","KZ":"Asia","KE":"Africa","KG":"Asia","KH":"Asia","KI":"Oceania","KN":"North America","KR":"Asia","KW":"Asia","LA":"Asia","LB":"Asia","LR":"Africa","LY":"Africa","LC":"North America","LI":"Europe","LK":"Asia","LS":"Africa","LT":"Europe","LU":"Europe","LV":"Europe","MO":"Asia","MF":"North America","MA":"Africa","MC":"Europe","MD":"Europe","MG":"Africa","MV":"Asia","MX":"North America","MH":"Oceania","MK":"Europe","ML":"Africa","MT":"Europe","MM":"Asia","ME":"Europe","MN":"Asia","MP":"Oceania","MZ":"Africa","MR":"Africa","MS":"North America","MQ":"North America","MU":"Africa","MW":"Africa","MY":"Asia","YT":"Africa","NA":"Africa","NC":"Oceania","NE":"Africa","NF":"Oceania","NG":"Africa","NI":"North America","NU":"Oceania","NL":"Europe","NO":"Europe","NP":"Asia","NR":"Oceania","NZ":"Oceania","OM":"Asia","PK":"Asia","PA":"North America","PE":"South America","PH":"Asia","PW":"Oceania","PG":"Oceania","PL":"Europe","PR":"North America","KP":"Asia","PT":"Europe","PY":"South America","PS":"Asia","PF":"Oceania","QA":"Asia","RE":"Africa","RO":"Europe","RU":"Europe","RW":"Africa","SA":"Asia","SD":"Africa","SN":"Africa","SG":"Asia","GS":"South America","SH":"Africa","SJ":"Europe","SB":"Oceania","SL":"Africa","SV":"North America","SM":"Europe","SO":"Africa","PM":"North America","RS":"Europe","SS":"Africa","ST":"Africa","SR":"South America","SK":"Europe","SI":"Europe","SE":"Europe","SZ":"Africa","SC":"Africa","SY":"Asia","TC":"North America","TD":"Africa","TG":"Africa","TH":"Asia","TJ":"Asia","TK":"Oceania","TM":"Asia","TO":"Oceania","TT":"North America","TN":"Africa","TR":"Asia","TV":"Oceania","TW":"Asia","TZ":"Africa","UG":"Africa","UA":"Europe","UY":"South America","US":"North America","UZ":"Asia","VC":"North America","VE":"South America","VG":"North America","VI":"North America","VN":"Asia","VU":"Oceania","WF":"Oceania","WS":"Oceania","YE":"Asia","ZA":"Africa","ZM":"Africa","ZW":"Africa","XK":"Europe"};
+CONTINENT2["VA"]="Europe";
+/* Sovereign states + territories missing from the simplified world map, so they can still be added and counted. [iso3, iso2, name] */
+const SUPP_COUNTRIES=[["AND","AD","Andorra"],["LIE","LI","Liechtenstein"],["MCO","MC","Monaco"],["SMR","SM","San Marino"],["VAT","VA","Vatican City"],["MLT","MT","Malta"],["GIB","GI","Gibraltar"],["IMN","IM","Isle of Man"],["JEY","JE","Jersey"],["GGY","GG","Guernsey"],["FRO","FO","Faroe Islands"],["ALA","AX","Aland Islands"],["SGP","SG","Singapore"],["HKG","HK","Hong Kong"],["MAC","MO","Macau"],["BHR","BH","Bahrain"],["MDV","MV","Maldives"],["BRN","BN","Brunei"],["SYC","SC","Seychelles"],["MUS","MU","Mauritius"],["COM","KM","Comoros"],["CPV","CV","Cape Verde"],["STP","ST","Sao Tome and Principe"],["MYT","YT","Mayotte"],["REU","RE","Reunion"],["PRI","PR","Puerto Rico"],["ATG","AG","Antigua and Barbuda"],["BRB","BB","Barbados"],["DMA","DM","Dominica"],["GRD","GD","Grenada"],["KNA","KN","Saint Kitts and Nevis"],["LCA","LC","Saint Lucia"],["VCT","VC","Saint Vincent and the Grenadines"],["ABW","AW","Aruba"],["CUW","CW","Curacao"],["VGB","VG","British Virgin Islands"],["VIR","VI","US Virgin Islands"],["CYM","KY","Cayman Islands"],["BMU","BM","Bermuda"],["TCA","TC","Turks and Caicos"],["AIA","AI","Anguilla"],["MSR","MS","Montserrat"],["GLP","GP","Guadeloupe"],["MTQ","MQ","Martinique"],["BLM","BL","Saint Barthelemy"],["MAF","MF","Saint Martin"],["GUF","GF","French Guiana"],["KIR","KI","Kiribati"],["TUV","TV","Tuvalu"],["NRU","NR","Nauru"],["MHL","MH","Marshall Islands"],["FSM","FM","Micronesia"],["PLW","PW","Palau"],["TON","TO","Tonga"],["WSM","WS","Samoa"],["ASM","AS","American Samoa"],["GUM","GU","Guam"],["MNP","MP","Northern Mariana Islands"],["COK","CK","Cook Islands"],["NIU","NU","Niue"],["PYF","PF","French Polynesia"],["NCL","NC","New Caledonia"],["WLF","WF","Wallis and Futuna"],["NFK","NF","Norfolk Island"]];
 function flag(iso2){return iso2?'<img class="fl" src="https://flagcdn.com/20x15/'+iso2.toLowerCase()+'.png" onerror="this.style.display=\'none\'">':'';}
 const AIRLINE_ICAO={"MEA":"MEA","Middle East Airlines":"MEA","Saudia":"SVA","Emirates":"UAE","Air Arabia":"ABY","Etihad":"ETD","Etihad Airways":"ETD","Turkish Airlines":"THY","Qatar Airways":"QTR","Flydubai":"FDB","flydubai":"FDB","Lufthansa":"DLH","Air France":"AFR","Wizz Air":"WZZ","Wizz":"WZZ","Ryanair":"RYR","Pegasus":"PGT","Aegean":"AEE","Vueling":"VLG","SriLankan":"ALK","SriLankan Airlines":"ALK","United":"UAL","United Airlines":"UAL","American":"AAL","American Airlines":"AAL","Delta":"DAL","Aeromexico":"AMX","Cathay Pacific":"CPA","Singapore Airlines":"SIA","Thai Airways":"THA","Qantas":"QFA","British Airways":"BAW","KLM":"KLM","Swiss":"SWR","Iberia":"IBE","EgyptAir":"MSR","Royal Jordanian":"RJA","Oman Air":"OMA","Gulf Air":"GFA"};
 function logoImg(al){const c=AIRLINE_ICAO[al];return c?'<img class="lg" src="https://raw.githubusercontent.com/Jxck-S/airline-logos/main/flightaware_logos/'+c+'.png" onerror="this.style.display=\'none\'">':'';}
@@ -660,14 +674,22 @@ $("share_close").onclick=()=>$("shareModal").classList.add("hidden");
 $("sharePublic").onchange=()=>saveProfile($("sharePublic").checked,$("shareName").value);
 $("shareName").onchange=()=>{if(PROFILE)saveProfile($("sharePublic").checked,$("shareName").value);};
 $("shareCopy").onclick=()=>{const i=$("shareLink");i.select();try{navigator.clipboard.writeText(i.value);}catch(e){}try{document.execCommand("copy");}catch(e){}$("share_msg").textContent="Link copied.";$("share_msg").className="msg ok";};
-$("goalEdit").onclick=()=>{const cur=goalGet()||"";const v=prompt("Set your country goal (a number):",cur);if(v===null)return;const n=parseInt(v);if(n>0){goalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(goalKey());}catch(e){}pushPrefs();render();}};
+$("goalEdit").onclick=()=>askModal({title:"Country goal",hint:"How many countries do you want to visit? Leave blank to clear.",value:goalGet()||"",placeholder:"e.g. 30",ok:function(v){v=(v||"").trim();if(v===""){try{localStorage.removeItem(goalKey());}catch(e){}pushPrefs();render();return null;}var n=parseInt(v);if(n>0){goalSet(n);render();return null;}return "Enter a positive number.";}});
 $("tripsTitle").onclick=()=>{const t=$("trips"),c=$("tripsChev");t.classList.toggle("hidden");if(c)c.textContent=t.classList.contains("hidden")?"+":"\u2013";};
-$("homeEdit").onclick=()=>{const cur=homeGet()||"";const v=prompt("Home airport code (e.g. BEY):",cur);if(v===null)return;const c=v.trim().toUpperCase();if(!c){try{localStorage.removeItem(homeKey());}catch(e){}pushPrefs();render();return;}if(!ap(c)){alert("Unknown airport code.");return;}homeSet(c);render();};
+$("homeEdit").onclick=()=>askModal({title:"Home airport",hint:"Your home airport code (IATA), e.g. BEY. Leave blank to clear.",value:homeGet()||"",placeholder:"BEY",ok:function(v){var c=(v||"").trim().toUpperCase();if(!c){try{localStorage.removeItem(homeKey());}catch(e){}pushPrefs();render();return null;}if(!ap(c))return "Unknown airport code.";homeSet(c);render();return null;}});
 function addWish(){const v=$("wishInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}
   const visited=new Set();FLIGHTS.forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])visited.add(a[5]);}));
   if(visited.has(id)){alert("You've already been to "+((ID2NAME&&ID2NAME[id])||v)+"! The bucket list is for places you haven't visited yet.");$("wishInput").value="";return;}
   const a=wishGet();if(!a.includes(id)){a.push(id);wishSet(a);}$("wishInput").value="";render();}
 $("wishAdd").onclick=addWish;
+var _askCb=null;
+function askModal(opts){opts=opts||{};$("askTitle").textContent=opts.title||"Set value";var hint=$("askHint");hint.textContent=opts.hint||"";hint.style.display=opts.hint?"":"none";var inp=$("askInput");inp.type=opts.type||"text";inp.value=opts.value!=null?opts.value:"";inp.placeholder=opts.placeholder||"";$("askErr").textContent="";$("askErr").className="msg";_askCb=opts.ok||null;$("askModal").classList.remove("hidden");setTimeout(function(){try{inp.focus();inp.select&&inp.select();}catch(e){}},40);}
+function askClose(){$("askModal").classList.add("hidden");_askCb=null;}
+function askSubmit(){if(!_askCb){askClose();return;}var r=_askCb($("askInput").value);if(r){$("askErr").textContent=r;$("askErr").className="msg err";}else askClose();}
+$("askOk").onclick=askSubmit;
+$("askCancel").onclick=askClose;
+$("askInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();askSubmit();}else if(e.key==="Escape"){e.preventDefault();askClose();}});
+$("askModal").addEventListener("click",function(e){if(e.target===$("askModal"))askClose();});
 (function(){const b=$("dataBtn"),m=$("dataMenu");if(b&&m){
   b.onclick=(e)=>{e.stopPropagation();m.classList.toggle("hidden");};
   m.addEventListener("click",()=>m.classList.add("hidden"));
@@ -680,7 +702,7 @@ function addManual(){const v=$("manualInput").value.trim();if(!v)return;const id
 $("manualAdd").onclick=addManual;
 $("manualInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addManual();}});
 $("manualChips").addEventListener("click",e=>{const b=e.target.closest("[data-mid]");if(b){const id=b.getAttribute("data-mid");manualSet(manualGet().filter(x=>x!==id));render();}});
-$("cgoalEdit").onclick=()=>{const cur=cgoalGet()||"";const v=prompt("Continents goal (1 to 7):",cur);if(v===null)return;const n=parseInt(v);if(n>0&&n<=7){cgoalSet(n);render();}else if(v.trim()===""){try{localStorage.removeItem(cgoalKey());}catch(e){}pushPrefs();render();}else alert("Enter a number from 1 to 7.");};
+$("cgoalEdit").onclick=()=>askModal({title:"Continents goal",hint:"How many of the 7 continents do you want to reach? Leave blank to clear.",value:cgoalGet()||"",placeholder:"1 to 7",ok:function(v){v=(v||"").trim();if(v===""){try{localStorage.removeItem(cgoalKey());}catch(e){}pushPrefs();render();return null;}var n=parseInt(v);if(n>0&&n<=7){cgoalSet(n);render();return null;}return "Enter a number from 1 to 7.";}});
 $("wishInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addWish();}});
 $("wishList").addEventListener("click",e=>{const b=e.target.closest("[data-wid]");if(b){const id=b.getAttribute("data-wid");wishSet(wishGet().filter(x=>x!==id));render();}});
 $("signin").onclick=async()=>{
@@ -712,7 +734,7 @@ $("set_pwsave").onclick=async()=>{const pw=$("set_pw").value,M=$("set_msg");
   catch(e){M.textContent="Error: "+e.message;M.className="msg err";}};
 function authmsg(t,c){const m=$("authmsg");m.textContent=t;m.className="msg "+(c||"");}
 if(configured){sb.auth.onAuthStateChange((ev,session)=>{
-  if(ev==="PASSWORD_RECOVERY"){const np=prompt("Enter a new password (at least 6 characters):");if(np&&np.length>=6){sb.auth.updateUser({password:np}).then(({error})=>{alert(error?("Could not update password: "+error.message):"Password updated. You are signed in.");});}}
+  if(ev==="PASSWORD_RECOVERY"){askModal({title:"Set a new password",hint:"At least 6 characters.",value:"",placeholder:"New password",type:"password",ok:function(v){if(!v||v.length<6)return "Password must be at least 6 characters.";sb.auth.updateUser({password:v}).then(function(r){var e=r&&r.error;alert(e?("Could not update password: "+e.message):"Password updated. You are signed in.");});return null;}});}
   showApp(session?session.user:null);
 });}
 
@@ -1027,11 +1049,11 @@ function render(){
   list.forEach((cn,i)=>{const iso=isoForCountry(cn)||((NAME2ID&&ID3TO2&&NAME2ID[cn.toLowerCase()])?ID3TO2[NAME2ID[cn.toLowerCase()]]:"");const cities=visCities[cn].size?[...visCities[cn]].slice(0,6).join(", "):"added manually";const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
 
   // want to visit
-  if(ID2NAME){const opts=Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]).sort();$("countryList").innerHTML=opts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+  if(ID2NAME){const opts=[...new Set(Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]))].sort();$("countryList").innerHTML=opts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
   const wa=wishGet();$("wishCount").textContent="("+wa.length+")";
   const wl=$("wishList");
   wl.innerHTML=wa.length?wa.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-wid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">Nothing yet. Add a country above.</span>';
-  if(ID2NAME){const mopts=Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]).sort();$("manualList").innerHTML=mopts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+  if(ID2NAME){const mopts=[...new Set(Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]))].sort();$("manualList").innerHTML=mopts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
   const mc=$("manualChips");mc.innerHTML=MANUAL.length?MANUAL.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-mid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">None added yet. Flights already count automatically.</span>';
 
   // continents, this year, goal, trips
