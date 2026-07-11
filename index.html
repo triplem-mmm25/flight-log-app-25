@@ -135,7 +135,7 @@ table.flts tr:hover td{background:var(--ink3)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:20px;border:3px solid transparent;background-clip:padding-box}
 ::-webkit-scrollbar-thumb:hover{background:var(--amber-d);background-clip:padding-box;border:3px solid transparent}
-html{scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+html{scrollbar-width:thin;scrollbar-color:var(--line2) transparent;color-scheme:dark}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .confirm-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .confirm-row input{background:var(--ink);border:1px solid var(--line2);border-radius:6px;color:var(--paper);padding:6px 8px;font-family:var(--mono);font-size:12px;width:100%}
@@ -260,6 +260,7 @@ img.lg{height:16px;width:16px;object-fit:contain;vertical-align:-3px;margin-righ
 .mbv{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .mbl{font-family:var(--mono);font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
 .fld2{background:var(--ink);border:1px solid var(--line2);color:var(--paper);font-family:var(--mono);font-size:14px;padding:8px 12px;border-radius:8px;outline:none}
+select.fld,select.fld2,.controls select{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239fb0c3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;cursor:pointer}
 .cmppick{display:flex;align-items:center;gap:14px;margin-bottom:16px}
 .cmpvs{font-family:var(--mono);font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.15em}
 .cmpgrid{display:flex;flex-direction:column}
@@ -441,8 +442,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 
       <section data-t="overview"><div class="sec-head"><h2 id="ctitle">Countries visited</h2><p>Been somewhere before you started logging flights? Add it here.</p></div>
         <div class="card" style="margin-bottom:14px">
-          <div class="controls"><input id="manualInput" list="manualList" placeholder="Add a country you've visited..."/><button class="tool" id="manualAdd">Add</button></div>
-          <datalist id="manualList"></datalist>
+          <div class="controls"><div class="ac" style="flex:1;min-width:160px"><input id="manualInput" placeholder="Country you've visited..." autocomplete="off" style="width:100%"/><div id="manualAC" class="aclist hidden"></div></div><input id="manualCity" placeholder="City / cities (optional)"/><input id="manualYear" placeholder="Year" inputmode="numeric" maxlength="4" style="max-width:84px"/><button class="tool" id="manualAdd">Add</button></div>
           <div id="manualChips" class="wishwrap"></div>
         </div>
         <div class="countries" id="countries"></div>
@@ -450,8 +450,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 
       <section data-t="overview"><div class="sec-head"><h2>Want to visit <span id="wishCount"></span></h2><p>Build a bucket list. These show in gold on the Countries map.</p></div>
         <div class="card">
-          <div class="controls"><input id="wishInput" list="countryList" placeholder="Add a country..."/><button class="tool" id="wishAdd">Add</button></div>
-          <datalist id="countryList"></datalist>
+          <div class="controls"><div class="ac" style="flex:1;min-width:160px"><input id="wishInput" placeholder="Add a country..." autocomplete="off" style="width:100%"/><div id="wishAC" class="aclist hidden"></div></div><button class="tool" id="wishAdd">Add</button></div>
           <div id="wishList" class="wishwrap"></div>
         </div>
       </section>
@@ -591,8 +590,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <div class="flabel">Home airport (your home base)</div>
   <div class="ac"><input id="pf_home" class="fld" placeholder="e.g. BEY or Beirut" autocomplete="off" style="margin-bottom:8px"/><div id="ac_home" class="aclist hidden"></div></div>
   <div class="flabel">Nationality</div>
-  <input id="pf_nat" class="fld" list="pf_natlist" placeholder="e.g. Lebanon" style="margin-bottom:8px"/>
-  <datalist id="pf_natlist"></datalist>
+  <div class="ac"><input id="pf_nat" class="fld" placeholder="e.g. Lebanon" autocomplete="off" style="margin-bottom:8px"/><div id="pf_natAC" class="aclist hidden"></div></div>
   <div class="flabel">Gender</div>
   <select id="pf_gender" class="fld" style="margin-bottom:8px"><option value="">Select...</option><option value="Female">Female</option><option value="Male">Male</option><option value="Non-binary">Non-binary</option><option value="Prefer not to say">Prefer not to say</option></select>
   <div class="flabel">Date of birth</div>
@@ -690,7 +688,7 @@ function cgoalKey(){return "flg_cgoal_"+(USERID||"anon");}
 function cgoalGet(){try{const v=parseInt(localStorage.getItem(cgoalKey()));return v>0?v:null;}catch(e){return null;}}
 function cgoalSet(v){try{localStorage.setItem(cgoalKey(),String(v));}catch(e){}pushPrefs();}
 function manualKey(){return "flg_manual_"+(USERID||"anon");}
-function manualGet(){try{return JSON.parse(localStorage.getItem(manualKey())||"[]")||[];}catch(e){return [];}}
+function manualGet(){var raw;try{raw=JSON.parse(localStorage.getItem(manualKey())||"[]")||[];}catch(e){raw=[];}return raw.map(function(x){return typeof x==="string"?{iso:x,cities:[],year:null}:{iso:x.iso,cities:Array.isArray(x.cities)?x.cities:[],year:x.year||null};}).filter(function(m){return m.iso;});}
 function manualSet(a){try{localStorage.setItem(manualKey(),JSON.stringify(a));}catch(e){}pushPrefs();}
 function homeKey(){return "flg_home_"+(USERID||"anon");}
 function homeGet(){try{return localStorage.getItem(homeKey())||null;}catch(e){return null;}}
@@ -732,6 +730,22 @@ function wireAC(inputId,listId){
   });
   inp.addEventListener("blur",()=>setTimeout(hide,150));
 }
+function wireCountryAC(inputId,listId){
+  const inp=$(inputId),list=$(listId);if(!inp||!list)return;
+  const hide=()=>{list.classList.add("hidden");list.innerHTML="";};
+  inp.addEventListener("input",()=>{
+    const q=inp.value.trim().toLowerCase();if(q.length<1){hide();return;}
+    const names=ID2NAME?[...new Set(Object.values(ID2NAME))]:[];
+    const starts=[],has=[];
+    names.forEach(n=>{const l=n.toLowerCase();if(l.startsWith(q))starts.push(n);else if(l.indexOf(q)>-1)has.push(n);});
+    const res=starts.sort().concat(has.sort()).slice(0,8);
+    if(!res.length){hide();return;}
+    list.innerHTML="";
+    res.forEach(n=>{const id=NAME2ID?NAME2ID[n.toLowerCase()]:null;const i2=id?iso3to2(id):"";const d=document.createElement("div");d.className="acitem";d.innerHTML=(i2?flag(i2)+' ':'')+n;d.onmousedown=e=>{e.preventDefault();inp.value=n;hide();};list.appendChild(d);});
+    list.classList.remove("hidden");
+  });
+  inp.addEventListener("blur",()=>setTimeout(hide,150));
+}
 function ap(code){return AP[(code||'').toUpperCase()];}
 function cityOf(code){const a=ap(code);return a?a[2]:code;}
 function hav(a,b){const R=6371,r=Math.PI/180,dLat=(b[1]-a[1])*r,dLon=(b[0]-a[0])*r,la1=a[1]*r,la2=b[1]*r;const h=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
@@ -763,7 +777,7 @@ let _prefT=null;
 function pushPrefs(){if(!sb||!USERID)return;clearTimeout(_prefT);_prefT=setTimeout(function(){try{const q=sb.from("profiles").upsert({user_id:USERID,prefs:collectPrefs()},{onConflict:"user_id"});if(q&&q.then)q.then(function(){},function(){});}catch(e){}},700);}
 function collectStats(){const iso=new Set(),cont=new Set();let km=0;
   FLIGHTS.forEach(f=>{const A=ap(f.from),B=ap(f.to);if(A&&B)km+=hav([A[0],A[1]],[B[0],B[1]]);[f.from,f.to].forEach(c=>{const a=ap(c);if(a){if(a[5])iso.add(a[5]);if(a[4]&&CONTINENT2[a[4]])cont.add(CONTINENT2[a[4]]);}});});
-  (typeof manualGet==="function"?manualGet():[]).forEach(id=>{iso.add(id);const i2=iso3to2(id);if(i2&&CONTINENT2[i2])cont.add(CONTINENT2[i2]);});
+  (typeof manualGet==="function"?manualGet():[]).forEach(m=>{iso.add(m.iso);const i2=iso3to2(m.iso);if(i2&&CONTINENT2[i2])cont.add(CONTINENT2[i2]);});
   const p=(typeof profGet==="function")?profGet():{};const em=($("useremail").textContent||"Traveler");
   return {name:((p.name||"").trim())||em.split("@")[0],emoji:p.emoji||"🌍",color:p.color||"#1E9E8E",flights:FLIGHTS.length,countries:iso.size,continents:cont.size,km:Math.round(km),iso:[...iso],updated:Date.now()};}
 let _statT=null;
@@ -922,12 +936,22 @@ $("askModal").addEventListener("click",function(e){if(e.target===$("askModal"))a
   document.addEventListener("click",(e)=>{if(!m.classList.contains("hidden")&&!m.contains(e.target)&&e.target!==b)m.classList.add("hidden");});
 }})();
 function addManual(){const v=$("manualInput").value.trim();if(!v)return;const id=NAME2ID?NAME2ID[v.toLowerCase()]:null;if(!id){alert("Pick a country from the list.");return;}
-  const a=manualGet();if(!a.includes(id))a.push(id);manualSet(a);
+  const cityRaw=$("manualCity")?$("manualCity").value.trim():"";
+  const cities=cityRaw?cityRaw.split(",").map(s=>s.trim()).filter(Boolean):[];
+  const yrRaw=$("manualYear")?$("manualYear").value.trim():"";
+  const year=/^\d{4}$/.test(yrRaw)?parseInt(yrRaw,10):null;
+  const a=manualGet();const ex=a.find(m=>m.iso===id);
+  if(ex){if(cities.length)ex.cities=cities;if(year)ex.year=year;}else a.push({iso:id,cities,year});
+  manualSet(a);
   wishSet(wishGet().filter(x=>x!==id));
-  $("manualInput").value="";render();}
+  $("manualInput").value="";if($("manualCity"))$("manualCity").value="";if($("manualYear"))$("manualYear").value="";render();}
 $("manualAdd").onclick=addManual;
-$("manualInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addManual();}});
-$("manualChips").addEventListener("click",e=>{const b=e.target.closest("[data-mid]");if(b){const id=b.getAttribute("data-mid");manualSet(manualGet().filter(x=>x!==id));render();}});
+["manualInput","manualCity","manualYear"].forEach(function(idn){var el=$(idn);if(el)el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addManual();}});});
+$("manualChips").addEventListener("click",e=>{
+  const be=e.target.closest("[data-medit]");
+  if(be){const id=be.getAttribute("data-medit");const m=manualGet().find(x=>x.iso===id);if(m){$("manualInput").value=(ID2NAME&&ID2NAME[id])||id;if($("manualCity")){$("manualCity").value=(m.cities||[]).join(", ");}if($("manualYear")){$("manualYear").value=m.year||"";}if($("manualCity"))$("manualCity").focus();try{$("manualInput").scrollIntoView({block:"nearest"});}catch(_){}}return;}
+  const b=e.target.closest("[data-mid]");if(b){const id=b.getAttribute("data-mid");manualSet(manualGet().filter(m=>m.iso!==id));render();}
+});
 $("cgoalEdit").onclick=()=>askModal({title:"Continents goal",hint:"How many of the 7 continents do you want to reach? Leave blank to clear.",value:cgoalGet()||"",placeholder:"1 to 7",ok:function(v){v=(v||"").trim();if(v===""){try{localStorage.removeItem(cgoalKey());}catch(e){}pushPrefs();render();return null;}var n=parseInt(v);if(n>0&&n<=7){cgoalSet(n);render();return null;}return "Enter a number from 1 to 7.";}});
 $("wishInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addWish();}});
 $("wishList").addEventListener("click",e=>{const b=e.target.closest("[data-wid]");if(b){const id=b.getAttribute("data-wid");wishSet(wishGet().filter(x=>x!==id));render();}});
@@ -1085,6 +1109,7 @@ function yearStats(Y){
     if(f.airline&&f.airline!=="Unknown")air[f.airline]=(air[f.airline]||0)+1;
     const k=f.date.slice(0,7);mon[k]=(mon[k]||0)+1;});
   const beforeISO=new Set();FLIGHTS.filter(f=>f.year<Y).forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])beforeISO.add(a[5]);}));
+  (typeof manualGet==="function"?manualGet():[]).forEach(m=>{if(m.iso&&m.year===Y)iso.add(m.iso);if(m.iso&&m.year!=null&&m.year<Y)beforeISO.add(m.iso);});
   let newC=0;iso.forEach(x=>{if(!beforeISO.has(x))newC++;});
   const topDest=Object.entries(arr).sort((a,b)=>b[1]-a[1])[0];
   const bm=Object.entries(mon).sort((a,b)=>b[1]-a[1])[0];
@@ -1290,7 +1315,7 @@ function render(){
   const yrs=Object.keys(perYear).map(Number).sort();
   const uniqAir=Object.keys(cityCount).length;
   const MANUAL=manualGet();
-  MANUAL.forEach(id=>{if(!visISO3[id]){visISO3[id]=id;const nm=(ID2NAME&&ID2NAME[id])||id;if(!visCities[nm])visCities[nm]=new Set();}});
+  MANUAL.forEach(m=>{const id=m.iso;if(!id)return;if(!visISO3[id])visISO3[id]=id;const nm=(ID2NAME&&ID2NAME[id])||id;visCities[nm]=visCities[nm]||new Set();(m.cities||[]).forEach(c=>{if(c)visCities[nm].add(c);});});
   const countriesN=Object.keys(visISO3).length;
   const flyDays=Math.round(hours/24),earth=(km/40075).toFixed(1);
   const top=(o,n)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n);
@@ -1362,21 +1387,21 @@ function render(){
   $("ctitle").textContent="Countries visited ("+countriesN+")";
   const cbox=$("countries");cbox.innerHTML="";
   const list=Object.keys(visCities).sort();
-  list.forEach((cn,i)=>{const iso=isoForCountry(cn)||((NAME2ID&&ID3TO2&&NAME2ID[cn.toLowerCase()])?ID3TO2[NAME2ID[cn.toLowerCase()]]:"");const cities=visCities[cn].size?[...visCities[cn]].slice(0,6).join(", "):"added manually";const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
+  list.forEach((cn,i)=>{const iso=isoForCountry(cn)||((NAME2ID&&ID3TO2&&NAME2ID[cn.toLowerCase()])?ID3TO2[NAME2ID[cn.toLowerCase()]]:"");const cities=(visCities[cn]&&visCities[cn].size)?[...visCities[cn]].slice(0,6).join(", "):"";const e=document.createElement("div");e.className="ct";e.innerHTML='<span class="n">'+(i+1)+'</span>'+flag(iso)+'<span class="nm">'+cn+'</span><span class="cy">'+cities+'</span>';cbox.appendChild(e);});
 
   // want to visit
-  if(ID2NAME){const opts=[...new Set(Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]))].sort();$("countryList").innerHTML=opts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+
   const wa=wishGet();$("wishCount").textContent="("+wa.length+")";
   const wl=$("wishList");
   wl.innerHTML=wa.length?wa.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-wid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">Nothing yet. Add a country above.</span>';
-  if(ID2NAME){const mopts=[...new Set(Object.keys(ID2NAME).filter(id=>!visISO3[id]).map(id=>ID2NAME[id]))].sort();$("manualList").innerHTML=mopts.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
-  const mc=$("manualChips");mc.innerHTML=MANUAL.length?MANUAL.map(id=>'<span class="wishchip">'+flag(iso3to2(id))+((ID2NAME&&ID2NAME[id])||id)+' <button class="wx" data-mid="'+id+'">\u00d7</button></span>').join(""):'<span class="cap">None added yet. Flights already count automatically.</span>';
+
+  const mc=$("manualChips");mc.innerHTML=MANUAL.length?MANUAL.map(m=>{const id=m.iso;const nm=(ID2NAME&&ID2NAME[id])||id;const extra=[(m.cities||[]).join(", "),m.year||""].filter(Boolean).join(" \u00b7 ");return '<span class="wishchip">'+flag(iso3to2(id))+nm+(extra?' <span style="opacity:.65">('+extra+')</span>':'')+' <button class="wx" data-medit="'+id+'" title="Add cities / year"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button> <button class="wx" data-mid="'+id+'" title="Remove">\u00d7</button></span>';}).join(""):'<span class="cap">None added yet. Flights already count automatically.</span>';
 
   // continents, this year, goal, trips
   const curY=new Date().getFullYear();
   const contSet={},contByArr={};
   FLIGHTS.forEach(f=>{[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[4]&&CONTINENT2[a[4]])contSet[CONTINENT2[a[4]]]=1;});const at=ap(f.to);if(at&&at[4]&&CONTINENT2[at[4]]){const cn=CONTINENT2[at[4]];contByArr[cn]=(contByArr[cn]||0)+1;}});
-  MANUAL.forEach(id=>{const i2=iso3to2(id);if(i2&&CONTINENT2[i2])contSet[CONTINENT2[i2]]=1;});
+  MANUAL.forEach(m=>{const i2=iso3to2(m.iso);if(i2&&CONTINENT2[i2])contSet[CONTINENT2[i2]]=1;});
   const contN=Object.keys(contSet).length;
   const tyFlights=FLIGHTS.filter(f=>f.year===curY);
   const tyISO=new Set();tyFlights.forEach(f=>[f.from,f.to].forEach(c=>{const a=ap(c);if(a&&a[5])tyISO.add(a[5]);}));
@@ -1534,7 +1559,7 @@ function fillPassport(){
     if(f.airline&&f.airline!=="Unknown")air[f.airline]=(air[f.airline]||0)+1;
     rte[[f.from,f.to].sort().join(" \u2013 ")]=(rte[[f.from,f.to].sort().join(" \u2013 ")]||0)+1;
     const y=+String(f.date).slice(0,4);if(y&&(!firstY||y<firstY))firstY=y;});
-  (typeof manualGet==="function"?manualGet():[]).forEach(id=>{iso.add(id);const i2=iso3to2(id);if(i2&&CONTINENT2[i2])cont.add(CONTINENT2[i2]);});
+  (typeof manualGet==="function"?manualGet():[]).forEach(m=>{iso.add(m.iso);const i2=iso3to2(m.iso);if(i2&&CONTINENT2[i2])cont.add(CONTINENT2[i2]);});
   const topAir=Object.entries(air).sort((a,b)=>b[1]-a[1])[0];
   const topRte=Object.entries(rte).sort((a,b)=>b[1]-a[1])[0];
   const st={flights:FLIGHTS.length,countries:iso.size,continents:cont.size,avgKm:FLIGHTS.length?km/FLIGHTS.length:0,longShare:FLIGHTS.length?longN/FLIGHTS.length:0};
@@ -1550,7 +1575,7 @@ function fillPassport(){
 function openProfile(){const p=profGet();pfDraft={emoji:p.emoji||"🌍",color:p.color||"#1E9E8E"};
   $("pf_name").value=p.name||"";$("pf_tag").value=p.tagline||"";
   $("pf_home").value=(typeof homeGet==="function"&&homeGet())||"";$("pf_nat").value=p.nationality||"";$("pf_gender").value=p.gender||"";$("pf_dob").value=p.dob||"";
-  if(ID2NAME){const names=[...new Set(Object.values(ID2NAME))].sort();$("pf_natlist").innerHTML=names.map(n=>'<option value="'+n.replace(/"/g,"")+'"></option>').join("");}
+
   updateProfSummary(p);
   $("avatarBig").textContent=pfDraft.emoji;$("avatarBig").style.background=pfDraft.color;
   $("pf_emojis").innerHTML=PF_EMOJIS.map(e=>'<button class="pickchip'+(e===pfDraft.emoji?" sel":"")+'" data-e="'+e+'">'+e+'</button>').join("");
@@ -1800,7 +1825,7 @@ Promise.all([
   fetch("airports.json").then(r=>r.json()).catch(()=>({})),
   fetch("world.geo.json").then(r=>r.json()).catch(()=>({features:[]}))
 ]).then(([airports,world])=>{
-  AP=airports;WORLDF=(world.features||[]);initMap();wireAC("a_from","ac_from");wireAC("a_to","ac_to");wireAC("pf_home","ac_home");refreshUser();
+  AP=airports;WORLDF=(world.features||[]);buildNameMaps();initMap();wireAC("a_from","ac_from");wireAC("a_to","ac_to");wireAC("pf_home","ac_home");wireCountryAC("manualInput","manualAC");wireCountryAC("wishInput","wishAC");wireCountryAC("pf_nat","pf_natAC");refreshUser();
 });
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
