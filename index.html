@@ -36,6 +36,9 @@ img.fl{height:12px;width:auto;vertical-align:-1px;margin-right:5px;border-radius
 .topbar .brand b{color:var(--amber)}
 .topbar .who{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:14px}
 .linkbtn{background:none;border:none;color:var(--cyan);font-family:var(--mono);font-size:12px;padding:0}
+.iconbtn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;line-height:0}
+.iconbtn svg{width:15px;height:15px}
+.iconbtn:hover{opacity:.75}
 .navbtn{background:var(--ink2);border:1px solid var(--line2);color:var(--paper);font-family:var(--body);font-size:13px;border-radius:9px;padding:7px 13px;cursor:pointer}
 .navbtn:hover{border-color:var(--amber-d)}
 .navbtn.out{color:var(--muted)}
@@ -359,11 +362,11 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
 
       <section data-t="overview"><div class="sec-head"><h2>Goals &amp; continents</h2></div>
         <div class="grid2">
-          <div class="panel"><h3>Country goal <button id="goalEdit" class="linkbtn" style="font-size:12px;margin-left:6px">edit</button></h3><div class="cap" id="goalCap"></div>
+          <div class="panel"><h3>Country goal <button id="goalEdit" class="linkbtn iconbtn" style="margin-left:8px" aria-label="Edit goal" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></h3><div class="cap" id="goalCap"></div>
             <div class="goalbar"><div id="goalFill" class="goalfill"></div></div>
             <div class="cap" id="goalNote" style="margin-top:10px"></div>
           </div>
-          <div class="panel"><h3>Continents <button id="cgoalEdit" class="linkbtn" style="font-size:12px;margin-left:6px">edit</button></h3><div class="cap" id="contList" style="margin-top:6px"></div>
+          <div class="panel"><h3>Continents <button id="cgoalEdit" class="linkbtn iconbtn" style="margin-left:8px" aria-label="Edit continents goal" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></h3><div class="cap" id="contList" style="margin-top:6px"></div>
             <div class="goalbar" style="margin-top:12px"><div id="cgoalFill" class="goalfill"></div></div>
             <div class="cap" id="cgoalNote" style="margin-top:10px"></div>
           </div>
@@ -453,7 +456,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
         </div>
       </section>
 
-      <section data-t="flights"><div class="sec-head"><h2 id="tripsTitle" style="cursor:pointer">Trips <span id="tripsCount"></span> <span class="chev" id="tripsChev">+</span></h2><p>Grouped by year from your home base: <span id="homeLabel"></span> <button id="homeEdit" class="linkbtn">edit</button></p></div>
+      <section data-t="flights"><div class="sec-head"><h2 id="tripsTitle" style="cursor:pointer">Trips <span id="tripsCount"></span> <span class="chev" id="tripsChev">+</span></h2><p>Grouped by year from your home base: <span id="homeLabel"></span> <button id="homeEdit" class="linkbtn iconbtn" style="margin-left:4px" aria-label="Edit home base" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></p></div>
         <div id="trips" class="tripwrap hidden"></div>
       </section>
 
@@ -562,6 +565,10 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
     <button id="set_pwsave" class="btn">Update password</button>
   </div>
   <div id="set_msg" class="msg" style="margin-top:10px"></div>
+  <div class="cap" style="margin:20px 0 8px">Gmail connection</div>
+  <div class="cap" style="opacity:.75;margin-bottom:8px">Used only to read flight confirmations. Disconnecting clears it here; to fully revoke, remove access on Google's page (opens when you click).</div>
+  <button id="set_gmail_off" class="btn ghost" style="margin-top:0">Disconnect Gmail</button>
+  <div id="set_gmailmsg" class="msg" style="margin-top:8px"></div>
   <div style="display:flex;gap:10px;margin-top:18px">
     <button id="set_signout" class="btn ghost" style="flex:1;margin-top:0">Sign out</button>
     <button id="set_close" class="btn ghost" style="flex:1;margin-top:0">Close</button>
@@ -948,6 +955,13 @@ $("settingsBtn").onclick=()=>{$("set_email").textContent=$("useremail").textCont
 $("set_pwtoggle").onclick=()=>{$("set_pwcur").value=$("set_pw").value=$("set_pw2").value="";$("set_msg").textContent="";$("set_pwbox").classList.remove("hidden");$("set_pwtoggle").classList.add("hidden");setTimeout(()=>{try{$("set_pwcur").focus();}catch(e){}},40);};
 $("set_close").onclick=()=>$("settingsModal").classList.add("hidden");
 $("set_signout").onclick=async()=>{$("settingsModal").classList.add("hidden");if(sb)await sb.auth.signOut();};
+if($("set_gmail_off"))$("set_gmail_off").onclick=async()=>{
+  const m=$("set_gmailmsg");if(m){m.textContent="Disconnecting...";m.style.color="";}
+  try{["flg_gmail_last_"+(USERID||""),"flg_gmail_pending","flg_gmail_reauth"].forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});}catch(e){}
+  try{if(sb&&sb.auth.getUserIdentities){const {data}=await sb.auth.getUserIdentities();const g=data&&data.identities&&data.identities.find(i=>i.provider==="google");if(g&&sb.auth.unlinkIdentity)await sb.auth.unlinkIdentity(g);}}catch(e){}
+  try{window.open("https://myaccount.google.com/connections","_blank");}catch(e){}
+  if(m){m.textContent="Disconnected here. Finish revoking on the Google page that just opened (remove this app under your connections).";m.style.color="var(--amber)";}
+};
 $("set_pwsave").onclick=async()=>{const cur=$("set_pwcur").value,nw=$("set_pw").value,cf=$("set_pw2").value,M=$("set_msg");
   if(!cur){M.textContent="Enter your current password.";M.className="msg err";return;}
   if(nw!==cf){M.textContent="New passwords do not match.";M.className="msg err";return;}
@@ -1169,17 +1183,21 @@ async function startGmail(full){
   if(full){try{localStorage.removeItem(gmailLastKey());}catch(e){}}
   const tok=await gmailToken();
   if(tok){scanGmail(tok,full);return;}
-  try{localStorage.setItem("flg_gmail_pending",full?"full":"1");}catch(e){}
+  reconnectGmail(full);
+}
+async function reconnectGmail(full){
+  try{localStorage.setItem("flg_gmail_pending",full?"full":"1");localStorage.setItem("flg_gmail_reauth","1");}catch(e){}
   status("Connecting Google...");
   try{
     const {error}=await sb.auth.linkIdentity({provider:"google",options:{scopes:"https://www.googleapis.com/auth/gmail.readonly",queryParams:{access_type:"offline",prompt:"consent"}}});
     if(error)throw error;
-  }catch(e){try{localStorage.removeItem("flg_gmail_pending");}catch(_){}status("Could not connect Google: "+((e&&e.message)||e));}
+  }catch(e){try{localStorage.removeItem("flg_gmail_pending");localStorage.removeItem("flg_gmail_reauth");}catch(_){}status("Could not connect Google: "+((e&&e.message)||e));}
 }
 async function scanGmail(token,full){
   try{
     status(full?"Reading your whole Gmail history for flights...":"Searching your inbox for flight confirmations...");
     const ids=await gmailList(token,gmailQuery(full));
+    try{localStorage.removeItem("flg_gmail_reauth");}catch(e){}
     if(!ids.length){status(full?"No flight emails found in your mailbox.":"No flight emails found since the last scan.");markGmailScanned();return;}
     status("Found "+ids.length+" email(s). Reading them...");
     const emails=[];
@@ -1193,7 +1211,13 @@ async function scanGmail(token,full){
     markGmailScanned();
     if(!fresh.length){status("No new flights found - your log looks up to date.");return;}
     status("");showConfirm(fresh);
-  }catch(e){status("Gmail scan failed: "+((e&&e.message)||e));}
+  }catch(e){var msg=(e&&e.message)||String(e);
+    if(/401/.test(msg)){
+      if(localStorage.getItem("flg_gmail_reauth")){try{localStorage.removeItem("flg_gmail_reauth");}catch(_){}status("Google access was denied or revoked. Open + Add flight and try Scan Gmail again to reconnect.");return;}
+      status("Google session expired - reconnecting...");reconnectGmail(full);return;
+    }
+    status("Gmail scan failed: "+msg);
+  }
 }
 function markGmailScanned(){try{localStorage.setItem(gmailLastKey(),new Date().toISOString());}catch(e){}}
 if($("a_gmail"))$("a_gmail").onclick=function(){startGmail(false);};
@@ -1638,7 +1662,7 @@ function renderTable(){
   const tb=$("fltbody");tb.innerHTML="";
   if(!rows.length){tb.innerHTML='<tr><td colspan="5" style="color:var(--dim)">No matches.</td></tr>';updateBulk();return;}
   rows.forEach(f=>{const a=ap(f.from),b=ap(f.to);const tr=document.createElement("tr");
-    tr.innerHTML='<td><input type="checkbox" class="rowsel" data-id="'+f.id+'"'+(selIds.has(f.id)?" checked":"")+'></td><td>'+f.date+'</td><td>'+flag(a&&a[4])+cityOf(f.from)+' &rarr; '+flag(b&&b[4])+cityOf(f.to)+'</td><td>'+logoImg(f.airline)+f.airline+'</td><td style="text-align:right;white-space:nowrap"><button class="edit" onclick="__editFlight(\''+f.id+'\')">edit</button><button class="del" onclick="__delFlight(\''+f.id+'\')">delete</button></td>';
+    tr.innerHTML='<td><input type="checkbox" class="rowsel" data-id="'+f.id+'"'+(selIds.has(f.id)?" checked":"")+'></td><td>'+f.date+'</td><td>'+flag(a&&a[4])+cityOf(f.from)+' &rarr; '+flag(b&&b[4])+cityOf(f.to)+'</td><td>'+logoImg(f.airline)+f.airline+'</td><td style="text-align:right;white-space:nowrap"><button class="edit iconbtn" aria-label="Edit flight" title="Edit" onclick="__editFlight(\''+f.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="del iconbtn" aria-label="Delete flight" title="Delete" onclick="__delFlight(\''+f.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>';
     tb.appendChild(tr);});
   const sa=$("selAll");if(sa)sa.checked=false;
   updateBulk();
