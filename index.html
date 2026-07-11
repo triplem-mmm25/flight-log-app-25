@@ -496,6 +496,7 @@ footer{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:20px;font
   <h3 id="a_title">Add a flight</h3>
   <button id="a_upload" class="btn ghost" style="margin-top:0">Upload photos/files to add automatically</button>
   <button id="a_gmail" class="btn ghost" style="margin-top:8px">Scan Gmail for flight confirmations</button>
+  <button id="a_gmail_full" class="linkbtn" style="display:block;margin:8px 0 0">Rescan my whole Gmail history</button>
   <div class="cap oratext">or enter it manually</div>
   <input id="a_date" class="fld" type="date"/>
   <div class="frow">
@@ -966,7 +967,7 @@ function authmsg(t,c){const m=$("authmsg");m.textContent=t;m.className="msg "+(c
 if(configured){sb.auth.onAuthStateChange((ev,session)=>{
   if(ev==="PASSWORD_RECOVERY"){askModal({title:"Set a new password",hint:"At least 8 characters, with a capital letter, a lowercase letter and a number.",value:"",placeholder:"New password",type:"password",ok:function(v){var pe=pwError(v);if(pe)return pe;sb.auth.updateUser({password:v}).then(function(r){var e=r&&r.error;alert(e?("Could not update password: "+e.message):"Password updated. You are signed in.");});return null;}});}
   showApp(session?session.user:null);
-  try{if(session&&session.provider_token&&localStorage.getItem("flg_gmail_pending")){localStorage.removeItem("flg_gmail_pending");setTimeout(function(){scanGmail(session.provider_token);},400);}}catch(e){}
+  try{if(session&&session.provider_token&&localStorage.getItem("flg_gmail_pending")){var _pf=localStorage.getItem("flg_gmail_pending")==="full";localStorage.removeItem("flg_gmail_pending");setTimeout(function(){scanGmail(session.provider_token,_pf);},400);}}catch(e){}
 });}
 
 /* ---------- data ---------- */
@@ -1142,14 +1143,15 @@ function gmailLastKey(){return "flg_gmail_last_"+(USERID||"anon");}
 function b64urlDecode(s){try{s=String(s||"").replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";const bin=atob(s);try{return decodeURIComponent(escape(bin));}catch(e){return bin;}}catch(e){return "";}}
 function stripHtml(h){return String(h||"").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<[^>]+>/g," ").replace(/&nbsp;/gi," ").replace(/&amp;/gi,"&").replace(/&lt;/gi,"<").replace(/&gt;/gi,">").replace(/\s+/g," ").trim();}
 function looksLikeFlight(text){return /\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\s?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(text)||/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(text)||/cancel|refund|schedule change|itinerary chang/i.test(text);}
-function gmailQuery(){
+function gmailQuery(full){
   const subj='{subject:"boarding pass" subject:"e-ticket" subject:"eticket" subject:"booking confirmation" subject:"flight confirmation" subject:"booking reference" subject:"itinerary" subject:"your flight" subject:"trip confirmation" subject:"check-in" subject:"cancelled" subject:"canceled" subject:"cancellation" subject:"refund" subject:"schedule change" subject:"flight change" subject:"itinerary change"}';
+  if(full)return subj; // whole mailbox, all dates
   let win="newer_than:2y";
   try{const last=localStorage.getItem(gmailLastKey());if(last){const d=new Date(last);if(!isNaN(d)){const y=d.getFullYear(),m=("0"+(d.getMonth()+1)).slice(-2),day=("0"+d.getDate()).slice(-2);win="after:"+y+"/"+m+"/"+day;}}}catch(e){}
   return subj+" "+win;
 }
 async function gmailFetch(url,token){const r=await fetch(url,{headers:{Authorization:"Bearer "+token}});if(!r.ok)throw new Error("Gmail API "+r.status);return r.json();}
-async function gmailList(token,q){const j=await gmailFetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50&q="+encodeURIComponent(q),token);return (j.messages||[]).map(m=>m.id);}
+async function gmailList(token,q){let ids=[],page="";for(let i=0;i<5;i++){const url="https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100&q="+encodeURIComponent(q)+(page?"&pageToken="+page:"");const j=await gmailFetch(url,token);(j.messages||[]).forEach(m=>ids.push(m.id));page=j.nextPageToken;if(!page||ids.length>=500)break;}return ids;}
 function headerVal(headers,name){const h=(headers||[]).find(x=>x.name&&x.name.toLowerCase()===name);return h?h.value:"";}
 function bodyFromPayload(payload){
   if(!payload)return "";
@@ -1161,38 +1163,41 @@ function bodyFromPayload(payload){
 async function gmailGet(token,id){const j=await gmailFetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/"+id+"?format=full",token);const hs=j.payload&&j.payload.headers;return {subject:headerVal(hs,"subject"),from:headerVal(hs,"from"),date:headerVal(hs,"date"),text:bodyFromPayload(j.payload)};}
 async function parseEmailsViaServer(emails){const r=await fetch("/api/parse-email",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({emails})});const t=await r.text();let d={};try{d=JSON.parse(t);}catch(_){}if(!r.ok)throw new Error((d&&d.error)||("server "+r.status));return d.flights||[];}
 async function gmailToken(){try{const {data}=await sb.auth.getSession();const s=data&&data.session;return s&&s.provider_token?s.provider_token:null;}catch(e){return null;}}
-async function startGmail(){
+async function startGmail(full){
   $("addModal").classList.add("hidden");
   if(!sb){status("Sign in first.");return;}
+  if(full){try{localStorage.removeItem(gmailLastKey());}catch(e){}}
   const tok=await gmailToken();
-  if(tok){scanGmail(tok);return;}
-  try{localStorage.setItem("flg_gmail_pending","1");}catch(e){}
+  if(tok){scanGmail(tok,full);return;}
+  try{localStorage.setItem("flg_gmail_pending",full?"full":"1");}catch(e){}
   status("Connecting Google...");
   try{
     const {error}=await sb.auth.linkIdentity({provider:"google",options:{scopes:"https://www.googleapis.com/auth/gmail.readonly",queryParams:{access_type:"offline",prompt:"consent"}}});
     if(error)throw error;
   }catch(e){try{localStorage.removeItem("flg_gmail_pending");}catch(_){}status("Could not connect Google: "+((e&&e.message)||e));}
 }
-async function scanGmail(token){
+async function scanGmail(token,full){
   try{
-    status("Searching your inbox for flight confirmations...");
-    const ids=await gmailList(token,gmailQuery());
-    if(!ids.length){status("No flight emails found since the last scan.");markGmailScanned();return;}
-    status("Reading "+ids.length+" email(s)...");
+    status(full?"Reading your whole Gmail history for flights...":"Searching your inbox for flight confirmations...");
+    const ids=await gmailList(token,gmailQuery(full));
+    if(!ids.length){status(full?"No flight emails found in your mailbox.":"No flight emails found since the last scan.");markGmailScanned();return;}
+    status("Found "+ids.length+" email(s). Reading them...");
     const emails=[];
-    for(const id of ids.slice(0,50)){try{const m=await gmailGet(token,id);if(m&&m.text&&looksLikeFlight(m.text))emails.push(m);}catch(e){}}
+    for(let i=0;i<ids.length;i++){try{const m=await gmailGet(token,ids[i]);if(m&&m.text&&looksLikeFlight(m.text))emails.push(m);}catch(e){}if(i%15===0)status("Reading emails... "+(i+1)+" of "+ids.length);}
     if(!emails.length){status("Found emails but no clear flight details.");markGmailScanned();return;}
-    status("Reading "+emails.length+" confirmation(s) with AI...");
-    const flights=await parseEmailsViaServer(emails);
+    const CHUNK=60;let flights=[];const batches=Math.ceil(emails.length/CHUNK);
+    for(let i=0;i<emails.length;i+=CHUNK){status("Reading "+emails.length+" confirmation(s) with AI"+(batches>1?" ("+(Math.floor(i/CHUNK)+1)+"/"+batches+")":"")+"...");const part=await parseEmailsViaServer(emails.slice(i,i+CHUNK));flights=flights.concat(part||[]);}
     const seen=new Set(FLIGHTS.map(f=>f.date+"|"+f.from+"|"+f.to));
-    const fresh=flights.filter(f=>f&&f.date&&f.from&&f.to&&!seen.has(f.date+"|"+String(f.from).toUpperCase()+"|"+String(f.to).toUpperCase()));
+    const uniq=new Set();
+    const fresh=flights.filter(f=>{if(!f||!f.date||!f.from||!f.to)return false;const k=f.date+"|"+String(f.from).toUpperCase()+"|"+String(f.to).toUpperCase();if(seen.has(k)||uniq.has(k))return false;uniq.add(k);return true;});
     markGmailScanned();
     if(!fresh.length){status("No new flights found - your log looks up to date.");return;}
     status("");showConfirm(fresh);
   }catch(e){status("Gmail scan failed: "+((e&&e.message)||e));}
 }
 function markGmailScanned(){try{localStorage.setItem(gmailLastKey(),new Date().toISOString());}catch(e){}}
-if($("a_gmail"))$("a_gmail").onclick=startGmail;
+if($("a_gmail"))$("a_gmail").onclick=function(){startGmail(false);};
+if($("a_gmail_full"))$("a_gmail_full").onclick=function(){startGmail(true);};
 $("fileInput").onchange=async e=>{const files=[...e.target.files];e.target.value="";if(!files.length)return;await handlePhotos(files);};
 function scale(file,max){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);
   img.onload=()=>{let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);const u=c.toDataURL("image/jpeg",0.85);URL.revokeObjectURL(url);res({kind:"image",data:u.split(",")[1],mediaType:"image/jpeg"});};
