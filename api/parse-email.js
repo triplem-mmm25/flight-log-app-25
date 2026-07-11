@@ -7,15 +7,19 @@
 // no date. This endpoint then reads the WHOLE batch in ONE call using the
 // cheapest model (Haiku). One request covers many emails.
 
-const PROMPT = `You are given several traveler emails (booking confirmations, e-tickets, itineraries, boarding passes, check-in reminders). Extract EVERY distinct flight leg across ALL of them.
+const PROMPT = `You are given several traveler emails (booking confirmations, e-tickets, itineraries, boarding passes, and possibly cancellation, refund, or schedule-change notices). Read and reconcile ALL of them together, not one at a time.
+Step 1: find flights that were booked.
+Step 2: find any that were later CANCELLED, REFUNDED, VOIDED, or rebooked to a different date/route - signalled by wording like "cancelled", "canceled", "cancellation", "refund", "booking cancelled", "flight cancelled", "schedule change", "itinerary changed", "no longer confirmed". Match them to the booked flight by route and date, or by booking reference / PNR / confirmation code.
+Step 3: return ONLY the flights that remained booked and would actually have been flown.
 Return ONLY a JSON array, no prose, no code fences.
 Each item must be: {"date":"YYYY-MM-DD","from":"IATA","to":"IATA","airline":"Airline name"}
 Rules:
-- Use 3-letter IATA airport codes. Convert city or airport names to their IATA code (Beirut -> BEY, Dubai -> DXB, Paris -> CDG). If a city has several airports and it is ambiguous, pick the main one.
+- Use 3-letter IATA airport codes. Convert city or airport names to their IATA code (Beirut -> BEY, Dubai -> DXB, Paris -> CDG). If ambiguous, pick the main airport.
 - "date" is the departure date. If the year is not explicit, infer it from the email's own date.
-- Include return legs and every segment of multi-leg trips.
+- Include return legs and every segment of multi-leg trips that were NOT cancelled.
+- EXCLUDE any flight that another email in the batch cancels, refunds, or voids. If a flight was rebooked to a new date or route, include only the new flight, not the old one.
 - Ignore fare sales, promotions, newsletters, loyalty statements and anything that is not an actual booked flight.
-- Do NOT invent flights. If an email has no real flight, contribute nothing for it. If none of the emails do, return [].`;
+- Do NOT invent flights. If none remain valid, return [].`;
 
 export const maxDuration = 60;
 
