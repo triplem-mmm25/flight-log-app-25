@@ -1212,9 +1212,14 @@ async function startGmail(full){
 }
 async function reconnectGmail(full){
   try{localStorage.setItem("flg_gmail_pending",full?"full":"1");localStorage.setItem("flg_gmail_reauth","1");}catch(e){}
-  status("Connecting Google...");
+  status("Reconnecting Google...");
   try{
-    const {error}=await sb.auth.linkIdentity({provider:"google",options:{scopes:"https://www.googleapis.com/auth/gmail.readonly",queryParams:{access_type:"offline",prompt:"consent"}}});
+    let hasGoogle=false;
+    try{const {data}=await sb.auth.getUserIdentities();hasGoogle=!!(data&&data.identities&&data.identities.some(i=>i.provider==="google"));}catch(e){}
+    const opts={scopes:"https://www.googleapis.com/auth/gmail.readonly",redirectTo:location.origin+location.pathname,queryParams:{access_type:"offline",prompt:"consent"}};
+    let error;
+    if(hasGoogle){({error}=await sb.auth.signInWithOAuth({provider:"google",options:opts}));}
+    else {({error}=await sb.auth.linkIdentity({provider:"google",options:opts}));}
     if(error)throw error;
   }catch(e){try{localStorage.removeItem("flg_gmail_pending");localStorage.removeItem("flg_gmail_reauth");}catch(_){}status("Could not connect Google: "+((e&&e.message)||e));}
 }
